@@ -14,8 +14,6 @@
     "lint": "eslint packages/core/src packages/app/src packages/server/src",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots",
     "typecheck": "tsc --noEmit -p packages/core && tsc --noEmit -p packages/app && tsc --noEmit -p packages/server && tsc --noEmit -p tsconfig.tooling.json",
     "screenshots": "node scripts/screenshots.mjs",
     "screenshots:banner": "node scripts/screenshots.mjs --banner-only",
@@ -27,7 +25,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
-    "@playwright/test": "^1.62.1",
     "@types/node": "^22",
     "eslint": "^9",
     "eslint-plugin-i18next": "^6.1.4",

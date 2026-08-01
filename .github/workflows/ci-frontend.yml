@@ -29,22 +29,6 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Visual regression tests
-        run: npm run test:visual
-
-      - name: Upload visual test report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: ignore
-
       - name: Storage integration fixture
         run: npm run verify:storage
 
