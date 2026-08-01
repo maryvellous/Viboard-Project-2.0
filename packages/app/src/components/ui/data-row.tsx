@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { densityClasses, type Density } from "@/lib/enterprise-ui";
+import { interactionClasses } from "@/lib/enterprise-ui";
 
 interface DataRowProps {
   children: React.ReactNode;
@@ -19,9 +20,8 @@ export function DataRow({
       className={cn(
         "flex items-center gap-2 rounded-md transition-colors",
         densityClasses[density].row,
-        active
-          ? "bg-accent text-accent-foreground"
-          : "text-foreground/85 hover:bg-accent/60",
+        active ? interactionClasses.selectedContent : interactionClasses.restingContent,
+        interactionClasses.keyboardFocus,
         className
       )}
     >

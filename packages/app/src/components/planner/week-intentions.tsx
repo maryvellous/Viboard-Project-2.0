@@ -41,7 +41,7 @@ export function WeekIntentions({ intentions, onChange }: WeekIntentionsProps) {
 
   return (
     <div className="h-8 shrink-0 border-b border-border/40 px-4 flex items-center gap-1.5">
-      <Target className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+      <Target className="h-3.5 w-3.5 shrink-0 text-muted-foreground/75" />
 
       {intentions.map((intention, index) =>
         editing === index ? (
@@ -102,7 +102,7 @@ export function WeekIntentions({ intentions, onChange }: WeekIntentionsProps) {
           onClick={() => startEdit(intentions.length)}
           className={cn(
             "text-[11px] px-1.5 py-0.5 rounded transition-colors",
-            "text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/40"
+            "text-muted-foreground/70 hover:bg-muted/40 hover:text-foreground"
           )}
         >
           + {t("pages.planner.intentions.add")}

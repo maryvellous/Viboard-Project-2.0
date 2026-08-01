@@ -247,7 +247,7 @@ export function TimeBlock({
                 {workspace?.name || block.workspaceId}
               </span>
               {isCompact && tasks.length > 0 && (
-                <span className="text-[10px] text-muted-foreground shrink-0">
+                <span className="shrink-0 text-xs text-muted-foreground">
                   {tasks.length}
                 </span>
               )}
@@ -255,7 +255,7 @@ export function TimeBlock({
 
             {/* Time label — compact only */}
             {isCompact && (
-              <span className="text-[10px] text-muted-foreground/60 truncate">
+              <span className="truncate text-xs text-muted-foreground/80">
                 {timeLabel}
               </span>
             )}
@@ -287,7 +287,7 @@ export function TimeBlock({
                         />
                       ))}
                     {isMedium && block.notes.length > 2 && (
-                      <span className="text-[10px] text-muted-foreground pl-1.5">
+                      <span className="pl-1.5 text-xs text-muted-foreground">
                         {t("pages.planner.block.moreCount", { count: block.notes.length - 2 })}
                       </span>
                     )}
@@ -331,7 +331,7 @@ export function TimeBlock({
                       />
                     ))}
                     {isMedium && tasks.length > 3 && (
-                      <span className="text-[10px] text-muted-foreground pl-1.5">
+                      <span className="pl-1.5 text-xs text-muted-foreground">
                         {t("pages.planner.block.moreCount", { count: tasks.length - 3 })}
                       </span>
                     )}
@@ -356,7 +356,7 @@ export function TimeBlock({
                     />
                   </div>
                 )}
-                <span className="block text-[10px] text-muted-foreground/50 pt-0.5">
+                <span className="block pt-0.5 text-xs text-muted-foreground/75">
                   {timeLabel}
                 </span>
               </div>

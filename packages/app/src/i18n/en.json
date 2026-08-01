@@ -38,7 +38,8 @@
       "all": "All",
       "loading": "Loading…",
       "tryAgain": "Try Again",
-      "reloadPage": "Reload Page"
+      "reloadPage": "Reload Page",
+      "clear": "Clear"
     },
     "aiBadge": "AI"
   },

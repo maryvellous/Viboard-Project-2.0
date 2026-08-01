@@ -8,6 +8,7 @@ import {
   ChevronUp,
   Circle,
   Star,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   getScopedEntityKey,
@@ -25,7 +26,7 @@ import { DataRow } from "@/components/ui/data-row";
 import { DenseList } from "@/components/ui/dense-list";
 import { DueLabel } from "@/components/ui/due-label";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { SectionLabel } from "@/components/patterns";
+import { PageHeader, SectionLabel } from "@/components/patterns";
 import { RecentWorkList, type RecentWorkListItem } from "@/components/recent-work-list";
 import {
   CaptureWidget,
@@ -42,6 +43,7 @@ import { usePlannerHydrated, usePlannerStore } from "@/stores/planner";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { selectCurrentAndUpcomingBlocks } from "@/lib/dashboard-today";
 import { cn } from "@/lib/utils";
+import { pageLayoutClasses, pageWidthClasses } from "@/lib/enterprise-ui";
 
 const DEFAULT_WORKSPACE_COLOR = "#64748b";
 const FOCUS_COLLAPSED_LIMIT = 6;
@@ -239,7 +241,7 @@ function TodayWidget({
 
           {shownDueTasks.length > 0 && (
             <div>
-              <p className="mb-1 px-2 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+              <p className="mb-1 px-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
                 {t("pages.dashboard.today.dueHeading")}
               </p>
               <DenseList>
@@ -335,8 +337,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
+      <PageHeader title={t("nav.sidebar.dashboard")} icon={LayoutDashboard} width="standard" />
       <ScrollArea className="flex-1">
-        <main className="mx-auto w-full max-w-5xl space-y-4 p-4 md:p-6">
+        <main
+          className={cn(
+            "mx-auto w-full space-y-4",
+            pageWidthClasses.standard,
+            pageLayoutClasses.contentPadding,
+          )}
+        >
           <CaptureWidget onTriageComplete={handleTriageComplete} />
 
           {overviewError ? (

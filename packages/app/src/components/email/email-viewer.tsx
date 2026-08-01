@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 import type { IncomingEmail } from "@/lib/email/types";
 import {
   formatEmailAddress,
@@ -54,7 +55,7 @@ export function EmailViewer({ email }: EmailViewerProps) {
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="shrink-0 bg-background">
-        <div className="max-w-4xl mx-auto px-6 py-2">
+        <div className={cn("mx-auto px-6 py-2", pageWidthClasses.reading)}>
           <h1 className="text-xl font-semibold truncate">
             {email.subject || t("email.viewer.noSubject")}
           </h1>
@@ -67,13 +68,13 @@ export function EmailViewer({ email }: EmailViewerProps) {
       </div>
 
       <div className="shrink-0">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className={cn("mx-auto px-6", pageWidthClasses.reading)}>
           <div className="h-px bg-border/40 mt-4" />
         </div>
       </div>
 
       <ScrollArea className="flex-1 min-h-0">
-        <div className="max-w-4xl mx-auto px-6 pt-3 pb-6 space-y-5">
+        <div className={cn("mx-auto space-y-5 px-6 pb-6 pt-3", pageWidthClasses.reading)}>
           <div>
             <button
               type="button"

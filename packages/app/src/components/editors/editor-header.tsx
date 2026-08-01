@@ -6,6 +6,7 @@ import { SaveStatusIndicator, type SaveStatus } from "@/components/ui/save-statu
 import { AIBadge } from "@/components/ui/ai-badge";
 import { Trash2, Bot, BotOff, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 interface EditorHeaderProps {
   title: string;
@@ -60,7 +61,7 @@ export function EditorHeader({
 
   return (
     <div className="shrink-0 bg-background">
-      <div className="max-w-4xl mx-auto px-6 py-2 flex items-center gap-3">
+      <div className={cn("mx-auto flex items-center gap-3 px-6 py-2", pageWidthClasses.reading)}>
         <Input
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
@@ -72,16 +73,17 @@ export function EditorHeader({
         {onSave && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={onSave}
             disabled={!isDirty || saveStatus === "saving"}
             title={isDirty ? t("editors.shared.saveTooltip") : t("editors.shared.noChangesTooltip")}
             className={cn(
-              "h-7 w-7 shrink-0",
+              "shrink-0",
               isDirty
                 ? "text-primary hover:text-primary/80"
-                : "text-muted-foreground/50"
+                : "text-muted-foreground/70"
             )}
+            aria-label={isDirty ? t("editors.shared.saveTooltip") : t("editors.shared.noChangesTooltip")}
           >
             <Save className="h-3.5 w-3.5" />
           </Button>
@@ -89,18 +91,19 @@ export function EditorHeader({
         {onAIInclusionChange && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={() => !isToggleDisabled && onAIInclusionChange(!aiIncluded)}
             disabled={isToggleDisabled}
             title={getTooltipText()}
             className={cn(
-              "h-7 w-7 shrink-0",
+              "shrink-0",
               isToggleDisabled
-                ? "text-muted-foreground/30 cursor-not-allowed"
+                ? "cursor-not-allowed text-muted-foreground/40"
                 : aiIncluded
-                ? "text-muted-foreground/60 hover:text-foreground"
-                : "text-muted-foreground/40 hover:text-muted-foreground/70"
+                ? "text-muted-foreground/80 hover:text-foreground"
+                : "text-muted-foreground/65 hover:text-foreground"
             )}
+            aria-label={getTooltipText()}
           >
             {aiIncluded && !isInExcludedFolder ? (
               <Bot className="h-3.5 w-3.5" />
@@ -111,9 +114,11 @@ export function EditorHeader({
         )}
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           onClick={onDelete}
-          className="h-7 w-7 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 shrink-0"
+          className="shrink-0 text-muted-foreground/70 hover:bg-destructive/10 hover:text-destructive"
+          title={t("common.buttons.delete")}
+          aria-label={t("common.buttons.delete")}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

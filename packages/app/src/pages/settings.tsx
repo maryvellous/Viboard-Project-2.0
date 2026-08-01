@@ -6,6 +6,8 @@ import { SettingsPageHeader } from "@/components/ui/settings-section";
 import { useSecondarySidebar } from "@/hooks/use-secondary-sidebar";
 import { SettingsNav, type SettingsCategory } from "@/components/settings/settings-nav";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { pageLayoutClasses, pageWidthClasses } from "@/lib/enterprise-ui";
+import { cn } from "@/lib/utils";
 
 const GeneralTab = lazy(() =>
   import("@/components/settings/general-tab").then(({ GeneralTab }) => ({ default: GeneralTab })),
@@ -100,7 +102,13 @@ export default function SettingsPage() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* key per category remounts the scroll container so each tab starts at the top */}
       <ScrollArea key={category} className="flex-1 min-h-0">
-        <div className="mx-auto w-full max-w-[820px] space-y-8 px-6 py-8 lg:px-8">
+        <div
+          className={cn(
+            "mx-auto w-full space-y-8 py-8",
+            pageWidthClasses.settings,
+            pageLayoutClasses.horizontalPadding,
+          )}
+        >
           <SettingsPageHeader
             title={t(pageMeta.titleKey)}
             description={t(pageMeta.descriptionKey)}

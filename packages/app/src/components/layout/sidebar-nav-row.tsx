@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
+import { interactionClasses } from "@/lib/enterprise-ui";
 
 type SidebarNavRole = "global" | "project";
 
@@ -38,7 +39,8 @@ export function SidebarNavRow({
     collapsed && "justify-center px-0",
     active
       ? "bg-sidebar-accent text-sidebar-accent-foreground"
-      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50",
+      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/55 hover:text-sidebar-foreground",
+    interactionClasses.keyboardFocus,
     className
   );
 
@@ -64,7 +66,7 @@ export function SidebarNavRow({
       )}
       {!collapsed && <span className="flex-1 truncate text-left">{label}</span>}
       {!collapsed && count !== undefined && count > 0 && (
-        <span className="text-[10px] tabular-nums font-medium text-sidebar-foreground/50">{count}</span>
+        <span className="text-[11px] tabular-nums font-medium text-sidebar-foreground/65">{count}</span>
       )}
     </>
   );

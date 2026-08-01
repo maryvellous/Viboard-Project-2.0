@@ -183,7 +183,7 @@ function TimelineRow({ event }: { event: ProjectTimelineEvent }) {
         <Icon className={cn("size-3 text-muted-foreground", event.overdue && "text-destructive")} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+        <span className="block text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
           {t(`pages.projects.home.timeline.events.${event.kind}`)}
         </span>
         <span className="block truncate text-sm">{event.title}</span>

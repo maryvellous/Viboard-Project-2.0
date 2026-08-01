@@ -4,6 +4,8 @@ import { isTauri } from "@desk/core";
 import { revealInFinder } from "@/components/docs/tree-item-utils";
 import { isRemoteMode } from "@/lib/connection";
 import { PATH_SEGMENTS } from "@desk/core";
+import { cn } from "@/lib/utils";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 interface EditorPathBarProps {
   filePath?: string;
@@ -48,11 +50,11 @@ export function EditorPathBar({ filePath }: EditorPathBarProps) {
 
   return (
     <div className="shrink-0">
-      <div className="max-w-4xl mx-auto px-6 pt-3">
+      <div className={cn("mx-auto px-6 pt-3", pageWidthClasses.reading)}>
         <button
           type="button"
           onClick={handleClick}
-          className="group flex items-center gap-1.5 text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-default"
+          className="group flex cursor-default items-center gap-1.5 text-[11px] text-muted-foreground/75 transition-colors hover:text-foreground"
           title={canReveal ? t("editors.shared.revealInFinder") : filePath}
         >
           {location.map((segment, i) => (
@@ -65,7 +67,7 @@ export function EditorPathBar({ filePath }: EditorPathBarProps) {
           {filename && (
             <span className="flex items-center gap-1.5">
               {location.length > 0 && <span className="text-muted-foreground/30">/</span>}
-              <span className="font-mono text-muted-foreground/40">{filename}</span>
+              <span className="font-mono text-muted-foreground/65">{filename}</span>
             </span>
           )}
           {canReveal && (

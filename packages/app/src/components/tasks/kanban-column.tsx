@@ -54,10 +54,10 @@ export function KanbanColumn({
     <div className={cn("flex flex-col h-full", !hideHeader && "min-w-[280px] w-[280px]")}>
       {/* Column header */}
       {!hideHeader && (
-        <div className="flex items-center gap-2 mb-3 px-1 flex-shrink-0">
+        <div className="mb-2 flex flex-shrink-0 items-center gap-2 px-1">
           <div className={cn("w-2 h-2 rounded-full", dotColor)} />
-          <h3 className="font-semibold text-[13px] text-foreground/80">{label}</h3>
-          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums font-medium">
+          <h3 className="text-sm font-medium text-foreground/90">{label}</h3>
+          <span className="ml-auto text-xs tabular-nums text-muted-foreground">
             {tasks.length}
           </span>
         </div>
@@ -67,10 +67,10 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          "rounded-xl p-2 transition-all duration-200 flex-1",
+          "flex-1 rounded-lg p-1.5 transition-colors duration-150",
           showHighlight
-            ? "bg-accent/70 ring-2 ring-ring/20"
-            : "bg-muted/20"
+            ? "bg-accent/60 ring-2 ring-ring/20"
+            : "bg-muted/15"
         )}
       >
         <SortableContext
@@ -101,7 +101,7 @@ export function KanbanColumn({
           </div>
         </SortableContext>
         {tasks.length === 0 && (
-          <div className="flex items-center justify-center h-20 text-[13px] text-muted-foreground/60 border border-dashed border-muted-foreground/15 rounded-lg">
+          <div className="flex h-16 items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
             {t("pages.tasks.kanban.noTasks")}
           </div>
         )}

@@ -104,7 +104,7 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
           <Divider />
 
           {!collapsed && (
-            <SectionLabel className="px-2.5 pb-0.5 text-[10px] tracking-wider text-sidebar-foreground/45">
+            <SectionLabel className="px-2.5 pb-0.5 text-[11px] tracking-wider text-sidebar-foreground/45">
               {t("nav.sidebar.workspaceViews")}
             </SectionLabel>
           )}
@@ -136,7 +136,7 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
 
           {!collapsed && (
             <div>
-              <SectionLabel className="px-2.5 pb-0.5 text-[10px] tracking-wider text-sidebar-foreground/45">
+              <SectionLabel className="px-2.5 pb-0.5 text-[11px] tracking-wider text-sidebar-foreground/45">
                 {t("nav.sidebar.projectsSection")}
               </SectionLabel>
 

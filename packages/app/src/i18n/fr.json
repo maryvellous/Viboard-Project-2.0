@@ -38,7 +38,8 @@
       "all": "Tout",
       "loading": "Chargement…",
       "tryAgain": "Réessayer",
-      "reloadPage": "Recharger la page"
+      "reloadPage": "Recharger la page",
+      "clear": "Effacer"
     },
     "aiBadge": "AI"
   },

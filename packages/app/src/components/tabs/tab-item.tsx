@@ -3,6 +3,7 @@ import { Home, FileText, CheckSquare, Calendar, Mail, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TabItem as TabItemType, TabType } from "@/stores/tabs";
 import { TabContextMenu } from "./tab-context-menu";
+import { useTranslation } from "react-i18next";
 
 const TAB_ICONS: Record<TabType, React.ElementType> = {
   desk: Home,
@@ -37,6 +38,7 @@ export const TabItem = memo(function TabItem({
   showIcon = true,
   isMainTab = false,
 }: TabItemProps) {
+  const { t } = useTranslation();
   const Icon = TAB_ICONS[tab.type];
   const isDeskTab = tab.type === "desk";
 
@@ -65,47 +67,53 @@ export const TabItem = memo(function TabItem({
       onClose={onClose}
       onCloseOthers={onCloseOthers}
     >
-      <button
-        onClick={onActivate}
-        onMouseDown={handleMouseDown}
-        title={tab.title}
+      <div
         className={cn(
-          "group relative flex h-8 w-[150px] shrink-0 items-center gap-1.5 rounded-t-lg border border-transparent px-3 text-xs transition-colors",
+          "group relative flex h-8 w-[150px] shrink-0 items-center rounded-t-lg border border-transparent text-xs transition-colors",
           isActive
             ? "bg-background text-foreground border-border/80 border-b-background shadow-[0_-1px_0_rgba(0,0,0,0.02)]"
             : "bg-muted/40 text-muted-foreground hover:bg-muted/60 hover:text-foreground",
           isMainTab && "font-medium"
         )}
       >
-        {isDeskTab && workspaceColor && (
-          <span
-            className="w-2 h-2 rounded-full shrink-0"
-            style={{ backgroundColor: workspaceColor }}
-          />
-        )}
-        {showIcon && (
-          <Icon className="h-3.5 w-3.5 shrink-0" />
-        )}
-        <span className="truncate flex-1 text-left">{tab.title}</span>
-
-        {tab.isDirty && (
-          <span className="text-muted-foreground/60 shrink-0 text-[10px] leading-none">•</span>
-        )}
+        <button
+          type="button"
+          onClick={onActivate}
+          onMouseDown={handleMouseDown}
+          title={tab.title}
+          className={cn(
+            "flex h-full min-w-0 flex-1 items-center gap-1.5 rounded-t-lg pl-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50",
+            tab.isPinned ? "pr-3" : "pr-8",
+          )}
+        >
+          {isDeskTab && workspaceColor && (
+            <span
+              className="size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: workspaceColor }}
+            />
+          )}
+          {showIcon && <Icon className="size-3.5 shrink-0" />}
+          <span className="flex-1 truncate">{tab.title}</span>
+          {tab.isDirty && (
+            <span className="shrink-0 text-[11px] leading-none text-muted-foreground/75">•</span>
+          )}
+        </button>
 
         {!tab.isPinned && (
-          <span
-            role="button"
-            tabIndex={-1}
+          <button
+            type="button"
             onClick={handleCloseClick}
+            title={t("editors.shared.closeTab")}
+            aria-label={t("editors.shared.closeTab")}
             className={cn(
-              "ml-1 p-0.5 rounded hover:bg-accent transition-opacity",
-              isActive ? "opacity-60" : "opacity-0 group-hover:opacity-100"
+              "absolute right-1 flex size-6 items-center justify-center rounded text-muted-foreground transition-[opacity,color,background-color] hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+              isActive ? "opacity-75" : "opacity-0 group-hover:opacity-75 focus-visible:opacity-100",
             )}
           >
-            <X className="h-3 w-3" />
-          </span>
+            <X className="size-3" />
+          </button>
         )}
-      </button>
+      </div>
     </TabContextMenu>
   );
 });

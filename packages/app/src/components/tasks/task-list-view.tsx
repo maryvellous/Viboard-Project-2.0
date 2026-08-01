@@ -15,6 +15,7 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { AIBadge } from "@/components/ui/ai-badge";
 import type { Task, TaskStatus } from "@desk/core/types";
 import { getScopedEntityKey } from "@desk/core";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 interface TaskListViewProps {
   tasks: Task[];
@@ -97,7 +98,7 @@ export function TaskListView({
 
   if (!groupByStatus) {
     return (
-      <div className="space-y-2 max-w-3xl">
+      <div className={cn("space-y-2", pageWidthClasses.reading)}>
         {tasks.map((task) => (
           <TaskListItem
             key={getScopedEntityKey(task)}
@@ -114,7 +115,7 @@ export function TaskListView({
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className={cn("space-y-6", pageWidthClasses.reading)}>
       {taskStatusOrder.map((status) => {
         if (hiddenStatuses.has(status)) return null;
 

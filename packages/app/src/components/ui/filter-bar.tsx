@@ -31,6 +31,7 @@ interface FilterBarProps {
   countLabel: string;
   className?: string;
   rightElement?: React.ReactNode;
+  leadingElement?: React.ReactNode;
   density?: Density;
   isLoading?: boolean;
 }
@@ -41,6 +42,7 @@ export function FilterBar({
   countLabel,
   className,
   rightElement,
+  leadingElement,
   density = "regular",
   isLoading = false,
 }: FilterBarProps) {
@@ -49,7 +51,8 @@ export function FilterBar({
   const defaultAllLabel = t("common.buttons.all");
 
   return (
-    <div className={cn("px-4 py-2 border-b border-border/80 flex items-center gap-3 flex-wrap", rowHeight, className)}>
+    <div className={cn("flex min-h-11 flex-1 flex-wrap items-center gap-3", rowHeight, className)}>
+      {leadingElement}
       {filters.map((filter) => (
         <div key={filter.id} className="flex items-center gap-1.5">
           <span className="text-xs text-muted-foreground">{filter.label}:</span>
@@ -68,7 +71,7 @@ export function FilterBar({
           </Select>
         </div>
       ))}
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-2">
         {isLoading ? (
           <Skeleton className="h-3 w-16" />
         ) : (

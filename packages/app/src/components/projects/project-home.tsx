@@ -17,6 +17,8 @@ import { useProjectHome, useUpdateProject, useDeleteProject } from "@/stores";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import type { ProjectUpdate } from "@desk/core/types";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
+import { pageLayoutClasses, pageWidthClasses } from "@/lib/enterprise-ui";
+import { cn } from "@/lib/utils";
 
 interface ProjectHomeProps {
   workspaceId: string;
@@ -92,7 +94,13 @@ export function ProjectHome({ workspaceId, projectId }: ProjectHomeProps) {
   return (
     <>
       <ScrollArea className="h-full">
-        <div className="mx-auto max-w-6xl space-y-7 px-4 py-5 md:px-6 md:py-6">
+        <div
+          className={cn(
+            "mx-auto w-full space-y-7 py-5 md:py-6",
+            pageWidthClasses.wide,
+            pageLayoutClasses.horizontalPadding,
+          )}
+        >
           <ProjectHomeHeader
             key={`${workspaceId}:${projectId}:header`}
             project={project}

@@ -3,10 +3,14 @@ import { FilterBar, type FilterBarConfig } from "@/components/ui/filter-bar";
 import { ViewModeToggle } from "@/components/ui/view-mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { densityClasses, type Density } from "@/lib/enterprise-ui";
+import { PageHeader } from "./page-header";
 
 interface FilteredListPageProps {
+  title: string;
+  icon?: LucideIcon;
   actionLabel?: string;
   onAction?: () => void;
   filters: FilterBarConfig[];
@@ -18,9 +22,12 @@ interface FilteredListPageProps {
   modal?: React.ReactNode;
   density?: Density;
   isLoading?: boolean;
+  filterLeading?: React.ReactNode;
 }
 
 export function FilteredListPage({
+  title,
+  icon,
   actionLabel,
   onAction,
   filters,
@@ -32,33 +39,43 @@ export function FilteredListPage({
   modal,
   density = "regular",
   isLoading = false,
+  filterLeading,
 }: FilteredListPageProps) {
   const isKanban = viewMode === "kanban";
   const contentPadding = isKanban ? "px-4 pt-2 pb-4" : densityClasses[density].content;
 
-  const rightElement = (
+  const filterRightElement = (
     <>
       {viewMode && onViewModeChange && (
         <ViewModeToggle value={viewMode} onChange={onViewModeChange} />
       )}
-      {actionLabel && onAction && (
-        <Button size="sm" onClick={onAction}>
-          <Plus className="size-4 mr-1" />
-          {actionLabel}
-        </Button>
-      )}
     </>
   );
 
+  const headerAction = actionLabel && onAction ? (
+    <Button size="sm" onClick={onAction}>
+      <Plus className="size-4" />
+      {actionLabel}
+    </Button>
+  ) : undefined;
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      <FilterBar
-        filters={filters}
-        count={count}
-        countLabel={countLabel}
-        rightElement={rightElement}
-        density={density}
-        isLoading={isLoading}
+      <PageHeader
+        title={title}
+        icon={icon}
+        actions={headerAction}
+        secondary={(
+          <FilterBar
+            filters={filters}
+            count={count}
+            countLabel={countLabel}
+            rightElement={filterRightElement}
+            leadingElement={filterLeading}
+            density={density}
+            isLoading={isLoading}
+          />
+        )}
       />
 
       {/* Kanban fills the viewport: the OverlayScrollbars viewport becomes a flex column and

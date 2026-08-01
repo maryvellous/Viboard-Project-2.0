@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CheckSquare, Search, Trash2, X } from "lucide-react";
+import { CheckSquare, FolderKanban, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { NewProjectModal } from "./new-project-modal";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { formatRelativeTime } from "@/lib/i18n/format";
 import { filterAndSortProjects, type ProjectSortOrder } from "@/lib/project-browse";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 const ALL_STATUSES = "all";
 const SORT_RECENT = "recent";
@@ -80,8 +81,41 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
 
   const isFiltering = searchQuery.trim() !== "" || statusFilter !== ALL_STATUSES;
 
+  const searchControl = (
+    <div className="relative w-full min-w-52 sm:w-64">
+      <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        ref={searchInputRef}
+        type="text"
+        placeholder={t("pages.projects.browse.searchPlaceholder")}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setSearchQuery("");
+        }}
+        className="h-8 pl-8 pr-8 text-sm"
+      />
+      {searchQuery && (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          onClick={() => {
+            setSearchQuery("");
+            searchInputRef.current?.focus();
+          }}
+          aria-label={t("common.buttons.clear")}
+        >
+          <X className="size-3.5" />
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <FilteredListPage
+      title={t("nav.sidebar.projectsSection")}
+      icon={FolderKanban}
       actionLabel={t("pages.projects.browse.newProject")}
       onAction={() => setNewProjectOpen(true)}
       filters={[
@@ -111,6 +145,7 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
       ]}
       count={filtered.length}
       countLabel={t("pages.projects.browse.countLabel")}
+      filterLeading={searchControl}
       modal={
         <>
           <NewProjectModal open={newProjectOpen} onClose={() => setNewProjectOpen(false)} />
@@ -128,7 +163,7 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
         </>
       }
     >
-      <div className="mx-auto max-w-4xl">
+      <div className={cn("mx-auto", pageWidthClasses.reading)}>
         {workspace?.id === workspaceId && (
           <div className="mb-6 border-b border-border/60 pb-5">
             <EntityOverview
@@ -147,34 +182,6 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
             />
           </div>
         )}
-
-        <div className="relative mb-3">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            ref={searchInputRef}
-            type="text"
-            placeholder={t("pages.projects.browse.searchPlaceholder")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setSearchQuery("");
-            }}
-            className="h-8 pl-8 pr-8 text-sm"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 -translate-y-1/2 size-6 text-muted-foreground hover:text-foreground"
-              onClick={() => {
-                setSearchQuery("");
-                searchInputRef.current?.focus();
-              }}
-            >
-              <X className="size-3.5" />
-            </Button>
-          )}
-        </div>
 
         {filtered.length === 0 ? (
           <StatePanel

@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import type { TaskStatus, TaskPriority } from "@desk/core/types";
 import { getEntityTabId } from "@/lib/tab-identity";
 import { useTabStore } from "@/stores/tabs";
+import { cn } from "@/lib/utils";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 interface TaskEditorProps {
   taskId: string;
@@ -267,7 +269,7 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
 
       {/* Sticky metadata row */}
       <div className="shrink-0">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className={cn("mx-auto px-6", pageWidthClasses.reading)}>
           <MetadataToolbar {...metadataProps} />
           <div className="h-px bg-border/40 mt-4" />
         </div>
@@ -275,7 +277,7 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
 
       <ScrollArea className="flex-1 min-h-0">
         {/* pt-3 + the editor's own py-1 (4px) = 16px, symmetric with the divider's mt-4 */}
-        <div className="max-w-4xl mx-auto px-6 pt-3 pb-6">
+        <div className={cn("mx-auto px-6 pb-6 pt-3", pageWidthClasses.reading)}>
           <RichTextEditor
             value={content}
             onChange={setContent}

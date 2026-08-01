@@ -38,7 +38,7 @@ export function DueLabel({ due, status, showUpcoming, className }: DueLabelProps
 
   return (
     <span
-      className={cn("text-[10px] tabular-nums shrink-0", tone, className)}
+      className={cn("text-[11px] tabular-nums shrink-0", tone, className)}
       title={formatDateShort(due)}
     >
       {today ? t("pages.planner.due.today") : formatDateShort(due)}

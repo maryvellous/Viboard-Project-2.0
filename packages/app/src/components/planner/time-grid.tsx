@@ -30,7 +30,7 @@ export function TimeGrid({ gridStartMinute, gridEndMinute, slotHeight }: TimeGri
         return (
           <span
             key={minute}
-            className="absolute right-2 text-[10px] text-muted-foreground/70 leading-none -translate-y-1/2"
+            className="absolute right-2 -translate-y-1/2 text-xs leading-none text-muted-foreground"
             style={{ top }}
           >
             {minutesToTime(minute)}

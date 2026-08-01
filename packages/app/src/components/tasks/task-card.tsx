@@ -61,7 +61,6 @@ export function TaskCard({
       ? {
           backgroundColor: `color-mix(in srgb, ${workspaceColor} 8%, var(--color-card))`,
           borderColor: `color-mix(in srgb, ${workspaceColor} 40%, transparent)`,
-          boxShadow: `0 0 0 1px color-mix(in srgb, ${workspaceColor} 15%, transparent)`,
         } as React.CSSProperties
       : {}),
   };
@@ -71,16 +70,16 @@ export function TaskCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-grab group touch-none border-border/50 bg-card overflow-hidden",
-        "shadow-sm hover:shadow-md hover:border-border",
-        "transition-all duration-150",
-        isDragging && "opacity-60 shadow-lg cursor-grabbing scale-[1.02] rotate-1"
+        "group cursor-grab touch-none gap-0 overflow-hidden rounded-lg border-border/70 bg-card py-0 shadow-none",
+        "hover:border-border hover:bg-accent/20",
+        "transition-[background-color,border-color,box-shadow,transform,opacity] duration-150",
+        isDragging && "cursor-grabbing scale-[1.02] rotate-1 opacity-60 shadow-lg"
       )}
       {...attributes}
       {...listeners}
     >
       <CardContent className="p-0" onClick={onClick}>
-        <div className="flex items-start gap-2 p-3.5">
+        <div className="flex items-start gap-2 p-3">
           <div className="mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
             <GripVertical className="h-4 w-4 text-muted-foreground/50" />
           </div>
@@ -94,7 +93,7 @@ export function TaskCard({
                     fill: workspaceColor || "#64748b",
                   }}
                 />
-                <span className="text-[11px] text-muted-foreground truncate">
+                <span className="truncate text-xs text-muted-foreground">
                   {workspaceName}
                 </span>
               </div>
@@ -102,7 +101,7 @@ export function TaskCard({
             {showProject && projectName && (
               <div className="flex items-center gap-1 mb-1.5">
                 <FolderKanban className="h-3 w-3 text-muted-foreground" />
-                <span className="text-[11px] text-muted-foreground truncate">
+                <span className="truncate text-xs text-muted-foreground">
                   {projectName}
                 </span>
               </div>
@@ -114,7 +113,7 @@ export function TaskCard({
             <div className="flex items-center gap-2 flex-wrap">
               {task.priority && <PriorityIcon priority={task.priority} />}
               {task.due && (
-                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Calendar className="h-3 w-3" />
                   {formatDate(task.due)}
                 </span>

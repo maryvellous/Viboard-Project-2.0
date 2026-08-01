@@ -14,7 +14,7 @@ export function AIBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "shrink-0 rounded bg-muted px-1 text-[10px] font-medium leading-4 text-muted-foreground",
+        "shrink-0 rounded bg-muted px-1 text-[11px] font-medium leading-4 text-muted-foreground",
         className,
       )}
       title={label}

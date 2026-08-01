@@ -20,6 +20,7 @@ import {
 import { useProjectName, useOpenFromQuery } from "@/hooks";
 import { priorityMeta, priorityOrder } from "@/lib/design-tokens";
 import type { Task, TaskStatus } from "@desk/core/types";
+import { CheckSquare } from "lucide-react";
 
 export default function TasksPage() {
   const { t } = useTranslation();
@@ -108,6 +109,8 @@ export default function TasksPage() {
 
   return (
     <FilteredListPage
+      title={t("nav.sidebar.tasks")}
+      icon={CheckSquare}
       actionLabel={t("pages.tasks.newTask")}
       onAction={() => setShowNewTask(true)}
       filters={[

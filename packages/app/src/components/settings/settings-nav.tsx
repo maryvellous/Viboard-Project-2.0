@@ -1,6 +1,7 @@
 import { Settings, Calendar, FolderOpen, FileText, Sparkles, Info, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { interactionClasses } from "@/lib/enterprise-ui";
 
 export type SettingsCategory =
   | "general"
@@ -57,10 +58,11 @@ export function SettingsNav({ active, onSelect }: SettingsNavProps) {
             type="button"
             onClick={() => onSelect(value)}
             className={cn(
-              "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-left transition-colors",
+              "flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition-colors",
               value === active
-                ? "bg-accent text-accent-foreground"
-                : "text-foreground/80 hover:bg-accent/50",
+                ? interactionClasses.selectedContent
+                : interactionClasses.restingContent,
+              interactionClasses.keyboardFocus,
             )}
           >
             <Icon className="size-3.5 shrink-0" />

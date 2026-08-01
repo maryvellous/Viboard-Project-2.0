@@ -50,7 +50,7 @@ export function MeetingCard({ meeting, onClick, isLatest }: MeetingCardProps) {
             {meeting.title}
           </span>
           {isLatest && (
-            <span className="text-[10px] font-medium text-brand-accent bg-brand-accent/10 px-1.5 py-0.5 rounded shrink-0">
+            <span className="text-[11px] font-medium text-brand-accent bg-brand-accent/10 px-1.5 py-0.5 rounded shrink-0">
               {t("pages.meetings.latestBadge")}
             </span>
           )}

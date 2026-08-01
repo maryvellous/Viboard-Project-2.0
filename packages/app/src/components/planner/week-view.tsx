@@ -42,6 +42,9 @@ import type { WorkspaceBlock } from "@desk/core/types";
 import type { ActiveTask } from "@desk/core";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { PageHeader } from "@/components/patterns";
+import { CalendarDays } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 /** Stable empty references — a week with no plan must not allocate on every render. */
 const NO_DAYS: Record<string, WorkspaceBlock[]> = {};
@@ -50,6 +53,7 @@ const NO_INTENTIONS: string[] = [];
 const NO_TASKS: ActiveTask[] = [];
 
 export function WeekView() {
+  const { t } = useTranslation();
   const plannerHydrated = usePlannerHydrated();
   const [currentMonday, setCurrentMonday] = useState(() =>
     getWeekMonday(new Date())
@@ -336,14 +340,17 @@ export function WeekView() {
       {/* Grid column — the rail lives outside it, and outside gridContainerRef, so it
           cannot perturb the ResizeObserver that sizes the slots. */}
       <div className="flex flex-col flex-1 min-w-0 min-h-0">
-        {/* Week navigation header */}
-        <div className="shrink-0 border-b border-border/60 h-10 px-4 flex items-center justify-center">
-          <WeekNavigator
-            currentMonday={currentMonday}
-            showWeekends={showWeekends}
-            onChange={setCurrentMonday}
-          />
-        </div>
+        <PageHeader
+          title={t("nav.sidebar.planner")}
+          icon={CalendarDays}
+          center={(
+            <WeekNavigator
+              currentMonday={currentMonday}
+              showWeekends={showWeekends}
+              onChange={setCurrentMonday}
+            />
+          )}
+        />
 
         <WeekIntentions
           intentions={intentions}
@@ -373,7 +380,7 @@ export function WeekView() {
                 >
                   <div
                     className={cn(
-                      "text-[11px] uppercase tracking-wide",
+                      "text-xs uppercase tracking-wide",
                       today
                         ? "text-primary font-semibold"
                         : "text-muted-foreground"

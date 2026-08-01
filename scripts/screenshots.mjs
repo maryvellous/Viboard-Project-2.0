@@ -29,54 +29,21 @@ import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import {
+  VISUAL_BASE_URL as BASE_URL,
+  VISUAL_PAGES as PAGES,
+  VISUAL_THEMES as THEMES,
+  VISUAL_VIEWPORT as VIEWPORT,
+  freezeVisualClock,
+  openVisualDoc,
+  openVisualMeeting,
+  visualSeedScript as seedScript,
+  waitForVisualApp as waitForApp,
+} from "./ui-visual-fixture.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "assets");
-const PORT = 3001;
-const BASE_URL = `http://localhost:${PORT}`;
-
-// Logical viewport; deviceScaleFactor 2 gives crisp retina PNGs.
-// Width is sized so the three default Kanban columns sit snug with no dead
-// space: sidebar 224 + handle 4 + main px-4 (32) + 3×280 columns + 2×12 gaps.
-const VIEWPORT = { width: 1128, height: 760 };
-const THEMES = /** @type {const} */ (["light", "dark"]);
 const TOUR_WIDTH = 1200;
-
-async function openScreenshotDoc(page) {
-  await page
-    .getByRole("treeitem", { name: /website redesign/i })
-    .click({ timeout: 10_000 });
-  await page.waitForTimeout(500);
-  await page
-    .getByRole("treeitem", { name: "Content Inventory", exact: true })
-    .click({ timeout: 10_000 });
-  await page.waitForTimeout(700);
-}
-
-async function openScreenshotMeeting(page) {
-  await page
-    .getByText("Client Kickoff", { exact: true })
-    .click({ timeout: 10_000 });
-  await page.waitForTimeout(700);
-}
-
-/**
- * Pages to capture. `route` is opened directly; `?open=` deep-links a tab.
- * `prep` runs extra interaction (the Docs page needs an item opened).
- */
-const PAGES = [
-  { name: "dashboard", route: "/" },
-  { name: "tasks", route: "/tasks" },
-  { name: "planner", route: "/planner" },
-  { name: "projects", route: "/projects?open=website-redesign" },
-  { name: "meetings", route: "/meetings?open=client-kickoff" },
-  {
-    name: "docs",
-    route: "/docs",
-    // The Docs page main pane is empty until a document is opened.
-    prep: openScreenshotDoc,
-  },
-];
 
 /**
  * One continuous tour through the real sidebar. Each destination is reached by
@@ -87,8 +54,8 @@ const TOUR_STEPS = [
   { name: "Dashboard", route: "/" },
   { name: "Planner", route: "/planner" },
   { name: "Tasks", route: "/tasks" },
-  { name: "Docs", route: "/docs", prep: openScreenshotDoc },
-  { name: "Meetings", route: "/meetings", prep: openScreenshotMeeting },
+  { name: "Docs", route: "/docs", prep: openVisualDoc },
+  { name: "Meetings", route: "/meetings", prep: openVisualMeeting },
   { name: "Website Redesign", route: "/projects" },
 ];
 
@@ -116,109 +83,6 @@ async function waitForServer(timeoutMs = 90_000) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function localISODate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-/** A representative current-week plan so the README shows the planner in use. */
-function screenshotPlannerState() {
-  const monday = new Date();
-  const mondayOffset = (monday.getDay() + 6) % 7;
-  monday.setDate(monday.getDate() - mondayOffset);
-  const weekOf = localISODate(monday);
-  const day = (offset) => {
-    const date = new Date(monday);
-    date.setDate(date.getDate() + offset);
-    return localISODate(date);
-  };
-
-  return {
-    weekPlans: {
-      [weekOf]: {
-        weekOf,
-        intentions: ["Ship the website refresh", "Prepare the migration dry run"],
-        days: {
-          [day(0)]: [
-            {
-              id: "shot-website",
-              workspaceId: "acme",
-              notes: ["Website launch"],
-              taskIds: ["contact-form-endpoint", "analytics-events"],
-              startMinute: 540,
-              endMinute: 690,
-            },
-          ],
-          [day(1)]: [
-            {
-              id: "shot-migration",
-              workspaceId: "acme",
-              notes: ["Migration dry run"],
-              taskIds: ["transformation-logic", "id-migration-script"],
-              startMinute: 600,
-              endMinute: 750,
-            },
-          ],
-          [day(2)]: [
-            {
-              id: "shot-side-project",
-              workspaceId: "side-projects",
-              notes: ["Pixel Weather"],
-              taskIds: ["location-search"],
-              startMinute: 570,
-              endMinute: 690,
-            },
-          ],
-          [day(3)]: [
-            {
-              id: "shot-admin",
-              workspaceId: "personal",
-              notes: ["Admin afternoon"],
-              taskIds: ["quarterly-taxes"],
-              startMinute: 780,
-              endMinute: 900,
-            },
-          ],
-        },
-      },
-    },
-  };
-}
-
-/** localStorage seed so the app boots straight into a deterministic state. */
-function seedScript(theme) {
-  const boot = { state: { dataPath: "~/DeskMD", setupCompleted: true }, version: 0 };
-  const navigation = { state: { currentWorkspaceId: "acme" }, version: 0 };
-  const planner = screenshotPlannerState();
-  const preferences = {
-    state: {
-      theme,
-      sidebarWidth: 224,
-      workDayStartHour: 9,
-      workDayEndHour: 18,
-      showWeekends: false,
-      secondarySidebarWidth: 280,
-      secondarySidebarCollapsed: false,
-      dismissedUpdateVersion: null,
-    },
-    version: 0,
-  };
-  return `
-    localStorage.setItem("desk-boot", ${JSON.stringify(JSON.stringify(boot))});
-    localStorage.setItem("desk-navigation", ${JSON.stringify(JSON.stringify(navigation))});
-    localStorage.setItem("desk-preferences", ${JSON.stringify(JSON.stringify(preferences))});
-    localStorage.setItem("planner-store", ${JSON.stringify(JSON.stringify(planner))});
-  `;
-}
-
-/** Wait until the app shell has hydrated and fixture data is showing. */
-async function waitForApp(page) {
-  await page.waitForSelector("text=Acme Co", { timeout: 20_000 });
-  await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(700);
-}
 
 // ── Banner ──────────────────────────────────────────────────────────────────
 
@@ -347,6 +211,7 @@ async function capturePages(browser, theme) {
     });
     await context.addInitScript(seedScript(theme));
     const page = await context.newPage();
+    await freezeVisualClock(page);
 
     await page.goto(`${BASE_URL}${shot.route}`, { waitUntil: "domcontentloaded" });
     await waitForApp(page);
@@ -426,6 +291,7 @@ async function captureTour(browser, theme) {
   });
   await context.addInitScript(seedScript(theme));
   const page = await context.newPage();
+  await freezeVisualClock(page);
   const frames = [];
 
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
@@ -504,12 +370,17 @@ async function main() {
     console.log(`Reusing dev server on ${BASE_URL}`);
   } else {
     console.log("Starting dev server…");
-    devServer = spawn("npm", ["run", "dev"], {
+    devServer = spawn("npm", ["run", "dev", "-w", "@desk/app", "--", "--host", "127.0.0.1", "--strictPort"], {
       cwd: ROOT,
       stdio: "ignore",
       detached: false,
     });
-    await waitForServer();
+    try {
+      await waitForServer();
+    } catch (error) {
+      devServer.kill();
+      throw error;
+    }
     console.log(`Dev server ready on ${BASE_URL}`);
   }
 

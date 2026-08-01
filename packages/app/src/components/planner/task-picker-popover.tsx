@@ -79,7 +79,7 @@ export function TaskPickerPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="w-full py-1 rounded text-[11px] text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/40 transition-colors flex items-center justify-center gap-1">
+        <button className="flex w-full items-center justify-center gap-1 rounded py-1 text-[11px] text-muted-foreground/75 transition-colors hover:bg-muted/40 hover:text-foreground">
           <Plus className="h-3 w-3" />
           {t("common.buttons.add")}
         </button>

@@ -229,7 +229,7 @@ export function DayColumn({
             backgroundColor: `color-mix(in srgb, ${taskDropColor || "#64748b"} 12%, transparent)`,
           }}
         >
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {minutesToTime(taskDropTarget.startMinute)}
           </span>
         </div>
@@ -246,7 +246,7 @@ export function DayColumn({
                 height: ((draft.endMinute - draft.startMinute) / 30) * slotHeight,
               }}
             >
-              <span className="text-[10px] text-primary/80 font-medium">
+              <span className="text-xs font-medium text-primary/90">
                 {minutesToTime(draft.startMinute)} – {minutesToTime(draft.endMinute)}
               </span>
             </div>

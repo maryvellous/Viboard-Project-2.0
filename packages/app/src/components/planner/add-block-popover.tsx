@@ -89,8 +89,8 @@ export function AddBlockButton({ date, weekOf, blocks = [], compact }: AddBlockB
         <button
           className={
             compact
-              ? "p-0.5 rounded text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/50 transition-colors"
-              : "px-2 py-1 rounded border border-dashed border-muted-foreground/20 text-[10px] text-muted-foreground/50 hover:border-muted-foreground/40 hover:text-muted-foreground transition-colors whitespace-nowrap"
+              ? "rounded p-0.5 text-muted-foreground/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+              : "whitespace-nowrap rounded border border-dashed border-border px-2 py-1 text-[11px] text-muted-foreground/75 transition-colors hover:border-muted-foreground/50 hover:text-foreground"
           }
         >
           <Plus className={compact ? "h-3.5 w-3.5" : "h-3 w-3 inline-block mr-0.5"} />

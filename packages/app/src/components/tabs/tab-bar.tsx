@@ -374,7 +374,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
                       <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                       <span className={`truncate flex-1 ${isActive ? "font-medium" : ""}`}>{tab.title}</span>
                       {tab.isDirty && (
-                        <span className="text-muted-foreground/60 shrink-0 text-[10px] leading-none">•</span>
+                        <span className="text-muted-foreground/60 shrink-0 text-[11px] leading-none">•</span>
                       )}
                       {!tab.isPinned && (
                         <span

@@ -94,7 +94,7 @@ export function WorkspaceSelector({ isCollapsed = false }: WorkspaceSelectorProp
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-full justify-between px-3 h-11 hover:bg-sidebar-accent/80 rounded-lg bg-sidebar-accent/30 border border-sidebar-border/50 transition-all hover:border-sidebar-border shadow-sm"
+                className="h-11 w-full justify-between rounded-lg border border-sidebar-border/60 bg-sidebar-accent/25 px-3 transition-colors hover:border-sidebar-border hover:bg-sidebar-accent/70"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Circle

@@ -44,7 +44,7 @@ export function DueStrip({ tasks }: DueStripProps) {
       ))}
       {tasks.length > MAX_DOTS && (
         <span
-          className="text-[9px] leading-none text-muted-foreground/60 tabular-nums"
+          className="text-[11px] leading-none text-muted-foreground/60 tabular-nums"
           aria-label={t("pages.planner.dueStrip.count", { count: tasks.length })}
         >
           +{tasks.length - MAX_DOTS}

@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { interactionClasses } from "@/lib/enterprise-ui";
 
 interface ListRowProps {
   /** Leading icon or status dot. Caller styles it (size, color, mt when a second line shows). */
@@ -41,12 +42,21 @@ export function ListRow({
   return (
     <div
       className={cn(
-        "group flex gap-2 px-3 py-1.5 cursor-pointer rounded-sm mx-1 hover:bg-accent/40",
+        "group mx-1 flex cursor-pointer gap-2 rounded-md px-3 py-1.5",
         alignTop ? "items-start" : "items-center",
-        isActive && "bg-accent",
+        isActive ? interactionClasses.selectedContent : interactionClasses.restingContent,
+        interactionClasses.keyboardFocus,
         className,
       )}
       onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick();
+        }
+      } : undefined}
     >
       {leading}
       <div className="min-w-0 flex-1">
@@ -69,7 +79,7 @@ export function ListRow({
               variant="ghost"
               size="icon"
               className={cn(
-                "size-5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground",
+                "size-7 text-muted-foreground opacity-0 hover:text-foreground group-hover:opacity-100 focus-visible:opacity-100",
                 alignTop && "mt-0.5",
               )}
               onClick={(e) => e.stopPropagation()}

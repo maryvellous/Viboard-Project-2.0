@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
+import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 type LoadingSkeletonVariant = "page" | "cards" | "list" | "tree" | "board" | "editor";
 
@@ -37,7 +38,7 @@ function Rows({ count, compact = false }: { count: number; compact?: boolean }) 
 
 function PageSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 p-6">
+    <div className={cn("mx-auto w-full space-y-6 p-6", pageWidthClasses.standard)}>
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-2">
           <Skeleton className="h-5 w-40" />
@@ -101,7 +102,7 @@ function EditorSkeleton() {
       <div className="h-8 border-b border-border/40 px-6 py-2">
         <Skeleton className="h-2.5 w-40" />
       </div>
-      <div className="mx-auto w-full max-w-4xl space-y-4 px-6 py-5">
+      <div className={cn("mx-auto w-full space-y-4 px-6 py-5", pageWidthClasses.reading)}>
         <Skeleton className="h-7 w-2/5" />
         <div className="flex gap-2 border-b border-border/40 pb-4">
           <Skeleton className="h-7 w-24" />

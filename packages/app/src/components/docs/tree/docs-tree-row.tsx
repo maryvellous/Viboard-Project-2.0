@@ -101,7 +101,7 @@ function SectionHeaderRow({
       className="flex flex-col justify-end gap-2 h-7 pb-0.5 pointer-events-none select-none"
     >
       {data.sectionShowDivider && <div className="h-px bg-border/60" />}
-      <SectionLabel className="pl-4 text-[10px] tracking-wider text-muted-foreground/45">
+      <SectionLabel className="pl-4 text-[11px] tracking-wider text-muted-foreground/45">
         {data.name}
       </SectionLabel>
     </div>
@@ -166,11 +166,11 @@ function FolderRow({ node, style, dragHandle }: DocsTreeRowProps) {
         data-drop-target-kind="folder"
         className={cn(
           "group relative flex items-center gap-1 px-2 h-7 cursor-pointer rounded-sm",
-          "hover:bg-accent/40",
+          "hover:bg-accent/55",
           // Doc-less projects recede but stay present — quieter, not hidden. Hover or
           // selection restores full strength.
           isProject && docCount === 0 && !node.isSelected && "opacity-50 hover:opacity-100",
-          node.isSelected && "bg-accent",
+          node.isSelected && "bg-accent/80 text-foreground",
           node.willReceiveDrop && "bg-primary/10 ring-1 ring-primary/40",
           "data-[desk-drop-target=true]:bg-primary/10 data-[desk-drop-target=true]:ring-1 data-[desk-drop-target=true]:ring-primary/40",
         )}
@@ -207,7 +207,7 @@ function FolderRow({ node, style, dragHandle }: DocsTreeRowProps) {
                 <BotOff className="size-3.5 text-muted-foreground/60" />
               )}
               {docCount > 0 ? (
-                <span className="text-[11px] text-muted-foreground/40 tabular-nums">{docCount}</span>
+                <span className="text-[11px] tabular-nums text-muted-foreground/70">{docCount}</span>
               ) : null}
             </div>
           </>
@@ -256,8 +256,8 @@ function DocRow({ node, style, dragHandle }: DocsTreeRowProps) {
         data-drop-target-kind="sibling"
         className={cn(
           "group relative flex items-center gap-1.5 px-2 h-7 cursor-pointer rounded-sm",
-          "hover:bg-accent/40",
-          node.isSelected && "bg-accent",
+          "hover:bg-accent/55",
+          node.isSelected && "bg-accent/80 text-foreground",
         )}
         onClick={handleClick}
       >
@@ -318,8 +318,8 @@ function AssetRow({ node, style, dragHandle }: DocsTreeRowProps) {
         data-drop-target-kind="sibling"
         className={cn(
           "group relative flex items-center gap-1.5 px-2 h-7 cursor-pointer rounded-sm",
-          "hover:bg-accent/40",
-          node.isSelected && "bg-accent",
+          "hover:bg-accent/55",
+          node.isSelected && "bg-accent/80 text-foreground",
         )}
         onClick={handleClick}
       >

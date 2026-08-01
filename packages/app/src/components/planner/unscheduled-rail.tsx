@@ -77,7 +77,7 @@ export function UnscheduledRail({
 
   if (collapsed) {
     return (
-      <div className="w-8 shrink-0 border-l border-border/60 flex flex-col items-center pt-2.5 gap-2">
+      <div className="flex w-8 shrink-0 flex-col items-center gap-2 border-l border-border/60 pt-3">
         <button
           onClick={() => setCollapsed(false)}
           title={t("pages.planner.rail.expand")}
@@ -86,7 +86,7 @@ export function UnscheduledRail({
           <Inbox className="h-3.5 w-3.5" />
         </button>
         {tasks.length > 0 && (
-          <span className="text-[10px] tabular-nums text-muted-foreground">
+          <span className="text-[11px] tabular-nums text-muted-foreground">
             {tasks.length}
           </span>
         )}
@@ -97,7 +97,7 @@ export function UnscheduledRail({
   return (
     <div className="w-64 shrink-0 border-l border-border/60 flex flex-col min-h-0">
       {/* Header — matches the WeekNavigator row's height so the rules line up */}
-      <div className="h-10 shrink-0 border-b border-border/60 px-3 flex items-center gap-1.5">
+      <div className="flex h-12 shrink-0 items-center gap-1.5 border-b border-border/60 px-3">
         <Inbox className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         <span className="text-xs font-medium flex-1 truncate">
           {t("pages.planner.rail.title")}
@@ -118,7 +118,7 @@ export function UnscheduledRail({
         {isLoading ? (
           <LoadingSkeleton variant="tree" rows={7} className="px-1 py-2" />
         ) : tasks.length === 0 ? (
-          <p className="p-4 text-center text-[11px] text-muted-foreground/70">
+          <p className="p-4 text-center text-xs text-muted-foreground">
             {t("pages.planner.rail.empty")}
           </p>
         ) : (
@@ -133,7 +133,7 @@ export function UnscheduledRail({
                     <div className="px-3 py-1 flex items-center gap-1.5">
                       <span
                         className={cn(
-                          "text-[10px] uppercase tracking-wide font-medium",
+                          "text-[11px] uppercase tracking-wide font-medium",
                           key === "overdue"
                             ? "text-destructive/80"
                             : "text-muted-foreground/70"
@@ -141,7 +141,7 @@ export function UnscheduledRail({
                       >
                         {t(`pages.planner.rail.${key}`)}
                       </span>
-                      <span className="text-[10px] tabular-nums text-muted-foreground/50">
+                      <span className="text-[11px] tabular-nums text-muted-foreground/70">
                         {bucket.length}
                       </span>
                     </div>
