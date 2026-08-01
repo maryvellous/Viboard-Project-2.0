@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { useCurrentWorkspace, useWorkspaces } from "@/stores";
 import { useSecondarySidebar } from "@/hooks/use-secondary-sidebar";
 import { StatePanel } from "@/components/ui/state-panel";
@@ -12,12 +13,36 @@ export default function DocsPage() {
   const currentWorkspace = useCurrentWorkspace();
   const { isLoading: workspacesLoading } = useWorkspaces();
   const currentWorkspaceId = currentWorkspace?.id || null;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [initialProjectId, setInitialProjectId] = useState(
+    () => searchParams.get("project") || undefined,
+  );
+
+  useEffect(() => {
+    if (!searchParams.has("project")) return;
+    searchParams.delete("project");
+    setSearchParams(searchParams, { replace: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const previousWorkspaceRef = useRef(currentWorkspaceId);
+  useEffect(() => {
+    const previous = previousWorkspaceRef.current;
+    previousWorkspaceRef.current = currentWorkspaceId;
+    if (previous === null || previous === currentWorkspaceId) return;
+    setInitialProjectId(undefined);
+  }, [currentWorkspaceId]);
 
   // Register the doc tree as the secondary sidebar slot for /docs.
   // The slot persists across tab switches (Desk tab ↔ doc tab) — only depends on the route.
   const pane = useMemo(
-    () => (currentWorkspaceId ? <DocsTreePane workspaceId={currentWorkspaceId} /> : null),
-    [currentWorkspaceId],
+    () => (currentWorkspaceId ? (
+      <DocsTreePane
+        key={currentWorkspaceId}
+        workspaceId={currentWorkspaceId}
+        initialProjectId={initialProjectId}
+      />
+    ) : null),
+    [currentWorkspaceId, initialProjectId],
   );
   useSecondarySidebar("/docs", pane);
 

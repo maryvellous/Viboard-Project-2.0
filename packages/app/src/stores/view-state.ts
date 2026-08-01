@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { TaskStatus, ProjectViewState, TaskViewMode } from "@desk/core/types";
 import { getDeskService, WORKSPACE_LEVEL_PROJECT_ID } from "@desk/core";
 import { invalidateDashboardOverview } from "./dashboard";
+import { invalidateProjectInsights } from "./project-insights-invalidation";
 
 // Query keys
 export const viewStateKeys = {
@@ -231,6 +232,7 @@ export function useHighlightedTasks(
     onSettled: () => {
       // Keep the dashboard Focus widget in sync with highlight changes.
       invalidateDashboardOverview(queryClient);
+      if (workspaceId) invalidateProjectInsights(queryClient, workspaceId);
     },
   });
 

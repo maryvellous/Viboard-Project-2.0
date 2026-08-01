@@ -7,29 +7,32 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { StatePanel } from "@/components/ui/state-panel";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { EntityOverview } from "@/components/entity-overview";
+import { Button } from "@/components/ui/button";
 import { ProjectHomeHeader } from "@/components/projects/project-home-header";
 import {
-  ActivitySection,
-  DocsSection,
-  MeetingsSection,
-  TasksSection,
+  CurrentWorkSection,
+  ProjectTimelineRail,
 } from "@/components/projects/project-home-sections";
-import { useProject, useUpdateProject, useDeleteProject } from "@/stores";
+import { useProjectHome, useUpdateProject, useDeleteProject } from "@/stores";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import type { ProjectUpdate } from "@desk/core/types";
+import { useMinuteClock } from "@/hooks/use-minute-clock";
 
 interface ProjectHomeProps {
   workspaceId: string;
   projectId: string;
 }
 
-/**
- * The project's home: header (name, description, status, task counts), the overview,
- * active tasks with quick-add, recent meetings, recent docs, and recent activity.
- */
+/** Calm project room: orientation, current work, and a factual schedule/history rail. */
 export function ProjectHome({ workspaceId, projectId }: ProjectHomeProps) {
   const { t } = useTranslation();
-  const { data: project, isLoading } = useProject(workspaceId, projectId);
+  const { today } = useMinuteClock();
+  const {
+    data: home,
+    isLoading,
+    isError,
+    refetch,
+  } = useProjectHome(workspaceId, projectId, today);
   const updateProject = useUpdateProject();
   const deleteProject = useDeleteProject();
   const setSelectedProject = useProjectSelectionStore((state) => state.setSelectedProject);
@@ -60,7 +63,19 @@ export function ProjectHome({ workspaceId, projectId }: ProjectHomeProps) {
     return <LoadingSkeleton variant="page" />;
   }
 
-  if (!project) {
+  if (isError) {
+    return (
+      <StatePanel
+        variant="error"
+        title={t("pages.projects.home.loadErrorTitle")}
+        description={t("pages.projects.home.loadErrorDescription")}
+        action={<Button variant="outline" size="sm" onClick={() => void refetch()}>{t("common.buttons.retry")}</Button>}
+        className="h-full"
+      />
+    );
+  }
+
+  if (!home) {
     return (
       <StatePanel
         variant="notFound"
@@ -72,31 +87,45 @@ export function ProjectHome({ workspaceId, projectId }: ProjectHomeProps) {
     );
   }
 
+  const { project, currentTasks, timeline, lastActivityAt } = home;
+
   return (
     <>
       <ScrollArea className="h-full">
-        <div className="mx-auto max-w-3xl px-6 py-6 space-y-6">
+        <div className="mx-auto max-w-6xl space-y-7 px-4 py-5 md:px-6 md:py-6">
           <ProjectHomeHeader
+            key={`${workspaceId}:${projectId}:header`}
             project={project}
             onUpdate={handleUpdate}
             onDeleteRequest={() => setConfirmDelete(true)}
+            lastActivityAt={lastActivityAt}
           />
-          <EntityOverview
-            title={t("pages.projects.home.overview.title")}
-            value={project.overview ?? ""}
-            placeholder={t("pages.projects.home.overview.placeholder")}
-            onSave={async (overview) => {
-              await updateProject.mutateAsync({
-                projectId,
-                workspaceId,
-                updates: { overview },
-              });
-            }}
-          />
-          <TasksSection workspaceId={workspaceId} projectId={projectId} />
-          <MeetingsSection workspaceId={workspaceId} projectId={projectId} />
-          <DocsSection workspaceId={workspaceId} projectId={projectId} />
-          <ActivitySection workspaceId={workspaceId} projectId={projectId} />
+          <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
+            <main className="min-w-0 space-y-9">
+              <EntityOverview
+                key={`${workspaceId}:${projectId}:overview`}
+                title={t("pages.projects.home.overview.title")}
+                value={project.overview ?? ""}
+                placeholder={t("pages.projects.home.overview.placeholder")}
+                onSave={async (overview) => {
+                  await updateProject.mutateAsync({
+                    projectId,
+                    workspaceId,
+                    updates: { overview },
+                  });
+                }}
+                collapsedClassName="max-h-72"
+                resetKey={`${workspaceId}:${projectId}`}
+              />
+              <CurrentWorkSection
+                key={`${workspaceId}:${projectId}:current-work`}
+                workspaceId={workspaceId}
+                projectId={projectId}
+                tasks={currentTasks}
+              />
+            </main>
+            <ProjectTimelineRail key={`${workspaceId}:${projectId}`} timeline={timeline} />
+          </div>
         </div>
       </ScrollArea>
 

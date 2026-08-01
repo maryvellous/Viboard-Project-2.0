@@ -4,6 +4,11 @@ import { getDeskService } from "@desk/core";
 import { writePerWorkspaceAgentFiles } from "@/lib/smart-index/agent-files";
 import { contentKeys } from "./content";
 import { invalidateDashboardOverview } from "./dashboard";
+import {
+  composeLegacyProjectHome,
+  isUnsupportedDeskOperation,
+  legacyProjectsToSummaries,
+} from "@/lib/project-service-compat";
 
 /** Regenerate per-workspace agent files when projects change */
 function regenerateWorkspaceAgentFiles(workspaceId: string) {
@@ -18,8 +23,12 @@ function regenerateWorkspaceAgentFiles(workspaceId: string) {
 export const projectKeys = {
   all: ["projects"] as const,
   byWorkspace: (workspaceId: string) => [...projectKeys.all, "workspace", workspaceId] as const,
+  summaries: (workspaceId: string, today: string) =>
+    [...projectKeys.byWorkspace(workspaceId), "summaries", today] as const,
   detail: (workspaceId: string, projectId: string) =>
     [...projectKeys.byWorkspace(workspaceId), "detail", projectId] as const,
+  home: (workspaceId: string, projectId: string, today: string) =>
+    [...projectKeys.byWorkspace(workspaceId), "home", projectId, today] as const,
 };
 
 /**
@@ -36,6 +45,23 @@ export function useProjects(workspaceId: string | null) {
   });
 }
 
+export function useProjectSummaries(workspaceId: string | null, today: string) {
+  return useQuery({
+    queryKey: projectKeys.summaries(workspaceId || "", today),
+    queryFn: async () => {
+      if (!workspaceId) throw new Error("workspaceId is required");
+      const service = getDeskService();
+      try {
+        return await service.getProjectSummaries(workspaceId, { today });
+      } catch (error) {
+        if (!isUnsupportedDeskOperation(error, "getProjectSummaries")) throw error;
+        return legacyProjectsToSummaries(await service.getProjects(workspaceId));
+      }
+    },
+    enabled: !!workspaceId,
+  });
+}
+
 /**
  * Hook to fetch a single project
  */
@@ -45,6 +71,43 @@ export function useProject(workspaceId: string | null, projectId: string | null)
     queryFn: async () => {
       if (!workspaceId || !projectId) throw new Error("workspaceId and projectId are required");
       return getDeskService().getProject(workspaceId, projectId);
+    },
+    enabled: !!workspaceId && !!projectId,
+  });
+}
+
+export function useProjectHome(
+  workspaceId: string | null,
+  projectId: string | null,
+  today: string,
+) {
+  return useQuery({
+    queryKey: projectKeys.home(workspaceId || "", projectId || "", today),
+    queryFn: async () => {
+      if (!workspaceId || !projectId) throw new Error("workspaceId and projectId are required");
+      const service = getDeskService();
+      try {
+        return await service.getProjectHome(workspaceId, projectId, { today });
+      } catch (error) {
+        if (!isUnsupportedDeskOperation(error, "getProjectHome")) throw error;
+        const [project, tasks, docs, meetings, workspaceView, projectView] = await Promise.all([
+          service.getProject(workspaceId, projectId),
+          service.getTasksByProject(workspaceId, projectId),
+          service.getDocsByProject(workspaceId, projectId),
+          service.getMeetingsByProject(workspaceId, projectId),
+          service.getViewState(workspaceId, null),
+          service.getViewState(workspaceId, projectId),
+        ]);
+        if (!project) return null;
+        return composeLegacyProjectHome(
+          project,
+          tasks,
+          docs,
+          meetings,
+          [...(workspaceView.highlightedTasks ?? []), ...(projectView.highlightedTasks ?? [])],
+          today,
+        );
+      }
     },
     enabled: !!workspaceId && !!projectId,
   });

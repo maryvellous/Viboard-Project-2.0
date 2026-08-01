@@ -12,6 +12,7 @@
  */
 import * as tasksApi from "../tasks";
 import * as projectsApi from "../projects";
+import * as projectInsightsApi from "../project-insights";
 import * as workspacesApi from "../workspaces";
 import * as meetingsApi from "../meetings";
 import * as personalApi from "../personal";
@@ -43,6 +44,8 @@ export const localDeskService: DeskService = {
   createProject: projectsApi.createProject,
   updateProject: projectsApi.updateProject,
   deleteProject: projectsApi.deleteProject,
+  getProjectSummaries: projectInsightsApi.getProjectSummaries,
+  getProjectHome: projectInsightsApi.getProjectHome,
 
   // Workspaces
   getWorkspaces: workspacesApi.getWorkspaces,

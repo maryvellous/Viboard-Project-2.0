@@ -30,7 +30,9 @@ export {
 // ── Projects ────────────────────────────────────────────────────────
 export {
   useProjects,
+  useProjectSummaries,
   useProject,
+  useProjectHome,
   useCreateProject,
   useUpdateProject,
   useDeleteProject,

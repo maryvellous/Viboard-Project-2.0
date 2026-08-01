@@ -4,6 +4,7 @@ import type { ActiveTask } from "@desk/core";
 import { getDeskService, isSameEntity } from "@desk/core";
 import { plannerKeys } from "./planner";
 import { invalidateDashboardOverview } from "./dashboard";
+import { invalidateProjectInsights } from "./project-insights-invalidation";
 
 // Query keys
 export const taskKeys = {
@@ -82,6 +83,7 @@ export function useCreateTask() {
     }) => getDeskService().createTask(data),
     onSuccess: (newTask) => {
       invalidateDashboardOverview(queryClient);
+      invalidateProjectInsights(queryClient, newTask.workspaceId);
       // Invalidate and refetch tasks for the workspace
       queryClient.invalidateQueries({
         queryKey: taskKeys.byWorkspace(newTask.workspaceId),
@@ -113,6 +115,7 @@ export function useUpdateTask() {
     onSuccess: (updatedTask) => {
       invalidateDashboardOverview(queryClient);
       if (updatedTask) {
+        invalidateProjectInsights(queryClient, updatedTask.workspaceId);
         // Directly update task in all cached list queries (avoids stale file-tree cache race).
         // Query invalidation alone would trigger a refetch that reads from the still-stale
         // file cache, causing the UI to snap back to old values briefly.
@@ -157,6 +160,7 @@ export function useDeleteTask() {
     onSuccess: (result) => {
       invalidateDashboardOverview(queryClient);
       if (result.success) {
+        invalidateProjectInsights(queryClient, result.workspaceId);
         queryClient.invalidateQueries({
           queryKey: taskKeys.byWorkspace(result.workspaceId),
         });
@@ -211,7 +215,11 @@ export function useMoveTask() {
         });
       }
     },
-    onSuccess: () => invalidateDashboardOverview(queryClient),
+    onSuccess: (updatedTask, variables) => {
+      invalidateDashboardOverview(queryClient);
+      const workspaceId = updatedTask?.workspaceId ?? variables.workspaceId;
+      if (workspaceId) invalidateProjectInsights(queryClient, workspaceId);
+    },
     // No onSettled/invalidate - optimistic update is sufficient
     // Invalidating causes race condition with file write, causing snap-back
   });
@@ -237,6 +245,7 @@ export function useMoveTaskToProject() {
     }) => getDeskService().moveTaskToProject(taskId, workspaceId, fromProjectId, toProjectId),
     onSuccess: (_result, variables) => {
       invalidateDashboardOverview(queryClient);
+      invalidateProjectInsights(queryClient, variables.workspaceId);
       // Invalidate workspace tasks to refresh lists (kanban, task list)
       queryClient.invalidateQueries({
         queryKey: taskKeys.byWorkspace(variables.workspaceId),

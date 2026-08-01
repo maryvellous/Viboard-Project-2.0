@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useCurrentWorkspace, useProjects, useWorkspaces } from "@/stores";
+import { useCurrentWorkspace, useProjectSummaries, useWorkspaces } from "@/stores";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import { StatePanel } from "@/components/ui/state-panel";
 import { ProjectsBrowse, ProjectHome } from "@/components/projects";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { Button } from "@/components/ui/button";
+import { useMinuteClock } from "@/hooks/use-minute-clock";
 
 /**
  * Projects — a single `/projects` route. With no selection it shows the
@@ -16,9 +18,15 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 export default function ProjectsPage() {
   const { t } = useTranslation();
   const currentWorkspace = useCurrentWorkspace();
+  const { today } = useMinuteClock();
   const currentWorkspaceId = currentWorkspace?.id || null;
   const { isLoading: workspacesLoading } = useWorkspaces();
-  const { data: projects = [], isLoading: projectsLoading } = useProjects(currentWorkspaceId);
+  const {
+    data: projects = [],
+    isLoading: projectsLoading,
+    isError: projectsError,
+    refetch: refetchProjects,
+  } = useProjectSummaries(currentWorkspaceId, today);
 
   const selectedProjectId = useProjectSelectionStore((s) => s.selectedProjectId);
   const setSelectedProject = useProjectSelectionStore((s) => s.setSelectedProject);
@@ -57,6 +65,22 @@ export default function ProjectsPage() {
           className="h-full"
         />
       </div>
+    );
+  }
+
+  if (projectsError) {
+    return (
+      <StatePanel
+        variant="error"
+        title={t("pages.projects.loadErrorTitle")}
+        description={t("pages.projects.loadErrorDescription")}
+        action={(
+          <Button variant="outline" size="sm" onClick={() => void refetchProjects()}>
+            {t("common.buttons.retry")}
+          </Button>
+        )}
+        className="h-full"
+      />
     );
   }
 

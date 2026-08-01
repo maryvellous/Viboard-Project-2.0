@@ -22,7 +22,7 @@ import { useTasks } from "@/stores/tasks";
 import { useWorkspaceDocsShell } from "@/stores/content";
 import { useMeetings } from "@/stores/meetings";
 import { countTreeFiles } from "@/lib/tree-count";
-import { useProjects } from "@/stores/projects";
+import { useProjectSummaries } from "@/stores/projects";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import { isActiveStatus } from "@/lib/task-status";
 import { SectionLabel } from "@/components/patterns";
@@ -30,6 +30,7 @@ import { WorkspaceSelector } from "./workspace-selector";
 import { useTabStore } from "@/stores/tabs";
 import { openGlobalSearch } from "@/components/global-search";
 import { SidebarNavRow } from "./sidebar-nav-row";
+import { useMinuteClock } from "@/hooks/use-minute-clock";
 
 interface SidebarProps {
   width: number;
@@ -48,12 +49,13 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const currentWorkspace = useCurrentWorkspace();
+  const { today } = useMinuteClock();
   const workspaceId = currentWorkspace?.id || null;
 
   const { data: tasks = [] } = useTasks(workspaceId);
   const { data: overviewTree = [] } = useWorkspaceDocsShell(workspaceId);
   const { data: meetings = [] } = useMeetings(workspaceId);
-  const { data: projects = [] } = useProjects(workspaceId);
+  const { data: projects = [] } = useProjectSummaries(workspaceId, today);
 
   const activeTaskCount = tasks.filter((t) => isActiveStatus(t.status)).length;
   const totalFiles = useMemo(() => countTreeFiles(overviewTree), [overviewTree]);
@@ -67,30 +69,18 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
   const setSelectedProject = useProjectSelectionStore((s) => s.setSelectedProject);
 
   // Active projects only, most recently touched first, capped — "All projects"
-  // covers the rest. Recency is the latest `updated` stamp across the tasks and
-  // meetings already fetched above, so it costs no extra reads; docs are not a
-  // signal here, meaning a doc save does not reorder the list. Projects with no
-  // stamped item sort last, A-Z.
+  // covers the rest. Project summaries include task, document, and meeting activity.
   const sidebarProjects = useMemo(() => {
-    const lastTouched = new Map<string, string>();
-    const bump = (projectId: string, stamp: string | undefined) => {
-      if (!stamp) return; // undated items carry no recency signal
-      const prev = lastTouched.get(projectId);
-      if (!prev || stamp > prev) lastTouched.set(projectId, stamp);
-    };
-    for (const task of tasks) bump(task.projectId, task.updated ?? task.created);
-    for (const meeting of meetings) bump(meeting.projectId, meeting.updated ?? meeting.created);
-
     return projects
       .filter((p) => p.status === "active")
       .sort((a, b) => {
-        const ta = lastTouched.get(a.id) ?? "";
-        const tb = lastTouched.get(b.id) ?? "";
+        const ta = a.lastActivityAt ?? "";
+        const tb = b.lastActivityAt ?? "";
         if (ta !== tb) return tb.localeCompare(ta);
         return a.name.localeCompare(b.name);
       })
       .slice(0, SIDEBAR_PROJECT_CAP);
-  }, [projects, tasks, meetings]);
+  }, [projects]);
 
   const collapsed = isCollapsed;
 
@@ -151,6 +141,17 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
               </SectionLabel>
 
               <div className="space-y-0.5">
+                <SidebarNavRow
+                  to="/projects"
+                  label={t("nav.sidebar.allProjects")}
+                  icon={FolderKanban}
+                  count={projectCount}
+                  active={pathname.startsWith("/projects") && !selectedProjectId}
+                  onClick={() => {
+                    setSelectedProject(null);
+                    switchToDesk();
+                  }}
+                />
                 {sidebarProjects.map((project) => (
                   <SidebarNavRow
                     key={project.id}
@@ -164,20 +165,6 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
                     }}
                   />
                 ))}
-                {/* Always present: the only route to the browse view (archived and
-                    paused projects, create, delete, filter). Carries the section's
-                    icon so it reads as a nav destination, not a project. */}
-                <SidebarNavRow
-                  to="/projects"
-                  label={t("nav.sidebar.allProjects")}
-                  icon={FolderKanban}
-                  count={projectCount}
-                  active={pathname.startsWith("/projects") && !selectedProjectId}
-                  onClick={() => {
-                    setSelectedProject(null);
-                    switchToDesk();
-                  }}
-                />
               </div>
 
               <Divider />

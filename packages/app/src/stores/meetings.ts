@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Meeting } from "@desk/core/types";
 import { getDeskService, isSameEntity } from "@desk/core";
 import { invalidateDashboardOverview } from "./dashboard";
+import { invalidateProjectInsights } from "./project-insights-invalidation";
 
 // Query keys
 export const meetingKeys = {
@@ -78,6 +79,7 @@ export function useCreateMeeting() {
     }) => getDeskService().createMeeting(data),
     onSuccess: (newMeeting) => {
       invalidateDashboardOverview(queryClient);
+      invalidateProjectInsights(queryClient, newMeeting.workspaceId);
       queryClient.invalidateQueries({
         queryKey: meetingKeys.byWorkspace(newMeeting.workspaceId),
       });
@@ -106,6 +108,7 @@ export function useUpdateMeeting() {
     onSuccess: (updatedMeeting) => {
       invalidateDashboardOverview(queryClient);
       if (updatedMeeting) {
+        invalidateProjectInsights(queryClient, updatedMeeting.workspaceId);
         // Directly update meeting in all cached list queries (avoids stale file-tree cache race).
         queryClient.setQueriesData<Meeting[]>(
           { queryKey: meetingKeys.all },
@@ -148,6 +151,7 @@ export function useMoveMeetingToProject() {
     }) => getDeskService().moveMeetingToProject(meetingId, workspaceId, fromProjectId, toProjectId),
     onSuccess: (_result, variables) => {
       invalidateDashboardOverview(queryClient);
+      invalidateProjectInsights(queryClient, variables.workspaceId);
       queryClient.invalidateQueries({
         queryKey: meetingKeys.byWorkspace(variables.workspaceId),
       });
@@ -174,6 +178,7 @@ export function useDeleteMeeting() {
     onSuccess: (result) => {
       invalidateDashboardOverview(queryClient);
       if (result.success) {
+        invalidateProjectInsights(queryClient, result.workspaceId);
         queryClient.invalidateQueries({
           queryKey: meetingKeys.byWorkspace(result.workspaceId),
         });

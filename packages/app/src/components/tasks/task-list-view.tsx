@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Archive, CheckCircle2, Circle, Clock, Loader2, FolderKanban, ChevronRight, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { formatDate, isOverdue, stripMarkdown } from "@/lib/format";
+import { formatDate, isOverdue } from "@/lib/format";
 import {
   taskStatusTextColors,
   taskStatusLabels,
@@ -205,7 +205,7 @@ function TaskListItem({
         <div className="flex items-start justify-between gap-2">
           <p
             className={cn(
-              "font-medium",
+              "min-w-0 text-sm font-medium leading-5",
               task.status === "done" && "line-through"
             )}
           >
@@ -219,27 +219,25 @@ function TaskListItem({
         </div>
 
         {/* Meta info row */}
-        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-          {projectName && (
-            <span className="flex items-center gap-1">
-              <FolderKanban className="h-3 w-3" />
-              {projectName}
-            </span>
-          )}
-          {task.due && (
-            <span className={cn(
-              isOverdue(task.due) && task.status !== "done" && "text-destructive"
-            )}>
-              {t("pages.tasks.list.dueLabel", { date: formatDate(task.due) })}
-            </span>
-          )}
-        </div>
-
-        {/* Content preview */}
-        {task.content && (
-          <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-            {stripMarkdown(task.content)}
-          </p>
+        {(projectName || task.due) && (
+          <div className="mt-1 flex min-w-0 items-center gap-3 text-xs text-muted-foreground">
+            {projectName && (
+              <span className="flex min-w-0 items-center gap-1">
+                <FolderKanban className="size-3 shrink-0" />
+                <span className="truncate">{projectName}</span>
+              </span>
+            )}
+            {task.due && (
+              <span
+                className={cn(
+                  "shrink-0",
+                  isOverdue(task.due) && task.status !== "done" && "text-destructive"
+                )}
+              >
+                {t("pages.tasks.list.dueLabel", { date: formatDate(task.due) })}
+              </span>
+            )}
+          </div>
         )}
       </div>
       {onToggleHighlight && (

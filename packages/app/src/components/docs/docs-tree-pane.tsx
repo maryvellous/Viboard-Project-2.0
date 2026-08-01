@@ -56,9 +56,10 @@ import { getScopedEntityKey } from "@desk/core";
 
 interface DocsTreePaneProps {
   workspaceId: string;
+  initialProjectId?: string;
 }
 
-export function DocsTreePane({ workspaceId }: DocsTreePaneProps) {
+export function DocsTreePane({ workspaceId, initialProjectId }: DocsTreePaneProps) {
   const { t } = useTranslation();
   const { data: overviewTree = [] } = useWorkspaceDocsShell(workspaceId);
 
@@ -393,6 +394,7 @@ export function DocsTreePane({ workspaceId }: DocsTreePaneProps) {
       >
         <DocsTree
           workspaceId={workspaceId}
+          initialProjectId={initialProjectId}
           activeDocKey={activeDocKey}
           searchQuery={searchQuery}
           sortBy={sortBy}

@@ -3,6 +3,7 @@ import type { Doc, ContentScope, Asset } from "@desk/core/types";
 import { getDeskService, isSameEntity } from "@desk/core";
 import type { ConvertibleAction, DocLocation } from "@desk/core";
 import { invalidateDashboardOverview } from "./dashboard";
+import { invalidateProjectInsights } from "./project-insights-invalidation";
 
 // Query keys for content (docs, assets, folders)
 export const contentKeys = {
@@ -70,6 +71,7 @@ export function useCreateDoc() {
     }) => getDeskService().createDoc(data),
     onSuccess: (newDoc) => {
       invalidateDashboardOverview(queryClient);
+      invalidateProjectInsights(queryClient, newDoc.workspaceId);
       queryClient.invalidateQueries({
         queryKey: contentKeys.byWorkspace(newDoc.workspaceId),
       });
@@ -95,6 +97,7 @@ export function useUpdateDoc() {
     onSuccess: (updatedDoc) => {
       invalidateDashboardOverview(queryClient);
       if (updatedDoc) {
+        invalidateProjectInsights(queryClient, updatedDoc.workspaceId);
         // Directly update doc in all cached list queries (avoids stale file-tree cache race).
         // Query invalidation alone would trigger a refetch that reads from the still-stale
         // file cache, causing the UI to snap back to old values briefly.
@@ -127,6 +130,7 @@ export function useDeleteDoc() {
     onSuccess: (success, doc) => {
       invalidateDashboardOverview(queryClient);
       if (success) {
+        invalidateProjectInsights(queryClient, doc.workspaceId);
         // Invalidate workspace-scoped queries (prefix-covers project/detail/overview).
         queryClient.invalidateQueries({
           queryKey: contentKeys.byWorkspace(doc.workspaceId),
@@ -239,6 +243,7 @@ export function useCreateFolder() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
     },
@@ -275,6 +280,7 @@ export function useRenameFolder() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
     },
@@ -309,6 +315,7 @@ export function useDeleteFolder() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
     },
@@ -345,6 +352,7 @@ export function useMoveFolder() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
     },
@@ -372,6 +380,7 @@ export function useMoveDoc() {
     onSuccess: (_result, variables) => {
       invalidateDashboardOverview(queryClient);
       const { workspaceId, from, to } = variables;
+      invalidateProjectInsights(queryClient, workspaceId);
       // Invalidate both source and destination trees.
       for (const loc of [from, to]) {
         queryClient.invalidateQueries({
@@ -409,6 +418,7 @@ export function useCreateDocInFolder() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
       // Also invalidate the flat list queries for backward compatibility
@@ -463,6 +473,7 @@ export function useImportFiles() {
         ),
       });
       if (variables.workspaceId) {
+        invalidateProjectInsights(queryClient, variables.workspaceId);
         queryClient.invalidateQueries({ queryKey: contentKeys.shell(variables.workspaceId) });
       }
       // Also invalidate the flat list queries

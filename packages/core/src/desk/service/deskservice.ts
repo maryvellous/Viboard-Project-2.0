@@ -22,6 +22,7 @@
  */
 import type * as tasksApi from "../tasks";
 import type * as projectsApi from "../projects";
+import type * as projectInsightsApi from "../project-insights";
 import type * as workspacesApi from "../workspaces";
 import type * as meetingsApi from "../meetings";
 import type * as personalApi from "../personal";
@@ -52,6 +53,8 @@ export interface DeskService {
   createProject: typeof projectsApi.createProject;
   updateProject: typeof projectsApi.updateProject;
   deleteProject: typeof projectsApi.deleteProject;
+  getProjectSummaries: typeof projectInsightsApi.getProjectSummaries;
+  getProjectHome: typeof projectInsightsApi.getProjectHome;
 
   // ── Workspaces ──────────────────────────────────────────────────────
   getWorkspaces: typeof workspacesApi.getWorkspaces;

@@ -1,58 +1,60 @@
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Calendar, FileText, Plus } from "lucide-react";
-import { toast } from "sonner";
-import { safeFormat } from "@/lib/i18n/format";
-import { Input } from "@/components/ui/input";
-import { EmptyState } from "@/components/ui/empty-state";
-import { SectionLabel, ListRow } from "@/components/patterns";
-import { AIBadge } from "@/components/ui/ai-badge";
-import { TaskListView } from "@/components/tasks/task-list-view";
-import { NewMeetingModal } from "@/components/meetings/new-meeting-modal";
 import {
-  useProjectTasks,
-  useProjectMeetings,
-  useContentTree,
-  useCreateTask,
-  useOpenTab,
-  useHighlightedTasks,
-} from "@/stores";
-import { extractDocs, compareDatesDesc } from "@desk/core";
-import type { TaskStatus } from "@desk/core/types";
-import { isActiveStatus } from "@/lib/task-status";
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { RecentWorkList, type RecentWorkListItem } from "@/components/recent-work-list";
+  Calendar,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  Clock,
+  FileText,
+  Loader2,
+  Plus,
+  Star,
+} from "lucide-react";
+import { toast } from "sonner";
+import type {
+  ProjectCurrentTask,
+  ProjectTimeline,
+  ProjectTimelineEvent,
+} from "@desk/core";
+import { getScopedEntityKey } from "@desk/core";
+import { cn } from "@/lib/utils";
+import { formatLocaleDate } from "@/lib/i18n/format";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { DueLabel } from "@/components/ui/due-label";
+import { PriorityIcon } from "@/components/ui/priority-icon";
+import { SectionLabel } from "@/components/patterns";
+import { useCreateTask, useHighlightedTasks, useOpenTab } from "@/stores";
 
-const TASK_CAP = 7;
-const ACTIVITY_CAP = 10;
-const NO_HIDDEN_STATUSES = new Set<TaskStatus>();
+const CURRENT_TASK_LIMIT = 6;
+const SCHEDULE_LIMIT = 5;
+const HISTORY_LIMIT = 8;
 
-function SectionLink({ to, children }: { to: string; children: ReactNode }) {
-  return (
-    <Link to={to} className="text-[11px] text-muted-foreground hover:text-foreground">
-      {children}
-    </Link>
-  );
-}
+const statusIcons = {
+  todo: Circle,
+  doing: Loader2,
+  waiting: Clock,
+} as const;
 
-export function TasksSection({
+export function CurrentWorkSection({
   workspaceId,
   projectId,
+  tasks,
 }: {
   workspaceId: string;
   projectId: string;
+  tasks: ProjectCurrentTask[];
 }) {
   const { t } = useTranslation();
-  const { data: tasks = [], isLoading } = useProjectTasks(workspaceId, projectId);
   const { openTask } = useOpenTab();
-  const { highlightedTasks, toggleHighlight } = useHighlightedTasks(workspaceId, projectId);
+  const { toggleHighlight } = useHighlightedTasks(workspaceId, projectId);
   const createTask = useCreateTask();
   const [newTitle, setNewTitle] = useState("");
-
-  const activeTasks = useMemo(() => tasks.filter((task) => isActiveStatus(task.status)), [tasks]);
-  const shown = activeTasks.slice(0, TASK_CAP);
-  const moreCount = activeTasks.length - shown.length;
+  const shown = tasks.slice(0, CURRENT_TASK_LIMIT);
+  const moreCount = tasks.length - shown.length;
   const boardLink = `/tasks?project=${projectId}`;
 
   const handleQuickAdd = async (event: FormEvent) => {
@@ -72,43 +74,62 @@ export function TasksSection({
     <section>
       <SectionLabel
         className="mb-2"
-        end={<SectionLink to={boardLink}>{t("pages.projects.home.openBoard")}</SectionLink>}
+        end={(
+          <Link to={boardLink} className="text-[11px] text-muted-foreground hover:text-foreground">
+            {t("pages.projects.home.openBoard")}
+          </Link>
+        )}
       >
-        {t("pages.projects.home.tasksHeading")}
+        {t("pages.projects.home.currentWork")}
       </SectionLabel>
 
-      {!isLoading && shown.length === 0 ? (
-        <EmptyState
-          display="inline"
-          className="py-6"
-          title={t("pages.projects.home.noActiveTasks")}
-        />
+      {shown.length === 0 ? (
+        <p className="rounded-md border border-dashed border-border/70 px-4 py-5 text-center text-sm text-muted-foreground">
+          {t("pages.projects.home.noCurrentWork")}
+        </p>
       ) : (
-        <TaskListView
-          tasks={shown}
-          onTaskClick={(task) => openTask(task)}
-          groupByStatus={false}
-          hiddenStatuses={NO_HIDDEN_STATUSES}
-          isLoading={isLoading}
-          highlightedTasks={highlightedTasks}
-          onToggleHighlight={toggleHighlight}
-        />
+        <div className="-mx-2 divide-y divide-border/40">
+          {shown.map((task) => {
+            const Icon = statusIcons[task.status as keyof typeof statusIcons];
+            return (
+              <div key={`${task.workspaceId}:${task.projectId}:${task.id}`} className="group flex items-center gap-2 px-2 py-2">
+                <button
+                  type="button"
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                  onClick={() => openTask(task)}
+                >
+                  <Icon className={cn("size-3.5 shrink-0 text-muted-foreground", task.status === "doing" && "text-primary")} />
+                  <span className="min-w-0 flex-1 truncate text-sm">{task.title}</span>
+                  {task.priority && <PriorityIcon priority={task.priority} className="shrink-0" />}
+                  <DueLabel due={task.due} status={task.status} showUpcoming />
+                </button>
+                <button
+                  type="button"
+                  className={cn(
+                    "rounded p-1 text-muted-foreground/50 transition-colors hover:bg-muted hover:text-brand-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+                    task.highlighted && "text-brand-accent",
+                  )}
+                  onClick={() => toggleHighlight(getScopedEntityKey(task))}
+                  aria-label={t(task.highlighted ? "menus.taskContextMenu.removeHighlight" : "menus.taskContextMenu.highlightForFocus")}
+                >
+                  <Star className={cn("size-3.5", task.highlighted && "fill-current")} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {moreCount > 0 && (
-        <Link
-          to={boardLink}
-          className="inline-block mt-2 text-xs text-muted-foreground hover:text-foreground"
-        >
+        <Link to={boardLink} className="mt-2 inline-block text-xs text-muted-foreground hover:text-foreground">
           {t("pages.projects.home.moreOnBoard", { count: moreCount })}
         </Link>
       )}
 
       <form onSubmit={handleQuickAdd} className="mt-3">
         <div className="relative">
-          <Plus className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          <Plus className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            type="text"
             value={newTitle}
             onChange={(event) => setNewTitle(event.target.value)}
             placeholder={t("pages.projects.home.quickAddPlaceholder")}
@@ -120,194 +141,95 @@ export function TasksSection({
   );
 }
 
-export function MeetingsSection({
-  workspaceId,
-  projectId,
-}: {
-  workspaceId: string;
-  projectId: string;
-}) {
+const timelineIcons = {
+  "project-created": Circle,
+  "task-created": Circle,
+  "task-completed": CheckCircle2,
+  "task-due": Clock,
+  meeting: Calendar,
+  "doc-created": FileText,
+  "doc-updated": FileText,
+} as const;
+
+function TimelineRow({ event }: { event: ProjectTimelineEvent }) {
   const { t } = useTranslation();
-  const { data: meetings = [], isLoading } = useProjectMeetings(workspaceId, projectId);
-  const { openMeeting } = useOpenTab();
-  const [newMeetingOpen, setNewMeetingOpen] = useState(false);
-
-  const recent = useMemo(
-    () => [...meetings].sort((a, b) => compareDatesDesc(a.date, b.date)).slice(0, 3),
-    [meetings],
-  );
-
-  return (
-    <section>
-      <SectionLabel
-        className="mb-1"
-        end={
-          <>
-            <button
-              type="button"
-              onClick={() => setNewMeetingOpen(true)}
-              className="flex items-center gap-0.5 text-[11px] text-muted-foreground hover:text-foreground"
-            >
-              <Plus className="size-3" />
-              {t("pages.projects.home.newMeeting")}
-            </button>
-            <span className="text-muted-foreground/40">·</span>
-            <SectionLink to={`/meetings?project=${projectId}`}>
-              {t("pages.projects.home.allMeetings")}
-            </SectionLink>
-          </>
-        }
-      >
-        {t("pages.projects.home.meetingsHeading")}
-      </SectionLabel>
-
-      {isLoading ? (
-        <LoadingSkeleton variant="list" rows={3} className="py-1" />
-      ) : recent.length === 0 ? (
-        <EmptyState
-          display="inline"
-          className="py-6"
-          title={t("pages.projects.home.noMeetings")}
-        />
-      ) : (
-        <div className="-mx-4">
-          {recent.map((meeting) => (
-            <ListRow
-              key={meeting.id}
-              onClick={() => openMeeting(meeting)}
-              leading={<Calendar className="size-3.5 shrink-0 text-muted-foreground" />}
-              title={
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="truncate">{meeting.title}</span>
-                  {meeting.author === "ai" && <AIBadge />}
-                </span>
-              }
-              meta={safeFormat(meeting.date, "MMM d")}
-            />
-          ))}
-        </div>
-      )}
-
-      <NewMeetingModal
-        open={newMeetingOpen}
-        onClose={() => setNewMeetingOpen(false)}
-        defaultProjectId={projectId}
-      />
-    </section>
-  );
-}
-
-export function DocsSection({
-  workspaceId,
-  projectId,
-}: {
-  workspaceId: string;
-  projectId: string;
-}) {
-  const { t } = useTranslation();
-  const { data: tree = [], isLoading } = useContentTree("project", workspaceId, projectId);
-  const { openDoc } = useOpenTab();
-
-  const recent = useMemo(
-    () =>
-      extractDocs(tree)
-        .sort((a, b) => compareDatesDesc(a.created, b.created))
-        .slice(0, 5),
-    [tree],
-  );
-
-  return (
-    <section>
-      <SectionLabel
-        className="mb-1"
-        end={
-          <SectionLink to={`/docs?project=${projectId}`}>
-            {t("pages.projects.home.allDocs")}
-          </SectionLink>
-        }
-      >
-        {t("pages.projects.home.docsHeading")}
-      </SectionLabel>
-
-      {isLoading ? (
-        <LoadingSkeleton variant="list" rows={4} className="py-1" />
-      ) : recent.length === 0 ? (
-        <EmptyState display="inline" className="py-6" title={t("pages.projects.home.noDocs")} />
-      ) : (
-        <div className="-mx-4">
-          {recent.map((doc) => (
-            <ListRow
-              key={doc.id}
-              onClick={() => openDoc(doc)}
-              leading={<FileText className="size-3.5 shrink-0 text-muted-foreground" />}
-              title={
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="truncate">{doc.title}</span>
-                  {doc.author === "ai" && <AIBadge />}
-                </span>
-              }
-              meta={safeFormat(doc.created, "MMM d")}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
-/**
- * Recent-work feed: the project's most recently saved items, keyed off the
- * `updated` frontmatter stamp (falling back to `created` for files that predate
- * it). Items with neither are excluded — the feed shows real activity only.
- */
-export function ActivitySection({
-  workspaceId,
-  projectId,
-}: {
-  workspaceId: string;
-  projectId: string;
-}) {
-  const { t } = useTranslation();
-  const { data: tasks = [], isLoading: tasksLoading } = useProjectTasks(workspaceId, projectId);
-  const { data: meetings = [], isLoading: meetingsLoading } = useProjectMeetings(workspaceId, projectId);
-  const { data: tree = [], isLoading: docsLoading } = useContentTree("project", workspaceId, projectId);
-  const { openTask, openMeeting, openDoc } = useOpenTab();
-
-  const recent = useMemo(() => {
-    const items: RecentWorkListItem[] = [];
-    const push = (
-      kind: RecentWorkListItem["kind"],
-      item: { id: string; title: string; updated?: string; created?: string },
-      onOpen: () => void,
-    ) => {
-      const activityAt = item.updated ?? item.created;
-      if (activityAt) items.push({ kind, id: item.id, title: item.title, activityAt, onOpen });
+  const { openTask, openDoc, openMeeting } = useOpenTab();
+  const Icon = timelineIcons[event.kind];
+  const canOpen = event.entityType && event.entityId;
+  const open = () => {
+    if (!canOpen) return;
+    const entity = {
+      id: event.entityId!,
+      title: event.title,
+      workspaceId: event.workspaceId,
+      projectId: event.projectId,
     };
-
-    for (const task of tasks) push("task", task, () => openTask(task));
-    for (const meeting of meetings) push("meeting", meeting, () => openMeeting(meeting));
-    for (const doc of extractDocs(tree)) push("doc", doc, () => openDoc(doc));
-
-    items.sort((a, b) => compareDatesDesc(a.activityAt, b.activityAt));
-    return items.slice(0, ACTIVITY_CAP);
-  }, [tasks, meetings, tree, openTask, openMeeting, openDoc]);
+    if (event.entityType === "task") openTask(entity);
+    else if (event.entityType === "doc") openDoc(entity);
+    else openMeeting(entity);
+  };
 
   return (
-    <section>
-      <SectionLabel className="mb-1">{t("pages.projects.home.activityHeading")}</SectionLabel>
-      {tasksLoading || meetingsLoading || docsLoading ? (
-        <LoadingSkeleton variant="list" rows={5} className="py-1" />
-      ) : recent.length === 0 ? (
-        <EmptyState
-          display="inline"
-          className="py-6"
-          title={t("pages.projects.home.noActivity")}
-        />
-      ) : (
-        <div className="-mx-4">
-          <RecentWorkList items={recent} />
-        </div>
+    <button
+      type="button"
+      disabled={!canOpen}
+      onClick={open}
+      className={cn(
+        "relative flex w-full gap-2.5 py-2 text-left",
+        canOpen && "rounded-sm hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
       )}
+    >
+      <span className="relative z-10 mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-border bg-background">
+        <Icon className={cn("size-3 text-muted-foreground", event.overdue && "text-destructive")} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
+          {t(`pages.projects.home.timeline.events.${event.kind}`)}
+        </span>
+        <span className="block truncate text-sm">{event.title}</span>
+        <span className={cn("block text-[11px] text-muted-foreground", event.overdue && "text-destructive/80")}>
+          {formatLocaleDate(event.at, { day: "numeric", month: "short", year: "numeric" })}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function TimelineGroup({ title, events }: { title: string; events: ProjectTimelineEvent[] }) {
+  if (events.length === 0) return null;
+  return (
+    <section>
+      <SectionLabel className="mb-1">{title}</SectionLabel>
+      <div className="relative before:absolute before:bottom-3 before:left-[9px] before:top-3 before:w-px before:bg-border/70">
+        {events.map((event) => <TimelineRow key={event.id} event={event} />)}
+      </div>
     </section>
+  );
+}
+
+export function ProjectTimelineRail({ timeline }: { timeline: ProjectTimeline }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const schedule = expanded ? timeline.schedule : timeline.schedule.slice(0, SCHEDULE_LIMIT);
+  const history = expanded ? timeline.history : timeline.history.slice(0, HISTORY_LIMIT);
+  const hasMore = timeline.schedule.length > SCHEDULE_LIMIT || timeline.history.length > HISTORY_LIMIT;
+
+  return (
+    <aside className="space-y-6 lg:border-l lg:border-border/60 lg:pl-7">
+      <TimelineGroup title={t("pages.projects.home.timeline.schedule")} events={schedule} />
+      <TimelineGroup title={t("pages.projects.home.timeline.history")} events={history} />
+      {hasMore && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1 px-1.5 text-xs text-muted-foreground"
+          onClick={() => setExpanded((value) => !value)}
+        >
+          {expanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+          {t(expanded ? "pages.projects.home.timeline.showLess" : "pages.projects.home.timeline.showMore")}
+        </Button>
+      )}
+    </aside>
   );
 }

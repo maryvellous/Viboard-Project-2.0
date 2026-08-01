@@ -80,6 +80,16 @@ export type {
   RecentWorkItem,
   RecentWorkKind,
 } from "./dashboard";
+export type {
+  ProjectCurrentTask,
+  ProjectHomeData,
+  ProjectInsightsOptions,
+  ProjectSummary,
+  ProjectTimeline,
+  ProjectTimelineEvent,
+  ProjectTimelineEventKind,
+} from "./project-insights";
+export { buildProjectCurrentTasks, buildProjectTimeline } from "./project-insights";
 export { sortTasksByOrder } from "./view-state";
 export type { AiExclusionState } from "./aiignore";
 

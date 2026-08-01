@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { Calendar, CheckSquare, FileText, MoreHorizontal, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { formatLocaleDate } from "@/lib/i18n/format";
+import { formatLocaleDate, formatRelativeTime } from "@/lib/i18n/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,24 +21,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Project, ProjectStatus, ProjectUpdate } from "@desk/core/types";
-import { projectStatusDotColors, projectStatuses, taskStatusColors } from "@/lib/design-tokens";
+import { projectStatusDotColors, projectStatuses } from "@/lib/design-tokens";
 import { countActiveTasks } from "@/lib/task-status";
 
 interface ProjectHomeHeaderProps {
   project: Project;
   onUpdate: (updates: ProjectUpdate) => Promise<void>;
   onDeleteRequest: () => void;
+  lastActivityAt?: string;
 }
 
 export function ProjectHomeHeader({
   project,
   onUpdate,
   onDeleteRequest,
+  lastActivityAt,
 }: ProjectHomeHeaderProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-2">
+    <header className="space-y-3 border-b border-border/60 pb-5">
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <InlineName value={project.name} onSave={(name) => onUpdate({ name })} />
@@ -88,8 +91,8 @@ export function ProjectHomeHeader({
         value={project.description ?? ""}
         onSave={(description) => onUpdate({ description: description || null })}
       />
-      <TaskCounts project={project} />
-    </div>
+      <ProjectMeta project={project} lastActivityAt={lastActivityAt} />
+    </header>
   );
 }
 
@@ -212,47 +215,15 @@ function InlineDescription({
   );
 }
 
-/**
- * Task counts, not a completion percentage.
- *
- * The old progress bar was `done / (backlog + todo + doing + waiting + done)`, which made a
- * project look *less* finished the moment you wrote another task down — the denominator was
- * "things I have thought of so far", not "the work". Counts have no denominator, so they cannot
- * lie. `countActiveTasks` is the same signal the sidebar and the projects list already show.
- */
-function TaskCounts({ project }: { project: Project }) {
+/** Compact linked project facts with no implied progress model. */
+function ProjectMeta({ project, lastActivityAt }: { project: Project; lastActivityAt?: string }) {
   const { t } = useTranslation();
   const byStatus = project.tasksByStatus;
   const active = countActiveTasks(byStatus);
-  const done = byStatus?.done ?? 0;
-  const backlog = byStatus?.backlog ?? 0;
-
-  const parts: { key: string; label: string; dot: string }[] = [];
-  if (active > 0) {
-    parts.push({
-      key: "active",
-      label: t("pages.projects.home.counts.active", { count: active }),
-      dot: taskStatusColors.doing,
-    });
-  }
-  if (done > 0) {
-    parts.push({
-      key: "done",
-      label: t("pages.projects.home.counts.done", { count: done }),
-      dot: taskStatusColors.done,
-    });
-  }
-  if (backlog > 0) {
-    parts.push({
-      key: "backlog",
-      label: t("pages.projects.home.counts.backlog", { count: backlog }),
-      dot: taskStatusColors.backlog,
-    });
-  }
 
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+      <span className="whitespace-nowrap">
         {t("pages.projects.home.createdOn", {
           date: formatLocaleDate(project.created, {
             day: "numeric",
@@ -261,13 +232,23 @@ function TaskCounts({ project }: { project: Project }) {
           }),
         })}
       </span>
-      {parts.map((part) => (
-        <span key={part.key} className="flex items-center gap-1.5">
-          <span className="text-muted-foreground/40">·</span>
-          <span className={cn("size-1.5 rounded-full", part.dot)} />
-          <span className="tabular-nums">{part.label}</span>
-        </span>
-      ))}
+      {lastActivityAt && (
+        <span>{t("pages.projects.home.lastActivity", { date: formatRelativeTime(lastActivityAt) })}</span>
+      )}
+      <nav className="flex flex-wrap items-center gap-3 sm:ml-auto">
+        <Link to={`/tasks?project=${project.id}`} className="flex items-center gap-1 hover:text-foreground">
+          <CheckSquare className="size-3.5" />
+          {t("pages.projects.home.metricTasks", { count: active })}
+        </Link>
+        <Link to={`/docs?project=${project.id}`} className="flex items-center gap-1 hover:text-foreground">
+          <FileText className="size-3.5" />
+          {t("pages.projects.home.metricDocs", { count: project.docCount ?? 0 })}
+        </Link>
+        <Link to={`/meetings?project=${project.id}`} className="flex items-center gap-1 hover:text-foreground">
+          <Calendar className="size-3.5" />
+          {t("pages.projects.home.metricMeetings", { count: project.meetingCount ?? 0 })}
+        </Link>
+      </nav>
     </div>
   );
 }

@@ -51,6 +51,8 @@ export type { DocAuthorFilter } from "./docs-tree-model";
 
 export interface DocsTreeProps {
   workspaceId: string;
+  /** Project branch to expand when arriving from a project-level link. */
+  initialProjectId?: string;
   /** Active doc id from the tab store — used to highlight the matching tree row. */
   activeDocKey: string | null;
   searchQuery: string;
@@ -71,6 +73,7 @@ export interface DocsTreeProps {
 
 export function DocsTree({
   workspaceId,
+  initialProjectId,
   activeDocKey,
   searchQuery,
   sortBy,
@@ -85,7 +88,9 @@ export function DocsTree({
   const { data: overviewTree = [], isLoading } = useWorkspaceDocsShell(workspaceId);
 
   // Locally tracked set of expanded project IDs — drives per-project query subscriptions.
-  const [expandedProjectIds, setExpandedProjectIds] = useState<Set<string>>(new Set());
+  const [expandedProjectIds, setExpandedProjectIds] = useState<Set<string>>(
+    () => new Set(initialProjectId ? [initialProjectId] : []),
+  );
 
   // Subscribe to each expanded project's document tree.
   const expandedProjectIdList = useMemo(
@@ -279,6 +284,7 @@ export function DocsTree({
   // ── Size measurement (arborist needs explicit width/height) ──────────────────
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const didApplyInitialProjectRef = useRef(false);
   const [size, setSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
@@ -293,6 +299,15 @@ export function DocsTree({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!initialProjectId || didApplyInitialProjectRef.current) return;
+    const tree = treeRef.current;
+    const nodeId = `folder|${PROJECT_TREE_PATH_PREFIX}${initialProjectId}`;
+    if (!tree?.get(nodeId)) return;
+    didApplyInitialProjectRef.current = true;
+    tree.open(nodeId);
+  }, [initialProjectId, arboristData, size.width, size.height]);
 
   // ── Render ───────────────────────────────────────────────────────────────────
 

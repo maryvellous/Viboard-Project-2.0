@@ -45,7 +45,9 @@
   "overviews": {
     "discardTitle": "Discard overview changes?",
     "discardDescription": "Your unsaved overview changes will be lost.",
-    "discardAction": "Discard changes"
+    "discardAction": "Discard changes",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "nav": {
     "sidebar": {
@@ -226,7 +228,16 @@
         "loading": "Loading project…",
         "notFoundTitle": "Project not found",
         "notFoundDescription": "This project may have been deleted or moved.",
+        "loadErrorTitle": "Couldn’t load this project",
+        "loadErrorDescription": "The project context could not be assembled. Try again.",
         "createdOn": "Created {{date}}",
+        "lastActivity": "Active {{date}}",
+        "metricTasks_one": "{{count}} active task",
+        "metricTasks_other": "{{count}} active tasks",
+        "metricDocs_one": "{{count}} doc",
+        "metricDocs_other": "{{count}} docs",
+        "metricMeetings_one": "{{count}} meeting",
+        "metricMeetings_other": "{{count}} meetings",
         "renameTitle": "Click to rename",
         "descriptionPlaceholder": "Add a short description…",
         "descriptionEditTitle": "Click to edit",
@@ -237,6 +248,23 @@
         "moreOnBoard_other": "{{count}} more on the board",
         "noActiveTasks": "No active tasks.",
         "quickAddPlaceholder": "Add a task…",
+        "currentWork": "Current work",
+        "noCurrentWork": "Nothing needs attention here right now.",
+        "timeline": {
+          "schedule": "Schedule",
+          "history": "History",
+          "showMore": "Show full timeline",
+          "showLess": "Show less",
+          "events": {
+            "project-created": "Project created",
+            "task-created": "Task added",
+            "task-completed": "Task completed",
+            "task-due": "Task due",
+            "meeting": "Meeting",
+            "doc-created": "Document added",
+            "doc-updated": "Document updated"
+          }
+        },
         "meetingsHeading": "Meetings",
         "newMeeting": "New meeting",
         "allMeetings": "All meetings",
@@ -265,6 +293,11 @@
         "allStatuses": "All statuses",
         "countLabel": "projects",
         "searchPlaceholder": "Search projects…",
+        "sortLabel": "Sort",
+        "sortRecent": "Recent activity",
+        "sortName": "Name A–Z",
+        "activeTasks_one": "{{count}} active",
+        "activeTasks_other": "{{count}} active",
         "workspaceOverview": {
           "title": "Workspace overview",
           "placeholder": "Describe this workspace, its purpose, and anything people should know first."
@@ -272,6 +305,8 @@
       },
       "deleteConfirmTitle": "Delete Project",
       "deleteConfirmDescription": "Are you sure you want to delete \"{{name}}\"? This will permanently remove the project and all its tasks, docs, and meetings.",
+      "loadErrorTitle": "Couldn’t load projects",
+      "loadErrorDescription": "Project information could not be loaded. Check the connection and try again.",
       "selectWorkspaceTitle": "Select a workspace",
       "selectWorkspaceDescription": "Choose a workspace in the sidebar to view projects."
     },

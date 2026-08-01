@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckSquare, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -10,15 +10,19 @@ import { StatePanel } from "@/components/ui/state-panel";
 import { FilteredListPage, ListRow } from "@/components/patterns";
 import { EntityOverview } from "@/components/entity-overview";
 import { cn } from "@/lib/utils";
-import { matchesSearch } from "@/lib/tree-count";
 import { projectStatusDotColors, projectStatuses } from "@/lib/design-tokens";
 import { countActiveTasks } from "@/lib/task-status";
 import type { Project } from "@desk/core/types";
-import { useProjects, useDeleteProject, useCurrentWorkspace, useUpdateWorkspace } from "@/stores";
+import { useProjectSummaries, useDeleteProject, useCurrentWorkspace, useUpdateWorkspace } from "@/stores";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import { NewProjectModal } from "./new-project-modal";
+import { useMinuteClock } from "@/hooks/use-minute-clock";
+import { formatRelativeTime } from "@/lib/i18n/format";
+import { filterAndSortProjects, type ProjectSortOrder } from "@/lib/project-browse";
 
 const ALL_STATUSES = "all";
+const SORT_RECENT = "recent";
+const SORT_NAME = "name";
 
 interface ProjectsBrowseProps {
   workspaceId: string;
@@ -31,7 +35,8 @@ interface ProjectsBrowseProps {
  */
 export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
   const { t } = useTranslation();
-  const { data: projects = [] } = useProjects(workspaceId);
+  const { today } = useMinuteClock();
+  const { data: projects = [] } = useProjectSummaries(workspaceId, today);
   const workspace = useCurrentWorkspace();
   const updateWorkspace = useUpdateWorkspace();
   const deleteProject = useDeleteProject();
@@ -39,18 +44,24 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>(ALL_STATUSES);
+  const [sortOrder, setSortOrder] = useState<string>(SORT_RECENT);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [deletingProject, setDeletingProject] = useState<Project | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    setSearchQuery("");
+    setStatusFilter(ALL_STATUSES);
+    setSortOrder(SORT_RECENT);
+  }, [workspaceId]);
+
   const filtered = useMemo(() => {
-    const list = projects.filter((p) => {
-      if (statusFilter !== ALL_STATUSES && p.status !== statusFilter) return false;
-      return matchesSearch(searchQuery, p.name, p.description);
+    return filterAndSortProjects(projects, {
+      query: searchQuery,
+      status: statusFilter,
+      sort: sortOrder as ProjectSortOrder,
     });
-    list.sort((a, b) => a.name.localeCompare(b.name));
-    return list;
-  }, [projects, searchQuery, statusFilter]);
+  }, [projects, searchQuery, sortOrder, statusFilter]);
 
   const handleDelete = useCallback(async () => {
     if (!deletingProject) return;
@@ -86,6 +97,17 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
           allLabel: t("pages.projects.browse.allStatuses"),
           width: "w-[160px]",
         },
+        {
+          id: "sort",
+          label: t("pages.projects.browse.sortLabel"),
+          value: sortOrder,
+          onChange: setSortOrder,
+          options: [
+            { value: SORT_RECENT, label: t("pages.projects.browse.sortRecent") },
+            { value: SORT_NAME, label: t("pages.projects.browse.sortName") },
+          ],
+          width: "w-[170px]",
+        },
       ]}
       count={filtered.length}
       countLabel={t("pages.projects.browse.countLabel")}
@@ -106,10 +128,11 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
         </>
       }
     >
-      <div className="max-w-3xl">
+      <div className="mx-auto max-w-4xl">
         {workspace?.id === workspaceId && (
-          <div className="mb-8">
+          <div className="mb-6 border-b border-border/60 pb-5">
             <EntityOverview
+              key={workspaceId}
               title={t("pages.projects.browse.workspaceOverview.title")}
               value={workspace.overview ?? ""}
               placeholder={t("pages.projects.browse.workspaceOverview.placeholder")}
@@ -119,6 +142,8 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
                   updates: { overview },
                 });
               }}
+              collapsedClassName="max-h-28"
+              resetKey={workspaceId}
             />
           </div>
         )}
@@ -184,8 +209,15 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
                   title={project.name}
                   meta={
                     <>
-                      <CheckSquare className="size-3" />
-                      {activeTasks}
+                      {activeTasks > 0 && (
+                        <>
+                          <CheckSquare className="size-3" />
+                          {t("pages.projects.browse.activeTasks", { count: activeTasks })}
+                        </>
+                      )}
+                      {project.lastActivityAt && (
+                        <span>{formatRelativeTime(project.lastActivityAt)}</span>
+                      )}
                     </>
                   }
                   secondLine={project.description || undefined}

@@ -94,9 +94,6 @@ export function planQueryInvalidations(
         break;
 
       case "project":
-        for (const workspaceId of affectedWorkspaces) {
-          targets.push({ type: "projects", workspaceId });
-        }
         break;
 
       case "workspace":
@@ -112,10 +109,17 @@ export function planQueryInvalidations(
           targets.push({ type: "tasks", workspaceId });
           targets.push({ type: "content", workspaceId });
           targets.push({ type: "meetings", workspaceId });
-          targets.push({ type: "projects", workspaceId });
         }
         if (hasCaptureChanges) targets.push({ type: "capture" });
         break;
+    }
+  }
+
+  if ([...affectedTypes].some((itemType) =>
+    ["task", "doc", "meeting", "project", "view", "unknown"].includes(itemType)
+  )) {
+    for (const workspaceId of affectedWorkspaces) {
+      targets.push({ type: "projects", workspaceId });
     }
   }
 

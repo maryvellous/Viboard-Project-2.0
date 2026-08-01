@@ -221,29 +221,27 @@ export async function getAllDocs(
  * Get all docs for a workspace across all projects (includes nested folders)
  */
 export async function getAllDocsForWorkspace(workspaceId: string): Promise<Doc[]> {
-  const allDocs: Doc[] = [];
-
-  // 1. Get workspace-level docs
-  const workspaceDocs = await getAllDocs("workspace", workspaceId);
-  allDocs.push(...workspaceDocs);
-
-  // 2. Get all project docs
+  const workspaceDocsPromise = getAllDocs("workspace", workspaceId);
   const projectsPath = await getProjectsPath(workspaceId);
-
+  let projectIds: string[] = [];
   if (await getStorage().exists(projectsPath)) {
     const projectEntries = await getStorage().readDir(projectsPath);
-
-    for (const entry of projectEntries) {
-      if (entry.isDirectory && !entry.name.startsWith(".") && entry.name !== SPECIAL_DIRS.UNASSIGNED) {
-        const projectDocs = await getAllDocs("project", workspaceId, entry.name);
-        allDocs.push(...projectDocs);
-      }
-    }
+    projectIds = projectEntries
+      .filter(
+        (entry) =>
+          entry.isDirectory
+          && !entry.name.startsWith(".")
+          && entry.name !== SPECIAL_DIRS.UNASSIGNED,
+      )
+      .map((entry) => entry.name);
   }
 
-  // 3. Get unassigned docs
-  const unassignedDocs = await getAllDocs("project", workspaceId, SPECIAL_DIRS.UNASSIGNED);
-  allDocs.push(...unassignedDocs);
+  const docGroups = await Promise.all([
+    workspaceDocsPromise,
+    ...projectIds.map((projectId) => getAllDocs("project", workspaceId, projectId)),
+    getAllDocs("project", workspaceId, SPECIAL_DIRS.UNASSIGNED),
+  ]);
+  const allDocs = docGroups.flat();
 
   allDocs.sort((a, b) => compareDatesDesc(a.created, b.created));
   return allDocs;

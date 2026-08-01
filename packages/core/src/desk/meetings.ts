@@ -145,15 +145,20 @@ export async function getMeetings(workspaceId: string): Promise<Meeting[]> {
   }
 
   const projectEntries = await getStorage().readDir(projectsPath);
-  const allMeetings: Meeting[] = [];
-
-  for (const entry of projectEntries) {
-    if (entry.isDirectory && !entry.name.startsWith(".")) {
-      const projectPath = await joinPath(projectsPath, entry.name);
-      const projectMeetings = await readProjectMeetings(workspaceId, entry.name, projectPath);
-      allMeetings.push(...projectMeetings);
-    }
-  }
+  const projectMeetingGroups = await Promise.all(
+    projectEntries
+      .filter(
+        (entry) =>
+          entry.isDirectory
+          && !entry.name.startsWith(".")
+          && entry.name !== SPECIAL_DIRS.UNASSIGNED,
+      )
+      .map(async (entry) => {
+        const projectPath = await joinPath(projectsPath, entry.name);
+        return readProjectMeetings(workspaceId, entry.name, projectPath);
+      }),
+  );
+  const allMeetings = projectMeetingGroups.flat();
 
   const unassignedPath = await getUnassignedPath(workspaceId);
   if (await getStorage().exists(unassignedPath)) {

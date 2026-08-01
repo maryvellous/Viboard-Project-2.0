@@ -45,7 +45,9 @@
   "overviews": {
     "discardTitle": "Änderungen am Überblick verwerfen?",
     "discardDescription": "Deine ungespeicherten Änderungen am Überblick gehen verloren.",
-    "discardAction": "Änderungen verwerfen"
+    "discardAction": "Änderungen verwerfen",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
   },
   "nav": {
     "sidebar": {
@@ -214,7 +216,16 @@
         "loading": "Projekt wird geladen…",
         "notFoundTitle": "Projekt nicht gefunden",
         "notFoundDescription": "Dieses Projekt wurde möglicherweise gelöscht oder verschoben.",
+        "loadErrorTitle": "Projekt konnte nicht geladen werden",
+        "loadErrorDescription": "Der Projektkontext konnte nicht zusammengestellt werden. Versuche es erneut.",
         "createdOn": "Erstellt am {{date}}",
+        "lastActivity": "Aktiv {{date}}",
+        "metricTasks_one": "{{count}} aktive Aufgabe",
+        "metricTasks_other": "{{count}} aktive Aufgaben",
+        "metricDocs_one": "{{count}} Dokument",
+        "metricDocs_other": "{{count}} Dokumente",
+        "metricMeetings_one": "{{count}} Meeting",
+        "metricMeetings_other": "{{count}} Meetings",
         "renameTitle": "Zum Umbenennen klicken",
         "descriptionPlaceholder": "Kurze Beschreibung hinzufügen…",
         "descriptionEditTitle": "Zum Bearbeiten klicken",
@@ -225,6 +236,23 @@
         "moreOnBoard_other": "{{count}} weitere auf dem Board",
         "noActiveTasks": "Keine aktiven Aufgaben.",
         "quickAddPlaceholder": "Aufgabe hinzufügen…",
+        "currentWork": "Aktuelle Arbeit",
+        "noCurrentWork": "Hier braucht gerade nichts deine Aufmerksamkeit.",
+        "timeline": {
+          "schedule": "Planung",
+          "history": "Verlauf",
+          "showMore": "Ganzen Verlauf anzeigen",
+          "showLess": "Weniger anzeigen",
+          "events": {
+            "project-created": "Projekt erstellt",
+            "task-created": "Aufgabe hinzugefügt",
+            "task-completed": "Aufgabe erledigt",
+            "task-due": "Aufgabe fällig",
+            "meeting": "Meeting",
+            "doc-created": "Dokument hinzugefügt",
+            "doc-updated": "Dokument aktualisiert"
+          }
+        },
         "meetingsHeading": "Meetings",
         "newMeeting": "Neues Meeting",
         "allMeetings": "Alle Meetings",
@@ -253,6 +281,11 @@
         "allStatuses": "Alle Status",
         "countLabel": "Projekte",
         "searchPlaceholder": "Projekte durchsuchen…",
+        "sortLabel": "Sortierung",
+        "sortRecent": "Letzte Aktivität",
+        "sortName": "Name A–Z",
+        "activeTasks_one": "{{count}} aktiv",
+        "activeTasks_other": "{{count}} aktiv",
         "workspaceOverview": {
           "title": "Arbeitsbereichsüberblick",
           "placeholder": "Beschreibe Zweck, Hintergrund und was man zuerst wissen sollte."
@@ -260,6 +293,8 @@
       },
       "deleteConfirmTitle": "Projekt löschen",
       "deleteConfirmDescription": "Möchtest du „{{name}}“ wirklich löschen? Damit werden das Projekt und alle Aufgaben, Dokumente und Meetings unwiderruflich entfernt.",
+      "loadErrorTitle": "Projekte konnten nicht geladen werden",
+      "loadErrorDescription": "Die Projektinformationen konnten nicht geladen werden. Prüfe die Verbindung und versuche es erneut.",
       "selectWorkspaceTitle": "Arbeitsbereich auswählen",
       "selectWorkspaceDescription": "Wähle einen Arbeitsbereich in der Seitenleiste, um Projekte anzuzeigen."
     },

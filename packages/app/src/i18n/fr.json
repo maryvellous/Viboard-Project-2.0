@@ -45,7 +45,9 @@
   "overviews": {
     "discardTitle": "Ignorer les modifications de la présentation ?",
     "discardDescription": "Les modifications non enregistrées seront perdues.",
-    "discardAction": "Ignorer les modifications"
+    "discardAction": "Ignorer les modifications",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins"
   },
   "nav": {
     "sidebar": {
@@ -214,7 +216,16 @@
         "loading": "Chargement du projet…",
         "notFoundTitle": "Projet introuvable",
         "notFoundDescription": "Ce projet a peut-être été supprimé ou déplacé.",
+        "loadErrorTitle": "Impossible de charger ce projet",
+        "loadErrorDescription": "Le contexte du projet n’a pas pu être assemblé. Réessayez.",
         "createdOn": "Créé le {{date}}",
+        "lastActivity": "Actif {{date}}",
+        "metricTasks_one": "{{count}} tâche active",
+        "metricTasks_other": "{{count}} tâches actives",
+        "metricDocs_one": "{{count}} document",
+        "metricDocs_other": "{{count}} documents",
+        "metricMeetings_one": "{{count}} réunion",
+        "metricMeetings_other": "{{count}} réunions",
         "renameTitle": "Cliquer pour renommer",
         "descriptionPlaceholder": "Ajouter une courte description…",
         "descriptionEditTitle": "Cliquer pour modifier",
@@ -225,6 +236,23 @@
         "moreOnBoard_other": "{{count}} autres sur le tableau",
         "noActiveTasks": "Aucune tâche active.",
         "quickAddPlaceholder": "Ajouter une tâche…",
+        "currentWork": "Travail en cours",
+        "noCurrentWork": "Rien ne demande votre attention ici pour le moment.",
+        "timeline": {
+          "schedule": "Planning",
+          "history": "Historique",
+          "showMore": "Afficher toute la chronologie",
+          "showLess": "Afficher moins",
+          "events": {
+            "project-created": "Projet créé",
+            "task-created": "Tâche ajoutée",
+            "task-completed": "Tâche terminée",
+            "task-due": "Échéance de tâche",
+            "meeting": "Réunion",
+            "doc-created": "Document ajouté",
+            "doc-updated": "Document mis à jour"
+          }
+        },
         "meetingsHeading": "Réunions",
         "newMeeting": "Nouvelle réunion",
         "allMeetings": "Toutes les réunions",
@@ -253,6 +281,11 @@
         "allStatuses": "Tous les statuts",
         "countLabel": "projets",
         "searchPlaceholder": "Rechercher des projets…",
+        "sortLabel": "Trier",
+        "sortRecent": "Activité récente",
+        "sortName": "Nom A–Z",
+        "activeTasks_one": "{{count}} active",
+        "activeTasks_other": "{{count}} actives",
         "workspaceOverview": {
           "title": "Présentation de l’espace",
           "placeholder": "Décrivez l’objectif, le contexte important et ce qu’il faut lire en premier."
@@ -260,6 +293,8 @@
       },
       "deleteConfirmTitle": "Supprimer le projet",
       "deleteConfirmDescription": "Voulez-vous vraiment supprimer « {{name}} » ? Cela supprimera définitivement le projet et toutes ses tâches, documents et réunions.",
+      "loadErrorTitle": "Impossible de charger les projets",
+      "loadErrorDescription": "Les informations des projets n’ont pas pu être chargées. Vérifiez la connexion et réessayez.",
       "selectWorkspaceTitle": "Sélectionner un espace",
       "selectWorkspaceDescription": "Choisissez un espace dans la barre latérale pour voir les projets."
     },

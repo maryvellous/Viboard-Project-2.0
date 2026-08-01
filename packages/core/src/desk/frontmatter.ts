@@ -42,6 +42,7 @@ export interface TaskMetadata {
   due?: string;
   created?: string;
   updated?: string;
+  completed?: string;
   author?: "ai";
 }
 
@@ -126,6 +127,7 @@ export function decodeTaskFrontmatter(
       due: optionalDate(data, "due", diagnostics),
       created: contentDate(data, "created", filename, diagnostics),
       updated: optionalDateTime(data, "updated", diagnostics),
+      completed: optionalDateTime(data, "completed", diagnostics),
       author: optionalAuthor(data, diagnostics),
     },
     diagnostics,

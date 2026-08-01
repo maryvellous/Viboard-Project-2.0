@@ -20,6 +20,66 @@ interface ProjectFrontmatter {
   created: string;
 }
 
+/** Read project.md without walking the project's task/content directories. */
+export async function getProjectRecord(
+  workspaceId: string,
+  projectId: string,
+): Promise<Project | null> {
+  const deskPath = await getDeskPath();
+  const projectMdPath = await joinPath(
+    deskPath,
+    PATH_SEGMENTS.WORKSPACES,
+    workspaceId,
+    PATH_SEGMENTS.PROJECTS,
+    projectId,
+    "project.md",
+  );
+
+  try {
+    const content = await getStorage().readTextFile(projectMdPath);
+    const { data: rawData, content: body } = parseMarkdown<Record<string, unknown>>(content);
+    const decoded = decodeProjectFrontmatter(rawData, projectId);
+    reportFrontmatterDiagnostics("project", projectMdPath, decoded.diagnostics);
+    return {
+      id: projectId,
+      workspaceId,
+      name: decoded.value.name,
+      status: decoded.value.status,
+      description: decoded.value.description,
+      overview: body.trim() || undefined,
+      created: decoded.value.created,
+    };
+  } catch (error) {
+    console.warn(`Failed to read project ${projectId}:`, error);
+    return null;
+  }
+}
+
+/** Read all project.md records without their child collections. */
+export async function getProjectRecords(workspaceId: string): Promise<Project[]> {
+  const deskPath = await getDeskPath();
+  const projectsPath = await joinPath(
+    deskPath,
+    PATH_SEGMENTS.WORKSPACES,
+    workspaceId,
+    PATH_SEGMENTS.PROJECTS,
+  );
+  if (!(await getStorage().exists(projectsPath))) return [];
+
+  const entries = await getStorage().readDir(projectsPath);
+  const records = await Promise.all(
+    entries
+      .filter(
+        (entry) =>
+          entry.isDirectory
+          && !entry.name.startsWith(".")
+          && entry.name !== SPECIAL_DIRS.UNASSIGNED,
+      )
+      .map((entry) => getProjectRecord(workspaceId, entry.name)),
+  );
+  return records.filter((project): project is Project => project !== null);
+}
+
 /**
  * Count tasks in a project directory
  */
@@ -86,55 +146,28 @@ async function countMarkdownFiles(dirPath: string, recursive = false): Promise<n
  */
 export async function getProjects(workspaceId: string): Promise<Project[]> {
   const deskPath = await getDeskPath();
-  const projectsPath = await joinPath(deskPath, PATH_SEGMENTS.WORKSPACES, workspaceId, PATH_SEGMENTS.PROJECTS);
-
-  if (!(await getStorage().exists(projectsPath))) {
-    return [];
-  }
-
-  const entries = await getStorage().readDir(projectsPath);
-  const projects: Project[] = [];
-
-  for (const entry of entries) {
-    if (entry.isDirectory && !entry.name.startsWith(".") && entry.name !== SPECIAL_DIRS.UNASSIGNED) {
-      try {
-        const projectPath = await joinPath(projectsPath, entry.name);
-        const projectMdPath = await joinPath(projectPath, "project.md");
-        const content = await getStorage().readTextFile(projectMdPath);
-        const { data: rawData, content: body } = parseMarkdown<Record<string, unknown>>(content);
-        const decoded = decodeProjectFrontmatter(rawData, entry.name);
-        reportFrontmatterDiagnostics("project", projectMdPath, decoded.diagnostics);
-        const data = decoded.value;
-
-        // Count project documents.
-        const taskStats = await countProjectTasks(projectPath);
-        const docsPath = await joinPath(projectPath, PATH_SEGMENTS.DOCS);
-        const meetingsPath = await joinPath(projectPath, PATH_SEGMENTS.MEETINGS);
-        const [docCount, meetingCount] = await Promise.all([
-          countMarkdownFiles(docsPath, true),
-          countMarkdownFiles(meetingsPath),
-        ]);
-
-        projects.push({
-          id: entry.name,
-          workspaceId,
-          name: data.name || entry.name,
-          status: data.status || "active",
-          description: data.description,
-          overview: body.trim() || undefined,
-          created: data.created,
-          taskCount: taskStats.total,
-          tasksByStatus: taskStats.byStatus,
-          docCount,
-          meetingCount,
-        });
-      } catch (e) {
-        console.warn(`Failed to read project ${entry.name}:`, e);
-      }
-    }
-  }
-
-  return projects;
+  const records = await getProjectRecords(workspaceId);
+  return Promise.all(records.map(async (project) => {
+    const projectPath = await joinPath(
+      deskPath,
+      PATH_SEGMENTS.WORKSPACES,
+      workspaceId,
+      PATH_SEGMENTS.PROJECTS,
+      project.id,
+    );
+    const [taskStats, docCount, meetingCount] = await Promise.all([
+      countProjectTasks(projectPath),
+      countMarkdownFiles(await joinPath(projectPath, PATH_SEGMENTS.DOCS), true),
+      countMarkdownFiles(await joinPath(projectPath, PATH_SEGMENTS.MEETINGS)),
+    ]);
+    return {
+      ...project,
+      taskCount: taskStats.total,
+      tasksByStatus: taskStats.byStatus,
+      docCount,
+      meetingCount,
+    };
+  }));
 }
 
 /**
@@ -144,43 +177,28 @@ export async function getProject(
   workspaceId: string,
   projectId: string
 ): Promise<Project | null> {
+  const project = await getProjectRecord(workspaceId, projectId);
+  if (!project) return null;
   const deskPath = await getDeskPath();
-  const projectPath = await joinPath(deskPath, PATH_SEGMENTS.WORKSPACES, workspaceId, PATH_SEGMENTS.PROJECTS, projectId);
-  const projectMdPath = await joinPath(projectPath, "project.md");
-
-  try {
-    const content = await getStorage().readTextFile(projectMdPath);
-    const { data: rawData, content: body } = parseMarkdown<Record<string, unknown>>(content);
-    const decoded = decodeProjectFrontmatter(rawData, projectId);
-    reportFrontmatterDiagnostics("project", projectMdPath, decoded.diagnostics);
-    const data = decoded.value;
-
-    // Count project documents.
-    const taskStats = await countProjectTasks(projectPath);
-    const docsPath = await joinPath(projectPath, PATH_SEGMENTS.DOCS);
-    const meetingsPath = await joinPath(projectPath, PATH_SEGMENTS.MEETINGS);
-    const [docCount, meetingCount] = await Promise.all([
-      countMarkdownFiles(docsPath, true),
-      countMarkdownFiles(meetingsPath),
-    ]);
-
-    return {
-      id: projectId,
-      workspaceId,
-      name: data.name || projectId,
-      status: data.status || "active",
-      description: data.description,
-      overview: body.trim() || undefined,
-      created: data.created,
-      taskCount: taskStats.total,
-      tasksByStatus: taskStats.byStatus,
-      docCount,
-      meetingCount,
-    };
-  } catch (error) {
-    console.warn(`Failed to read project ${projectId}:`, error);
-    return null;
-  }
+  const projectPath = await joinPath(
+    deskPath,
+    PATH_SEGMENTS.WORKSPACES,
+    workspaceId,
+    PATH_SEGMENTS.PROJECTS,
+    projectId,
+  );
+  const [taskStats, docCount, meetingCount] = await Promise.all([
+    countProjectTasks(projectPath),
+    countMarkdownFiles(await joinPath(projectPath, PATH_SEGMENTS.DOCS), true),
+    countMarkdownFiles(await joinPath(projectPath, PATH_SEGMENTS.MEETINGS)),
+  ]);
+  return {
+    ...project,
+    taskCount: taskStats.total,
+    tasksByStatus: taskStats.byStatus,
+    docCount,
+    meetingCount,
+  };
 }
 
 /**

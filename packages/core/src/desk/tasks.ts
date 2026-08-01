@@ -33,6 +33,7 @@ interface TaskFrontmatter extends Record<string, unknown> {
   due?: string;
   created?: string;
   updated?: string;
+  completed?: string;
   author?: string;
 }
 
@@ -66,6 +67,7 @@ function buildTask(
     due: metadata.due,
     created: metadata.created,
     updated: metadata.updated,
+    completed: metadata.completed,
     author: metadata.author,
     content: body,
   };
@@ -79,11 +81,22 @@ function applyTaskUpdates(
   body: string,
   updates: TaskUpdate
 ): { frontmatter: Record<string, unknown>; content: string } {
+  const previousStatus = data.status;
+  const nextStatus = updates.status;
+  let completed = data.completed;
+
+  if (nextStatus === "done" && previousStatus !== "done") {
+    completed = nowISO();
+  } else if (nextStatus && nextStatus !== "done" && previousStatus === "done") {
+    completed = undefined;
+  }
+
   return {
     frontmatter: {
       ...data,
       ...(updates.title && { title: updates.title }),
       ...(updates.status && { status: updates.status }),
+      ...(completed !== data.completed && { completed }),
       // null clears the field (→ undefined → dropped by serializeMarkdown); undefined leaves it.
       ...(updates.priority !== undefined && { priority: updates.priority ?? undefined }),
       ...(updates.due !== undefined && { due: updates.due ?? undefined }),
@@ -147,15 +160,20 @@ export async function getTasks(workspaceId: string): Promise<Task[]> {
   }
 
   const projectEntries = await getStorage().readDir(projectsPath);
-  const allTasks: Task[] = [];
-
-  for (const entry of projectEntries) {
-    if (entry.isDirectory && !entry.name.startsWith(".")) {
-      const projectPath = await joinPath(projectsPath, entry.name);
-      const projectTasks = await readProjectTasks(workspaceId, entry.name, projectPath);
-      allTasks.push(...projectTasks);
-    }
-  }
+  const projectTaskGroups = await Promise.all(
+    projectEntries
+      .filter(
+        (entry) =>
+          entry.isDirectory
+          && !entry.name.startsWith(".")
+          && entry.name !== SPECIAL_DIRS.UNASSIGNED,
+      )
+      .map(async (entry) => {
+        const projectPath = await joinPath(projectsPath, entry.name);
+        return readProjectTasks(workspaceId, entry.name, projectPath);
+      }),
+  );
+  const allTasks = projectTaskGroups.flat();
 
   // Also read unassigned tasks
   const unassignedPath = await getUnassignedPath(workspaceId);

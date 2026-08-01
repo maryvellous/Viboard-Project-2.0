@@ -44,6 +44,7 @@ export interface Task {
   due?: string;            // ISO date
   created?: string;        // ISO date - absent when the file carries no date
   updated?: string;        // ISO datetime - stamped on every save
+  completed?: string;      // ISO datetime - stamped when entering done, cleared when reopened
   author?: DocAuthor;      // 'ai' when an agent wrote it; absent = the user
   content: string;         // Markdown body
 }
