@@ -7,7 +7,7 @@
  * development. @desk/server runs the same domain layer against a NodeFsProvider (and a
  * future S3Provider) by calling setStorage() at boot — no domain code changes.
  *
- * Scope: the 10 raw I/O primitives only. Environment/path helpers (isTauri,
+ * Scope: the raw I/O primitives only. Environment/path helpers (isTauri,
  * getDeskPath, joinPath, …) are NOT storage I/O and live in ../env.
  */
 
@@ -22,6 +22,11 @@ export interface FileStat {
   mtime: Date | null; // File modification time
   size: number;
 }
+
+/** Result of an atomic, no-clobber text-file creation. */
+export type AtomicCreateTextResult =
+  | { status: "created" }
+  | { status: "exists"; current: string | null };
 
 export interface StorageProvider {
   /**
@@ -38,6 +43,10 @@ export interface StorageProvider {
   readTextFile(path: string): Promise<string>;
   /** Write a UTF-8 text file. */
   writeTextFile(path: string, content: string): Promise<void>;
+  /** Create a complete text file atomically, without replacing an existing path. */
+  createTextFileAtomically(path: string, content: string): Promise<AtomicCreateTextResult>;
+  /** Replace a text file with a flushed, same-directory atomic rename. */
+  replaceTextFileAtomically(path: string, content: string): Promise<void>;
   /** Write a binary file. */
   writeFile(path: string, bytes: Uint8Array): Promise<void>;
   /** Create a directory (recursively). */

@@ -7,7 +7,7 @@ import "./i18n";
 import { Buffer as BufferPolyfill } from "buffer";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { AppBootScreen } from "./app/boot-screen";
+import { AppBootError, AppBootScreen } from "./app/boot-screen";
 import { applyThemePreference, readPersistedTheme } from "./lib/theme";
 
 // gray-matter — used by every Markdown parse (parseMarkdown) — calls
@@ -37,19 +37,26 @@ async function bootstrap() {
   const { setDataRootResolver } = await import("@desk/core/host");
   const { useBootStore } = await import("./stores/boot");
   setDataRootResolver(async () => useBootStore.getState().dataPath || "~/DeskMD");
+  const { isTauri } = await import("@desk/core");
+  const boot = useBootStore.getState();
+  const nativeRemote = isTauri() && boot.connectionMode === "remote" && Boolean(boot.serverUrl);
 
   // Set the Tauri FS scope BEFORE any store module is evaluated. File-backed
   // zustand stores (createRemoteSettingStorage & co.) read the filesystem during
   // hydration at module-eval time — that must happen after the scope is set,
   // otherwise the narrowed capability denies the read and the store hydrates
   // empty. expandFsScope() is a no-op in browser mode (isTauri() guard inside).
-  const { expandFsScope } = await import("@desk/core/host/files");
-  try {
-    await expandFsScope(); // no arg → getDeskPath() → data-root resolver → boot store
-  } catch (error) {
-    // Never block launch on a scope failure — fs calls will just be denied,
-    // and the file-backed store adapters already catch & return null.
-    console.error("[Desk] expandFsScope failed at bootstrap:", error);
+  if (isTauri() && !nativeRemote) {
+    const { expandFsScope } = await import("@desk/core/host/files");
+    try {
+      await expandFsScope(); // claims ownership before any local read or write
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("[Desk] data-root ownership failed at bootstrap:", error);
+      stopInitialThemeSync();
+      root.render(<AppBootError message={message} />);
+      return;
+    }
   }
 
   // Wire the remaining seams (only needed once writes happen): editor-sync
@@ -58,7 +65,6 @@ async function bootstrap() {
   const { useOpenEditorRegistry } = await import("./stores/open-editor-registry");
   setEditorNotifier({
     isOpen: (p) => useOpenEditorRegistry.getState().isOpen(p),
-    updateLastSaved: (p, c) => useOpenEditorRegistry.getState().updateLastSaved(p, c),
     handlePathDeleted: (p) => useOpenEditorRegistry.getState().handlePathDeleted(p),
     handlePathChange: (o, n) => useOpenEditorRegistry.getState().handlePathChange(o, n),
   });
@@ -103,9 +109,7 @@ async function bootstrap() {
     // reloading re-wires the service; requests go through the Tauri HTTP plugin (Rust
     // reqwest, bypasses CSP/CORS) with a Keychain-backed Bearer token. Local mode (and
     // the browser-fixture dev build, where isTauri() is false) keeps LocalDeskService.
-    const { isTauri } = await import("@desk/core");
-    const boot = useBootStore.getState();
-    if (isTauri() && boot.connectionMode === "remote" && boot.serverUrl) {
+    if (nativeRemote) {
       const { setDeskService, setStorage, GuardStorageProvider } = await import("@desk/core/host");
       const { createRemoteDeskService } = await import("./lib/remote-desk-service");
       const { nativeFetch } = await import("./lib/native-http");

@@ -2,11 +2,10 @@
  * Open Editor Registry
  *
  * Tracks all files currently open in editor tabs.
- * Used by file watcher to distinguish our saves from external changes.
+ * Used by the file watcher to route lifecycle events to open editors.
  *
  * Key responsibilities:
  * - Track which files are open (for routing file watcher events)
- * - Store lastSavedContent to detect external vs our saves
  * - Handle path changes (move/rename) and deletions while editing
  */
 
@@ -18,8 +17,6 @@ export interface EditorSession {
   path: string;
   type: EditorType;
   entityId: string;
-  /** What we last wrote to disk (for external change detection) */
-  lastSavedContent: string;
   /** Set when file was moved/renamed externally */
   newPath: string | null;
   /** Set when file was deleted externally */
@@ -32,9 +29,6 @@ interface OpenEditorRegistryState {
   // Lifecycle
   register(path: string, session: { type: EditorType; entityId: string }): void;
   unregister(path: string): void;
-
-  // State updates
-  updateLastSaved(path: string, content: string): void;
 
   // Queries
   isOpen(path: string): boolean;
@@ -63,7 +57,6 @@ export const useOpenEditorRegistry = create<OpenEditorRegistryState>((set, get) 
         path,
         type,
         entityId,
-        lastSavedContent: "", // Set later via updateLastSaved after loading from disk
         newPath: null,
         isDeleted: false,
       });
@@ -75,17 +68,6 @@ export const useOpenEditorRegistry = create<OpenEditorRegistryState>((set, get) 
     set((state) => {
       const sessions = new Map(state.sessions);
       sessions.delete(path);
-      return { sessions };
-    });
-  },
-
-  updateLastSaved(path, content) {
-    set((state) => {
-      const sessions = new Map(state.sessions);
-      const session = sessions.get(path);
-      if (session) {
-        sessions.set(path, { ...session, lastSavedContent: content });
-      }
       return { sessions };
     });
   },
@@ -164,4 +146,3 @@ export const useOpenEditorRegistry = create<OpenEditorRegistryState>((set, get) 
     });
   },
 }));
-

@@ -29,6 +29,8 @@
       "back": "Retour",
       "continue": "Continuer",
       "retry": "Réessayer",
+      "discard": "Ignorer",
+      "done": "Terminé",
       "dontSave": "Ne pas enregistrer",
       "create": "Créer",
       "rename": "Renommer",
@@ -41,14 +43,18 @@
       "reloadPage": "Recharger la page",
       "clear": "Effacer"
     },
-    "aiBadge": "AI"
+    "aiBadge": "IA",
+    "bootErrorTitle": "DeskMD n’a pas pu ouvrir le dossier de données"
   },
   "overviews": {
     "discardTitle": "Ignorer les modifications de la présentation ?",
     "discardDescription": "Les modifications non enregistrées seront perdues.",
     "discardAction": "Ignorer les modifications",
     "showMore": "Afficher plus",
-    "showLess": "Afficher moins"
+    "showLess": "Afficher moins",
+    "loadFailed": "Desk n’a pas pu charger cet aperçu. Votre fichier n’a pas été modifié.",
+    "missing": "Ce fichier d’aperçu n’existe plus.",
+    "unsavedHint": "Vos modifications non enregistrées sont protégées et peuvent être restaurées."
   },
   "nav": {
     "sidebar": {
@@ -567,6 +573,9 @@
         "confirmLabel": "Réinitialiser"
       },
       "pathDialog": {
+        "confirmTitle": "Changer de dossier de données ?",
+        "confirmDescription": "Desk enregistrera les éditeurs ouverts, passera à {{path}}, puis se rechargera.",
+        "confirmSwitch": "Changer et recharger",
         "existingTitle": "Données existantes trouvées",
         "existingDescription_one": "{{count}} espace trouvé à cet emplacement.",
         "existingDescription_other": "{{count}} espaces trouvés à cet emplacement.",
@@ -829,7 +838,25 @@
         "meeting": "Réunion"
       },
       "entityNotFound": "{{entity}} introuvable",
-      "closeTab": "Fermer l'onglet"
+      "closeTab": "Fermer l'onglet",
+      "discardFailed": "Impossible de supprimer le brouillon de récupération. Vos modifications restent ouvertes ; réessayez.",
+      "retryDiscard": "Réessayer d’abandonner",
+      "contextTransitionBlocked": "Résolvez ou abandonnez les modifications non enregistrées avant de changer de contexte de données.",
+      "loadFailed": {
+        "title": "Impossible de charger le contenu de {{entity}}",
+        "description": "Desk n'a pas ouvert de copie vide et votre fichier n'a pas été modifié. Vérifiez la connexion, puis réessayez."
+      },
+      "versionMismatch": {
+        "title": "Le client et le serveur Desk doivent utiliser la même version",
+        "description": "Ce client utilise une API d'éditeur plus récente que le serveur ne prend pas encore en charge. Aucun fichier n'a été modifié. Mettez le serveur à jour, puis réessayez."
+      },
+      "review": "Examiner",
+      "conflict": {
+        "title": "Ce fichier a été modifié en dehors de Desk",
+        "description": "Choisissez la version à conserver. Desk n’écrasera pas automatiquement la modification externe.",
+        "useExternal": "Utiliser la version externe",
+        "keepDesk": "Conserver la version Desk"
+      }
     }
   },
   "entities": {
@@ -1235,6 +1262,7 @@
         "title": "Fichier supprimé",
         "description": "Ce fichier a été supprimé du système de fichiers.",
         "unsavedHint": "Vous avez des modifications non enregistrées. Restaurez-les pour recréer le fichier.",
+        "parentMissing": "Le dossier parent n’existe plus. Desk conservera votre brouillon, mais ne reconstruira pas un espace de travail ou un projet supprimé.",
         "restoreFromEdits": "Restaurer depuis les modifications",
         "closeTab": "Fermer l'onglet"
       },

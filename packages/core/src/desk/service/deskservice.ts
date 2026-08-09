@@ -35,8 +35,13 @@ import type * as indexCacheApi from "../index-cache";
 import type * as aiignoreApi from "../aiignore";
 import type * as aiUsageApi from "../ai-usage";
 import type * as maintenanceApi from "../maintenance";
+import type * as editorDocumentsApi from "../editor-documents";
 
 export interface DeskService {
+  // ── Versioned editor persistence ───────────────────────────────────
+  getEditorDocument: typeof editorDocumentsApi.getEditorDocument;
+  saveEditorDocument: typeof editorDocumentsApi.saveEditorDocument;
+
   // ── Tasks ───────────────────────────────────────────────────────────
   getTasks: typeof tasksApi.getTasks;
   getTasksByProject: typeof tasksApi.getTasksByProject;

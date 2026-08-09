@@ -54,14 +54,22 @@ interface FileDeletedBannerProps {
   /** Whether the editor still has unsaved in-memory edits that can be restored */
   hasUnsavedEdits?: boolean;
   /** Called when user wants to re-create the file from in-memory edits */
-  onRecover?: () => void;
+  onRecover?: () => Promise<boolean>;
+  recoveryBlocked?: "parent-missing" | null;
+  recovering?: boolean;
 }
 
 /**
  * Banner shown when a file has been deleted while being edited.
  * If there are unsaved edits, offers to recover by re-creating the file.
  */
-export function FileDeletedBanner({ onClose, hasUnsavedEdits, onRecover }: FileDeletedBannerProps) {
+export function FileDeletedBanner({
+  onClose,
+  hasUnsavedEdits,
+  onRecover,
+  recoveryBlocked,
+  recovering,
+}: FileDeletedBannerProps) {
   const { t } = useTranslation();
   return (
     <div className="h-full flex items-center justify-center bg-background">
@@ -79,11 +87,20 @@ export function FileDeletedBanner({ onClose, hasUnsavedEdits, onRecover }: FileD
               {t("ui.editorBanners.fileDeleted.unsavedHint")}
             </p>
           )}
+          {recoveryBlocked === "parent-missing" && (
+            <p className="text-sm text-destructive mt-2">
+              {t("ui.editorBanners.fileDeleted.parentMissing")}
+            </p>
+          )}
         </div>
         <div className="flex gap-2 justify-center">
           {hasUnsavedEdits && onRecover && (
-            <Button onClick={onRecover}>
-              {t("ui.editorBanners.fileDeleted.restoreFromEdits")}
+            <Button onClick={() => void onRecover()} disabled={recovering}>
+              {recovering
+                ? t("common.buttons.saving")
+                : recoveryBlocked === "parent-missing"
+                  ? t("common.buttons.tryAgain")
+                  : t("ui.editorBanners.fileDeleted.restoreFromEdits")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose}>

@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { InlineProgress } from "@/components/ui/inline-progress";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { FormField } from "@/components/ui/form-field";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useUpdateWorkspace, useDeleteWorkspace, useHomeWorkspace } from "@/stores/workspaces";
@@ -38,7 +37,6 @@ export function EditWorkspaceModal({ open, onClose, workspace }: EditWorkspaceMo
 
   const [name, setName] = useState(workspace.name);
   const [description, setDescription] = useState(workspace.description || "");
-  const [overview, setOverview] = useState(workspace.overview || "");
   const [color, setColor] = useState(workspace.color || "#3b82f6");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
@@ -46,9 +44,8 @@ export function EditWorkspaceModal({ open, onClose, workspace }: EditWorkspaceMo
   const resetForm = useCallback(() => {
     setName(workspace.name);
     setDescription(workspace.description || "");
-    setOverview(workspace.overview || "");
     setColor(workspace.color || "#3b82f6");
-  }, [workspace.color, workspace.description, workspace.name, workspace.overview]);
+  }, [workspace.color, workspace.description, workspace.name]);
 
   // Start every modal session from the last saved workspace state.
   useEffect(() => {
@@ -58,7 +55,6 @@ export function EditWorkspaceModal({ open, onClose, workspace }: EditWorkspaceMo
   const dirty =
     name.trim() !== workspace.name.trim() ||
     description.trim() !== (workspace.description || "").trim() ||
-    overview.trim() !== (workspace.overview || "").trim() ||
     color !== (workspace.color || "#3b82f6");
 
   // The modal itself intercepts every close path with a Desk confirm dialog. Register only
@@ -92,7 +88,6 @@ export function EditWorkspaceModal({ open, onClose, workspace }: EditWorkspaceMo
         updates: {
           name: name.trim(),
           description: description.trim() || null,
-          overview,
           color,
         },
       });
@@ -146,16 +141,6 @@ export function EditWorkspaceModal({ open, onClose, workspace }: EditWorkspaceMo
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t("modals.editWorkspace.descriptionPlaceholder")}
                 className="min-h-[80px] resize-none"
-              />
-            </FormField>
-
-            <FormField label={t("modals.editWorkspace.overviewLabel")} optional>
-              <RichTextEditor
-                value={overview}
-                onChange={setOverview}
-                placeholder={t("modals.editWorkspace.overviewPlaceholder")}
-                minHeight="120px"
-                maxHeight="240px"
               />
             </FormField>
 

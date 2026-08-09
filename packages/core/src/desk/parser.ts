@@ -180,14 +180,26 @@ export function resolveContentDate(
 }
 
 /**
- * Descending compare for optional YYYY-MM-DD / ISO datetime strings (lexicographic,
- * which is chronological for this format). Undated values sort LAST.
+ * Descending compare for optional YYYY-MM-DD / ISO datetime strings. Date-only
+ * values are interpreted as UTC midnight so ordering is identical in every
+ * browser and server timezone.
  */
 export function compareDatesDesc(a?: string, b?: string): number {
   if (a === b) return 0;
   if (!a) return 1;
   if (!b) return -1;
+  const aTime = sortableDateTime(a);
+  const bTime = sortableDateTime(b);
+  if (aTime !== null && bTime !== null && aTime !== bTime) return bTime - aTime;
   return b.localeCompare(a);
+}
+
+function sortableDateTime(value: string): number | null {
+  const dateOnly = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const time = dateOnly
+    ? Date.UTC(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : Date.parse(value);
+  return Number.isFinite(time) ? time : null;
 }
 
 /**

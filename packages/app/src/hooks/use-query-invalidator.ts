@@ -1,9 +1,8 @@
 /**
  * useQueryInvalidator Hook
  *
- * Routes file system events to the appropriate handler:
- * - Open files → Editor update (via event bus)
- * - Closed files → TanStack Query invalidation
+ * Routes filesystem events into full-record editor refetches, lifecycle events,
+ * and the matching list/tree query invalidations.
  *
  * This hook replaces the old useFileWatcher and adds awareness
  * of which files are currently open in editors.
@@ -41,9 +40,7 @@ import {
   useOpenEditorRegistry,
   type EditorSession,
 } from "@/stores/open-editor-registry";
-import { publishContentUpdate, publishDeleted } from "@desk/core";
-import { hostFileExists, readHostTextFile } from "@/lib/host-files";
-import { parseMarkdown } from "@desk/core";
+import { publishDeleted } from "@desk/core";
 import { isLocalDisk } from "@/lib/connection";
 import { getDeskService } from "@desk/core";
 import { notifyLocalMaintenanceOfExternalChanges } from "@/lib/host-maintenance";
@@ -55,6 +52,7 @@ import {
   planQueryInvalidations,
   type QueryInvalidationTarget,
 } from "@/lib/query-invalidation-plan";
+import { editorDocumentRootKey } from "@/lib/query-client";
 
 const pendingAgentFileWorkspaces = new Set<string>();
 let pendingTopLevelAgentFiles = false;
@@ -157,9 +155,15 @@ async function handleFileChange(
   for (const path of event.paths) {
     const session = registry.getSession(path);
     if (session) {
-      await handleOpenFileChange(path, session, event.kind);
+      handleOpenFileChange(path, session, event.kind);
     }
   }
+
+  // Every local watcher event can change a full-record editor revision,
+  // including workspace/project overviews that are not tab-registry entries.
+  // Refetching the dedicated query lets each controller adopt or conflict based
+  // on its own dirty state. Save echoes are equal-revision no-ops.
+  await queryClient.invalidateQueries({ queryKey: editorDocumentRootKey });
 
   // Then clear file caches and invalidate queries for the changed paths so closed
   // views refetch. (Editor-handled paths are synced above; the extra background
@@ -205,11 +209,11 @@ function invalidateQueriesForPaths(
  * Handle a file change for an open file
  * Returns true if the change was handled (external change detected)
  */
-async function handleOpenFileChange(
+function handleOpenFileChange(
   path: string,
-  session: EditorSession,
-  eventKind: WatchEvent["kind"]
-): Promise<boolean> {
+  _session: EditorSession,
+  eventKind: WatchEvent["kind"],
+): boolean {
   // For remove events, the file is gone - mark as deleted and notify editor
   if (eventKind === "remove") {
     useOpenEditorRegistry.getState().handlePathDeleted(path);
@@ -217,53 +221,9 @@ async function handleOpenFileChange(
     return true;
   }
 
-  // For "any" events (batched), check if file still exists
-  // This handles cases where remove got merged with other events
-  if (eventKind === "any") {
-    const fileExists = await hostFileExists(path);
-    if (!fileExists) {
-      useOpenEditorRegistry.getState().handlePathDeleted(path);
-      publishDeleted(path);
-      return true;
-    }
-  }
-
-  try {
-    const fileContent = await readHostTextFile(path);
-
-    // Parse to extract body for comparison (registry stores body only, not full file with frontmatter)
-    const { content: fileBody } = parseMarkdown<Record<string, unknown>>(fileContent);
-
-    // Body matches what we last saved → our save event, ignore
-    // Note: gray-matter's stringify/parse roundtrip may add/remove leading/trailing
-    // newlines, so we trim both sides for comparison
-    if (fileBody.trim() === session.lastSavedContent.trim()) {
-      return true; // Handled (it was our own save)
-    }
-
-    // External change → update editor via event bus
-    publishContentUpdate(path, fileContent); // Publish full file (handler parses it)
-
-    // Update lastSavedContent in registry with body (not full file) to maintain consistency
-    useOpenEditorRegistry.getState().updateLastSaved(path, fileBody);
-
-    return true;
-  } catch (error) {
-    // File might have been deleted or moved
-    // Check error message (Tauri errors may not be instanceof Error)
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    if (
-      errorMessage.includes("not found") ||
-      errorMessage.includes("No such file") ||
-      errorMessage.includes("os error 2")
-    ) {
-      useOpenEditorRegistry.getState().handlePathDeleted(path);
-      publishDeleted(path);
-      return true;
-    }
-    console.error(`[query-invalidator] Error reading file: ${path}`, error);
-    return false;
-  }
+  // Modify/create events are handled by the full-record query invalidation in
+  // handleFileChange. The controller compares complete SHA-256 revisions.
+  return true;
 }
 
 /**

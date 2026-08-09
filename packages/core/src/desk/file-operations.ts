@@ -6,16 +6,20 @@
  *
  * All write/update/delete/move operations automatically:
  * - Invalidate the content cache (so list views refresh)
- * - Notify open editors via the registry (prevents false "external change" detection)
+ * - Notify open editors about delete/move lifecycle changes
  */
 
 import { joinPath } from "./env";
 import { getStorage } from "./storage";
-import { parseMarkdown, serializeMarkdown, filenameToId, nowISO } from "./parser";
+import { parseMarkdown, filenameToId } from "./parser";
 import { publishPathChange, publishDeleted } from "./editor-event-bus";
 import { publishDomainWrite } from "./domain-write-bus";
 import { getEditorNotifier } from "./editor-notifier";
 import { getContentCache } from "./file-cache";
+import {
+  createMarkdownRecord,
+  mutateMarkdownRecord,
+} from "./markdown-record-repository";
 
 // =============================================================================
 // TYPES
@@ -147,43 +151,11 @@ export async function writeMarkdownFile<T extends Record<string, unknown>>(
   parts.pop();
   await getStorage().mkdir(parts.join("/"));
 
-  // Every caller writes a content file (task/doc/meeting/capture) — workspace.md
-  // and project.md are written elsewhere — so the `updated` stamp is unconditional.
-  const fileContent = serializeMarkdown(
-    { ...frontmatter, updated: options.updatedStamp ?? nowISO() },
-    content
-  );
-  await getStorage().writeTextFile(filePath, fileContent);
-  getContentCache().invalidate(filePath);
-  publishDomainWrite({ kind: "write", filePath });
-}
-
-/**
- * Save an editor's body into an existing markdown file, preserving its frontmatter.
- *
- * The editor-save funnel: reads the current frontmatter off disk (the on-disk copy wins over
- * whatever the editor session last saw — metadata mutations land there first), stamps
- * `updated`, writes, and publishes on the domain-write bus like every other record write.
- * Returns the full serialized content and the frontmatter it preserved.
- *
- * Throws when the file can't be read: writing anyway would replace the record's frontmatter
- * (title, status, dates) with `{}`. The editor keeps the unsaved text, so aborting loses
- * nothing and the save can be retried.
- */
-export async function saveMarkdownBody(
-  filePath: string,
-  body: string,
-): Promise<{ fullContent: string; frontmatter: Record<string, unknown> }> {
-  const raw = await getStorage().readTextFile(filePath);
-  const frontmatter = parseMarkdown<Record<string, unknown>>(raw).data;
-
-  const stamped = { ...frontmatter, updated: nowISO() };
-  const fullContent = serializeMarkdown(stamped, body);
-  await getStorage().writeTextFile(filePath, fullContent);
-  getContentCache().invalidate(filePath);
-  publishDomainWrite({ kind: "update", filePath });
-
-  return { fullContent, frontmatter: stamped };
+  const result = await createMarkdownRecord(filePath, frontmatter, content, {
+    stampUpdated: true,
+    updatedStamp: options.updatedStamp,
+  });
+  if (result.status !== "saved") throw new FileCollisionError(filePath);
 }
 
 /**
@@ -206,7 +178,7 @@ export interface UpdateFileOptions {
 /**
  * Update a markdown file's frontmatter and/or content
  *
- * Automatically invalidates cache and notifies open editors.
+ * Automatically invalidates the cache.
  *
  * @param filePath - Absolute path to file
  * @param updater - Function that receives current frontmatter and content, returns updated values
@@ -225,30 +197,26 @@ export async function updateMarkdownFile<T extends Record<string, unknown>>(
   updater: (frontmatter: T, content: string) => { frontmatter: T; content: string },
   options: UpdateFileOptions = {}
 ): Promise<UpdateResult<T> | null> {
-  if (!(await getStorage().exists(filePath))) {
-    return null;
+  let committedContent = "";
+  const result = await mutateMarkdownRecord<T>({
+    filePath,
+    update: (frontmatter, content) => {
+      const updated = updater(frontmatter, content);
+      committedContent = updated.content;
+      return updated;
+    },
+    stampUpdated: true,
+    updatedStamp: options.updatedStamp,
+  });
+  if (result.status === "missing") return null;
+  if (result.status === "conflict") {
+    throw new Error(`Concurrent writes did not settle for: ${filePath}`);
   }
-
-  const rawContent = await getStorage().readTextFile(filePath);
-  const { data, content } = parseMarkdown<T>(rawContent);
-
-  const updated = updater(data, content);
-  // Stamp after the updater so it can't be overwritten with a stale value.
-  const frontmatter = { ...updated.frontmatter, updated: options.updatedStamp ?? nowISO() };
-  const fileContent = serializeMarkdown(frontmatter, updated.content);
-  await getStorage().writeTextFile(filePath, fileContent);
-
-  getContentCache().invalidate(filePath);
-  publishDomainWrite({ kind: "update", filePath });
-
-  const registry = getEditorNotifier();
-  if (registry.isOpen(filePath)) {
-    registry.updateLastSaved(filePath, updated.content);
-  }
-
   return {
-    frontmatter,
-    content: updated.content,
+    frontmatter: result.snapshot.frontmatter,
+    // Preserve the updater's semantic body exactly for existing domain callers.
+    // Parsing the serialized record adds gray-matter's trailing newline.
+    content: committedContent,
     filePath,
   };
 }

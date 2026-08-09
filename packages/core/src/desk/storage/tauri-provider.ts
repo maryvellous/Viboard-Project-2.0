@@ -6,7 +6,12 @@
  * (ensureHiddenPathAllowed) needed because the runtime fs scope cannot
  * glob-match dot-prefixed path segments.
  */
-import type { DirEntry, FileStat, StorageProvider } from "./provider";
+import type {
+  AtomicCreateTextResult,
+  DirEntry,
+  FileStat,
+  StorageProvider,
+} from "./provider";
 
 // Lazy import the Tauri fs module only when first needed.
 async function getTauriFsModule() {
@@ -57,6 +62,22 @@ export class TauriProvider implements StorageProvider {
     await ensureHiddenPathAllowed(path);
     const fs = await getTauriFsModule();
     await fs.writeTextFile(path, content);
+  }
+
+  async createTextFileAtomically(
+    path: string,
+    content: string,
+  ): Promise<AtomicCreateTextResult> {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<AtomicCreateTextResult>("create_text_file_atomically", {
+      path,
+      content,
+    });
+  }
+
+  async replaceTextFileAtomically(path: string, content: string): Promise<void> {
+    const { invoke } = await import("@tauri-apps/api/core");
+    await invoke("replace_text_file_atomically", { path, content });
   }
 
   async writeFile(path: string, bytes: Uint8Array): Promise<void> {

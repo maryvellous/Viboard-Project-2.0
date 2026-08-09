@@ -7,7 +7,7 @@
  * during onboarding like any other workspace — there is no magic folder name.
  */
 import type { Workspace, WorkspaceUpdate } from "../types";
-import { parseMarkdown, serializeMarkdown, todayISO } from "./parser";
+import { parseMarkdown, todayISO } from "./parser";
 import {
   decodeWorkspaceFrontmatter,
   reportFrontmatterDiagnostics,
@@ -18,8 +18,12 @@ import { allocateUniqueName, removeDirectoryWithContents } from "./file-operatio
 import { PATH_SEGMENTS, SPECIAL_DIRS, FILE_NAMES } from "./constants";
 import { getAgentFileWriter } from "./agent-file-writer";
 import { overviewTemplate } from "./overview";
+import {
+  createMarkdownRecord,
+  mutateMarkdownRecord,
+} from "./markdown-record-repository";
 
-interface WorkspaceFrontmatter {
+interface WorkspaceFrontmatter extends Record<string, unknown> {
   name: string;
   description?: string;
   color?: string;
@@ -211,8 +215,11 @@ export async function createWorkspace(data: {
     ...(workspace.isHome && { home: true }),
   };
 
-  const fileContent = serializeMarkdown(frontmatter, overview);
-  await getStorage().writeTextFile(await joinPath(workspacePath, FILE_NAMES.WORKSPACE_MD), fileContent);
+  const recordPath = await joinPath(workspacePath, FILE_NAMES.WORKSPACE_MD);
+  const created = await createMarkdownRecord(recordPath, frontmatter, overview);
+  if (created.status !== "saved") {
+    throw new Error(`Workspace record already exists: ${recordPath}`);
+  }
 
   clearHomeWorkspaceCache();
 
@@ -236,23 +243,25 @@ export async function updateWorkspace(
   const deskPath = await getDeskPath();
   const workspacePath = await joinPath(deskPath, PATH_SEGMENTS.WORKSPACES, workspaceId, FILE_NAMES.WORKSPACE_MD);
 
-  if (!(await getStorage().exists(workspacePath))) return null;
-
-  const content = await getStorage().readTextFile(workspacePath);
-  const { data, content: body } = parseMarkdown<Record<string, unknown>>(content);
-
-  const updatedData: Record<string, unknown> = {
-    ...data,
-    ...(updates.name && { name: updates.name }),
-    // null clears the field (→ undefined → dropped by serializeMarkdown); undefined leaves it.
-    ...(updates.description !== undefined && { description: updates.description ?? undefined }),
-    ...(updates.color !== undefined && { color: updates.color ?? undefined }),
-  };
-
-  const newBody = updates.overview !== undefined ? (updates.overview ?? "") : body;
-  const fileContent = serializeMarkdown(updatedData, newBody);
-  await getStorage().writeTextFile(workspacePath, fileContent);
-  const decoded = decodeWorkspaceFrontmatter(updatedData, workspaceId).value;
+  const result = await mutateMarkdownRecord<Record<string, unknown>>({
+    filePath: workspacePath,
+    update: (data, body) => ({
+      frontmatter: {
+        ...data,
+        ...(updates.name && { name: updates.name }),
+        // null clears; undefined preserves the existing field.
+        ...(updates.description !== undefined && { description: updates.description ?? undefined }),
+        ...(updates.color !== undefined && { color: updates.color ?? undefined }),
+      },
+      content: updates.overview !== undefined ? (updates.overview ?? "") : body,
+    }),
+  });
+  if (result.status === "missing") return null;
+  if (result.status === "conflict") {
+    throw new Error(`Concurrent writes did not settle for: ${workspacePath}`);
+  }
+  const decoded = decodeWorkspaceFrontmatter(result.snapshot.frontmatter, workspaceId).value;
+  const newBody = result.snapshot.content;
 
   return {
     id: workspaceId,

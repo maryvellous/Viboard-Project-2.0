@@ -115,13 +115,7 @@ export function ProjectHome({ workspaceId, projectId }: ProjectHomeProps) {
                 title={t("pages.projects.home.overview.title")}
                 value={project.overview ?? ""}
                 placeholder={t("pages.projects.home.overview.placeholder")}
-                onSave={async (overview) => {
-                  await updateProject.mutateAsync({
-                    projectId,
-                    workspaceId,
-                    updates: { overview },
-                  });
-                }}
+                documentRef={{ kind: "project-overview", workspaceId, projectId }}
                 collapsedClassName="max-h-72"
                 resetKey={`${workspaceId}:${projectId}`}
               />

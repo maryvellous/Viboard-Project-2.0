@@ -45,6 +45,18 @@ describe("Markdown parser helpers", () => {
     ]);
   });
 
+  it("sorts mixed date-only and ISO timestamps using UTC", () => {
+    expect([
+      "2025-12-31T23:30:00.000Z",
+      "2026-01-01",
+      "2026-01-01T00:30:00.000Z",
+    ].sort(compareDatesDesc)).toEqual([
+      "2026-01-01T00:30:00.000Z",
+      "2026-01-01",
+      "2025-12-31T23:30:00.000Z",
+    ]);
+  });
+
   it("rejects invalid frontmatter containers", () => {
     expect(() => serializeMarkdown(null, "")).toThrow(/invalid data type/);
     expect(() => serializeMarkdown([], "")).toThrow(/invalid data type/);

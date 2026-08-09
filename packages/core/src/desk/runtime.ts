@@ -13,6 +13,7 @@ import { resetEditorEventSubscribers } from "./editor-event-bus";
 import { resetEditorNotifier } from "./editor-notifier";
 import { resetContentCache, resetFileTreeService } from "./file-cache";
 import { resetMaintenanceEngine } from "./maintenance";
+import { resetMarkdownRecordRepository } from "./markdown-record-repository";
 import { resetSearchIndex } from "./search-index";
 import { resetDeskService } from "./service";
 import { resetStorage } from "./storage";
@@ -20,6 +21,7 @@ import { clearHomeWorkspaceCache } from "./workspaces";
 
 export function resetDeskRuntime(): void {
   resetMaintenanceEngine();
+  resetMarkdownRecordRepository();
   resetDomainWriteListeners();
   resetEditorEventSubscribers();
   resetFileTreeService();

@@ -132,6 +132,7 @@ function handleWatchEvent(event: unknown) {
       !np.includes(".DS_Store") &&
       !np.includes("/.git/") &&
       !np.includes("/.desk/") &&
+      !np.split("/").pop()?.startsWith(".deskmd-write-") &&
       !np.endsWith(".view.json")
     );
   });

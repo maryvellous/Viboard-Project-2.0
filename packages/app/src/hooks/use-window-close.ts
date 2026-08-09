@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTabStore } from "@/stores/tabs";
 import { isTauri } from "@desk/core";
 import { getUnsavedChangeLabels } from "@/lib/unsaved-changes-guard";
+import { flushAllEditorSessions } from "@/lib/editor-session-controller";
 
 /**
  * Hook to handle window close requests from Tauri.
@@ -46,9 +47,10 @@ export function useWindowClose(onCloseRequested?: (dirtyTabs: string[]) => void)
     const setupListener = async () => {
       const { listen } = await import("@tauri-apps/api/event");
       unlisten = await listen("window-close-requested", async () => {
+        const editorsFlushed = await flushAllEditorSessions();
         // Get current tabs state (not stale closure value)
         const currentTabs = useTabStore.getState().tabs;
-        const dirtyTabs = currentTabs.filter((t) => t.isDirty);
+        const dirtyTabs = editorsFlushed ? [] : currentTabs.filter((t) => t.isDirty);
         const dirtyLabels = [
           ...dirtyTabs.map((tab) => tab.title),
           ...getUnsavedChangeLabels(),

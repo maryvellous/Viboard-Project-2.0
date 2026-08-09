@@ -11,7 +11,12 @@ import { BrowserProvider } from "./browser-provider";
 import type { StorageProvider } from "./provider";
 import { TauriProvider } from "./tauri-provider";
 
-export type { DirEntry, FileStat, StorageProvider } from "./provider";
+export type {
+  AtomicCreateTextResult,
+  DirEntry,
+  FileStat,
+  StorageProvider,
+} from "./provider";
 export { GuardStorageProvider } from "./guard-provider";
 export { InMemoryStorageProvider } from "./memory-provider";
 export type { MemorySeedFile } from "./memory-provider";

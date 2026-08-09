@@ -5,7 +5,7 @@
  * This is a generic format that any mail client add-in/extension can use.
  */
 
-import { formatLocaleDate } from "@/lib/i18n/format";
+import { formatLocaleDate } from "../i18n/format";
 
 export type EmailSource = 'outlook' | 'thunderbird' | 'apple-mail' | 'other';
 

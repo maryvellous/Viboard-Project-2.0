@@ -1,4 +1,9 @@
-import type { DirEntry, FileStat, StorageProvider } from "./provider";
+import type {
+  AtomicCreateTextResult,
+  DirEntry,
+  FileStat,
+  StorageProvider,
+} from "./provider";
 
 export interface MemorySeedFile {
   path: string;
@@ -32,6 +37,7 @@ function normalizePath(path: string): string {
 
 function parentPath(path: string): string | null {
   const normalized = normalizePath(path);
+  if (normalized === "/") return null;
   const index = normalized.lastIndexOf("/");
   if (index < 0) return null;
   if (index === 0) return "/";
@@ -102,6 +108,23 @@ export class InMemoryStorageProvider implements StorageProvider {
 
   async writeTextFile(path: string, content: string): Promise<void> {
     await this.writeFile(path, encoder.encode(content));
+  }
+
+  async createTextFileAtomically(
+    path: string,
+    content: string,
+  ): Promise<AtomicCreateTextResult> {
+    const normalized = normalizePath(path);
+    const existing = this.files.get(normalized);
+    if (existing) {
+      return { status: "exists", current: decoder.decode(existing.bytes) };
+    }
+    await this.writeTextFile(normalized, content);
+    return { status: "created" };
+  }
+
+  async replaceTextFileAtomically(path: string, content: string): Promise<void> {
+    await this.writeTextFile(path, content);
   }
 
   async writeFile(path: string, bytes: Uint8Array): Promise<void> {

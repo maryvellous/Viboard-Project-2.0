@@ -4,17 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SaveStatusIndicator, type SaveStatus } from "@/components/ui/save-status";
 import { AIBadge } from "@/components/ui/ai-badge";
-import { Trash2, Bot, BotOff, Save } from "lucide-react";
+import { Trash2, Bot, BotOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pageWidthClasses } from "@/lib/enterprise-ui";
 
 interface EditorHeaderProps {
   title: string;
   onTitleChange: (title: string) => void;
+  onTitleBlur?: () => void;
   placeholder?: string;
   saveStatus: SaveStatus;
-  onSave?: () => void;
-  isDirty?: boolean;
+  onRetry?: () => void;
+  onReview?: () => void;
   onDelete: () => void;
   /** Provenance: the file carries `author: ai` (display-only mark next to the title) */
   authorAI?: boolean;
@@ -31,10 +32,11 @@ interface EditorHeaderProps {
 export function EditorHeader({
   title,
   onTitleChange,
+  onTitleBlur,
   placeholder,
   saveStatus,
-  onSave,
-  isDirty,
+  onRetry,
+  onReview,
   onDelete,
   authorAI,
   aiIncluded,
@@ -65,29 +67,14 @@ export function EditorHeader({
         <Input
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
+          onBlur={onTitleBlur}
           placeholder={resolvedPlaceholder}
-          className="text-xl font-semibold border-none shadow-none px-0 h-auto py-1 focus-visible:ring-0 bg-transparent flex-1"
+          className="h-auto flex-1 border-none bg-transparent px-3 py-1 text-xl font-semibold shadow-none focus-visible:ring-0"
         />
         {authorAI && <AIBadge />}
         <SaveStatusIndicator status={saveStatus} />
-        {onSave && (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onSave}
-            disabled={!isDirty || saveStatus === "saving"}
-            title={isDirty ? t("editors.shared.saveTooltip") : t("editors.shared.noChangesTooltip")}
-            className={cn(
-              "shrink-0",
-              isDirty
-                ? "text-primary hover:text-primary/80"
-                : "text-muted-foreground/70"
-            )}
-            aria-label={isDirty ? t("editors.shared.saveTooltip") : t("editors.shared.noChangesTooltip")}
-          >
-            <Save className="h-3.5 w-3.5" />
-          </Button>
-        )}
+        {onRetry && <Button variant="ghost" size="sm" onClick={onRetry}>{t("common.buttons.retry")}</Button>}
+        {onReview && <Button variant="ghost" size="sm" onClick={onReview}>{t("editors.shared.review")}</Button>}
         {onAIInclusionChange && (
           <Button
             variant="ghost"

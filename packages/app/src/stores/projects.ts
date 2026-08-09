@@ -9,6 +9,7 @@ import {
   isUnsupportedDeskOperation,
   legacyProjectsToSummaries,
 } from "@/lib/project-service-compat";
+import { invalidateEditorDocuments } from "@/lib/query-client";
 
 /** Regenerate per-workspace agent files when projects change */
 function regenerateWorkspaceAgentFiles(workspaceId: string) {
@@ -160,6 +161,7 @@ export function useUpdateProject() {
         return project;
       }),
     onSuccess: (updatedProject, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (updatedProject) {
         queryClient.invalidateQueries({

@@ -21,6 +21,23 @@ class RejectEntityWritesProvider extends NodeFsProvider {
     }
     await super.writeTextFile(path, content);
   }
+
+  override async replaceTextFileAtomically(
+    path: string,
+    content: string,
+  ) {
+    if (path.endsWith("/workspace.md") || path.endsWith("/project.md")) {
+      throw new Error("simulated entity write failure");
+    }
+    return super.replaceTextFileAtomically(path, content);
+  }
+
+  override async createTextFileAtomically(path: string, content: string) {
+    if (path.endsWith("/workspace.md") || path.endsWith("/project.md")) {
+      throw new Error("simulated entity write failure");
+    }
+    return super.createTextFileAtomically(path, content);
+  }
 }
 
 async function verify(root: string) {

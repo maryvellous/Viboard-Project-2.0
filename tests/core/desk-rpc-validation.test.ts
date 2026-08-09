@@ -36,4 +36,21 @@ describe("Desk RPC entity mutation validation", () => {
   it("leaves unrelated RPC operations untouched", () => {
     expect(validateDeskRpcEntityMutation("getTasks", [42])).toBeNull();
   });
+
+  it("validates versioned editor references and recreation payloads", () => {
+    const ref = { kind: "document", workspaceId: "acme", projectId: "website", id: "Research/notes" };
+    expect(validateDeskRpcEntityMutation("getEditorDocument", [ref])).toBeNull();
+    expect(validateDeskRpcEntityMutation("getEditorDocument", [{ ...ref, id: "../workspace" }]))
+      .toMatchObject({ path: "args[0].id" });
+    expect(validateDeskRpcEntityMutation("saveEditorDocument", [{
+      ref,
+      expectedRevision: "abc",
+      patch: { kind: "document", title: "Notes", body: "Body" },
+    }])).toBeNull();
+    expect(validateDeskRpcEntityMutation("saveEditorDocument", [{
+      ref,
+      expectedRevision: null,
+      patch: { kind: "document", body: "Body" },
+    }])).toEqual({ path: "args[0].baseSnapshot", message: "required for recreation" });
+  });
 });

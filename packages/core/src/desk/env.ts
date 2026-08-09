@@ -67,6 +67,13 @@ export async function expandFsScope(dataPath?: string): Promise<void> {
   await invoke("expand_fs_scope", { path: resolvedPath });
 }
 
+/** Release local data-root ownership before switching the native app to remote mode. */
+export async function releaseDataRootOwnership(): Promise<void> {
+  if (!isTauri()) return;
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke("release_data_root_ownership");
+}
+
 /**
  * Join path segments.
  */

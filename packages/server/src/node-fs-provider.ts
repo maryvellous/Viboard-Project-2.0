@@ -1,15 +1,17 @@
 /**
  * NodeFsProvider — the StorageProvider backed by the server's local filesystem.
  *
- * A direct port of TauriProvider to node:fs/promises: the same 10 raw I/O
+ * A direct port of TauriProvider to node:fs/promises: the same raw I/O
  * primitives, minus the Tauri capability-scope dance (the server has plain
  * POSIX access to its data volume). The domain layer runs against this verbatim
  * once boot() calls setStorage(new NodeFsProvider()).
  */
 import {
   access,
+  link,
   lstat,
   mkdir,
+  open,
   readFile,
   readdir,
   realpath,
@@ -19,8 +21,14 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { realpathSync } from "node:fs";
-import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
-import type { DirEntry, FileStat, StorageProvider } from "@desk/core/host";
+import { randomUUID } from "node:crypto";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import type {
+  AtomicCreateTextResult,
+  DirEntry,
+  FileStat,
+  StorageProvider,
+} from "@desk/core/host";
 
 export class NodeFsProvider implements StorageProvider {
   private readonly root: string;
@@ -124,6 +132,67 @@ export class NodeFsProvider implements StorageProvider {
     await writeFile(await this.writableWithin(path), content, "utf8");
   }
 
+  async createTextFileAtomically(
+    path: string,
+    content: string,
+  ): Promise<AtomicCreateTextResult> {
+    const target = await this.writableWithin(path);
+    const temporary = await this.writeAtomicTemporary(target, content);
+    try {
+      try {
+        // A same-directory hard link publishes the fully flushed temporary inode
+        // only if the target does not exist. Unlike rename, it never clobbers.
+        await link(temporary, target);
+      } catch (error) {
+        if (isAlreadyExistsError(error)) {
+          return { status: "exists", current: await readOptionalText(target) };
+        }
+        throw error;
+      }
+      await syncDirectory(dirname(target));
+      return { status: "created" };
+    } finally {
+      await rm(temporary, { force: true }).catch(() => undefined);
+    }
+  }
+
+  async replaceTextFileAtomically(path: string, content: string): Promise<void> {
+    const target = await this.writableWithin(path);
+    const temporary = await this.writeAtomicTemporary(target, content);
+    try {
+      await rename(temporary, target);
+      await syncDirectory(dirname(target));
+    } finally {
+      await rm(temporary, { force: true }).catch(() => undefined);
+    }
+  }
+
+  private async writeAtomicTemporary(target: string, content: string): Promise<string> {
+    const temporary = join(
+      dirname(target),
+      `.deskmd-write-${basename(target)}-${process.pid}-${randomUUID()}.tmp`,
+    );
+    const safeTemporary = await this.writableWithin(temporary);
+    const mode = await stat(target)
+      .then((value) => value.mode & 0o777)
+      .catch(() => 0o600);
+    const handle = await open(safeTemporary, "wx", mode);
+    let failure: unknown;
+    try {
+      await handle.writeFile(content, "utf8");
+      await handle.sync();
+    } catch (error) {
+      failure = error;
+    } finally {
+      await handle.close();
+    }
+    if (failure) {
+      await rm(safeTemporary, { force: true }).catch(() => undefined);
+      throw failure;
+    }
+    return safeTemporary;
+  }
+
   async writeFile(path: string, bytes: Uint8Array): Promise<void> {
     await writeFile(await this.writableWithin(path), bytes);
   }
@@ -170,11 +239,42 @@ export class NodeFsProvider implements StorageProvider {
   }
 }
 
+async function readOptionalText(path: string): Promise<string | null> {
+  try {
+    return await readFile(path, "utf8");
+  } catch (error) {
+    if (isNotFoundError(error)) return null;
+    throw error;
+  }
+}
+
+async function syncDirectory(path: string): Promise<void> {
+  try {
+    const handle = await open(path, "r");
+    try {
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+  } catch {
+    // Directory fsync is unavailable on some filesystems/platforms. The file
+    // itself was already synced before rename, so this is best-effort only.
+  }
+}
+
 function isNotFoundError(error: unknown): boolean {
   return (
     error instanceof Error &&
     "code" in error &&
     (error as NodeJS.ErrnoException).code === "ENOENT"
+  );
+}
+
+function isAlreadyExistsError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    "code" in error &&
+    (error as NodeJS.ErrnoException).code === "EEXIST"
   );
 }
 

@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { CheckCircle2, FolderPlus } from "lucide-react";
+import { FolderPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useBootStore } from "@/stores/boot";
@@ -22,7 +22,7 @@ import { isTauri } from "@desk/core";
 import { getDeskService } from "@desk/core";
 import { expandHostFsScope } from "@/lib/host-files";
 import { isRemoteMode } from "@/lib/connection";
-import type { Workspace } from "@desk/core/types";
+import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
 
 // Hosted mode only: the account/sign-out section (and better-auth) is lazy-loaded
 // behind the build flag, so the desktop bundle never includes it.
@@ -52,10 +52,13 @@ export function DataTab() {
   const [pendingPath, setPendingPath] = useState("");
   const [pathDialogOpen, setPathDialogOpen] = useState(false);
   const [isCheckingPath, setIsCheckingPath] = useState(false);
-  const [foundWorkspaces, setFoundWorkspaces] = useState<Workspace[]>([]);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const handleResetConfirm = () => {
+  const handleResetConfirm = async () => {
+    if (!(await prepareEditorContextTransition())) {
+      toast.error(t("editors.shared.contextTransitionBlocked"));
+      return;
+    }
     resetBoot();
     resetPreferences();
     resetNavigation();
@@ -64,69 +67,49 @@ export function DataTab() {
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     root.classList.toggle("dark", systemDark);
     toast.success(t("toasts.settings.settingsReset"));
+    window.location.reload();
   };
 
-  const handleCheckDataPath = async () => {
+  const handleCheckDataPath = () => {
     if (!pendingPath.trim()) return;
+    setPathDialogOpen(true);
+  };
 
+  const handleConfirmPathChange = async () => {
+    const previousPath = dataPath;
     setIsCheckingPath(true);
-
     try {
-      // Temporarily set the path so getWorkspaces knows where to look
-      const oldPath = dataPath;
+      if (!(await prepareEditorContextTransition())) {
+        toast.error(t("editors.shared.contextTransitionBlocked"));
+        return;
+      }
+      if (isTauri()) {
+        await expandHostFsScope(pendingPath);
+      }
       setDataPath(pendingPath);
-
-      if (isTauri()) {
-        const existingWorkspaces = await getDeskService().getWorkspaces();
-        setFoundWorkspaces(existingWorkspaces);
-        setPathDialogOpen(true);
+      const existingWorkspaces = isTauri()
+        ? await getDeskService().getWorkspaces()
+        : [];
+      if (existingWorkspaces.length > 0) {
+        setCurrentWorkspaceId(existingWorkspaces[0].id);
       } else {
-        // In browser mode, just update the path
-        queryClient.invalidateQueries();
-        toast.success(t("toasts.settings.dataPathUpdated"));
+        setSetupCompleted(false);
       }
-
-      // If dialog will open, restore old path until user confirms
-      if (isTauri()) {
-        setDataPath(oldPath);
-      }
+      window.location.reload();
     } catch (error) {
-      console.error("Error checking path:", error);
-      setFoundWorkspaces([]);
-      setPathDialogOpen(true);
+      console.error("Failed to switch DeskMD data folder:", error);
+      setDataPath(previousPath);
+      if (isTauri()) {
+        try {
+          await expandHostFsScope(previousPath);
+        } catch (rollbackError) {
+          console.error("Failed to restore previous DeskMD data folder:", rollbackError);
+        }
+      }
+      toast.error(error instanceof Error ? error.message : String(error));
     } finally {
       setIsCheckingPath(false);
     }
-  };
-
-  const handleConfirmPathChange = async (useExisting: boolean) => {
-    setDataPath(pendingPath);
-    if (isTauri()) {
-      try {
-        await expandHostFsScope(pendingPath);
-      } catch (error) {
-        console.error("Failed to update file scope for new data path:", error);
-      }
-    }
-    queryClient.invalidateQueries();
-
-    if (useExisting && foundWorkspaces.length > 0) {
-      // Use first existing workspace
-      setCurrentWorkspaceId(foundWorkspaces[0].id);
-      toast.success(t("toasts.settings.switchedToPath", { path: pendingPath }));
-    } else if (foundWorkspaces.length === 0) {
-      // No workspaces found - trigger setup wizard for this path
-      setSetupCompleted(false);
-      toast.success(t("toasts.settings.dataPathUpdatedCreateWorkspace"));
-    } else {
-      // User wants to create new despite existing
-      setSetupCompleted(false);
-      toast.success(t("toasts.settings.dataPathUpdatedWizard"));
-    }
-
-    setPathDialogOpen(false);
-    setPendingPath("");
-    setFoundWorkspaces([]);
   };
 
   return (
@@ -208,73 +191,22 @@ export function DataTab() {
       <Dialog open={pathDialogOpen} onOpenChange={setPathDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            {foundWorkspaces.length > 0 ? (
-              <>
-                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-                </div>
-                <DialogTitle>{t("settings.data.pathDialog.existingTitle")}</DialogTitle>
-                <DialogDescription>
-                  {t("settings.data.pathDialog.existingDescription", {
-                    count: foundWorkspaces.length,
-                  })}
-                </DialogDescription>
-              </>
-            ) : (
-              <>
-                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <FolderPlus className="h-6 w-6 text-primary" />
-                </div>
-                <DialogTitle>{t("settings.data.pathDialog.emptyTitle")}</DialogTitle>
-                <DialogDescription>
-                  {t("settings.data.pathDialog.emptyDescription")}
-                </DialogDescription>
-              </>
-            )}
-          </DialogHeader>
-
-          {foundWorkspaces.length > 0 && (
-            <div className="space-y-2 py-2">
-              {foundWorkspaces.map((workspace) => (
-                <div
-                  key={workspace.id}
-                  className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30"
-                >
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: workspace.color || "#3b82f6" }}
-                  />
-                  <div>
-                    <p className="font-medium text-sm">{workspace.name}</p>
-                    {workspace.description && (
-                      <p className="text-xs text-muted-foreground">{workspace.description}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <FolderPlus className="h-6 w-6 text-primary" />
             </div>
-          )}
-
+            <DialogTitle>{t("settings.data.pathDialog.confirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("settings.data.pathDialog.confirmDescription", { path: pendingPath })}
+            </DialogDescription>
+          </DialogHeader>
           <div className="flex flex-col gap-2 pt-2">
-            {foundWorkspaces.length > 0 ? (
-              <>
-                <Button onClick={() => handleConfirmPathChange(true)}>
-                  {t("settings.data.pathDialog.useExisting")}
-                </Button>
-                <Button variant="outline" onClick={() => handleConfirmPathChange(false)}>
-                  {t("settings.data.pathDialog.startFresh")}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={() => handleConfirmPathChange(false)}>
-                  {t("settings.data.pathDialog.continueToSetup")}
-                </Button>
-                <Button variant="outline" onClick={() => setPathDialogOpen(false)}>
-                  {t("common.buttons.cancel")}
-                </Button>
-              </>
-            )}
+            <Button onClick={() => void handleConfirmPathChange()} disabled={isCheckingPath}>
+              {isCheckingPath && <InlineProgress />}
+              {t("settings.data.pathDialog.confirmSwitch")}
+            </Button>
+            <Button variant="outline" onClick={() => setPathDialogOpen(false)} disabled={isCheckingPath}>
+              {t("common.buttons.cancel")}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

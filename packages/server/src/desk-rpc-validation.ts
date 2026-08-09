@@ -170,6 +170,12 @@ export function validateDeskRpcEntityMutation(
   operation: string,
   args: unknown[],
 ): DeskRpcValidationIssue | null {
+  if (operation === "getEditorDocument") {
+    return validateEditorRef(args[0], "args[0]");
+  }
+  if (operation === "saveEditorDocument") {
+    return validateEditorSave(args[0], "args[0]");
+  }
   if (operation === "moveTask") {
     return validateEnumArgument(args[1], "args[1]", TASK_STATUSES);
   }
@@ -207,6 +213,107 @@ export function validateDeskRpcEntityMutation(
   }
 
   return null;
+}
+
+const EDITOR_KINDS = [
+  "task",
+  "document",
+  "meeting",
+  "workspace-overview",
+  "project-overview",
+] as const;
+
+function validateEditorSave(value: unknown, path: string): DeskRpcValidationIssue | null {
+  if (!isRecord(value)) return { path, message: "expected an object" };
+  if (
+    value.expectedRevision !== null
+    && (typeof value.expectedRevision !== "string" || !value.expectedRevision)
+  ) {
+    return { path: `${path}.expectedRevision`, message: "expected a non-empty string or null" };
+  }
+  const refIssue = validateEditorRef(value.ref, `${path}.ref`);
+  if (refIssue) return refIssue;
+  if (value.expectedRevision === null) {
+    if (!isRecord(value.baseSnapshot) || !isRecord(value.baseSnapshot.ref)) {
+      return { path: `${path}.baseSnapshot`, message: "required for recreation" };
+    }
+    const baseRefIssue = validateEditorRef(value.baseSnapshot.ref, `${path}.baseSnapshot.ref`);
+    if (baseRefIssue) return baseRefIssue;
+    if (JSON.stringify(value.ref) !== JSON.stringify(value.baseSnapshot.ref)) {
+      return { path: `${path}.baseSnapshot.ref`, message: "must match ref" };
+    }
+  }
+  if (!isRecord(value.patch)) {
+    return { path: `${path}.patch`, message: "expected an object" };
+  }
+  const ref = value.ref as Record<string, unknown>;
+  if (value.patch.kind !== ref.kind) {
+    return { path: `${path}.patch.kind`, message: "must match ref.kind" };
+  }
+  if ("body" in value.patch && typeof value.patch.body !== "string") {
+    return { path: `${path}.patch.body`, message: "expected string" };
+  }
+  if ("title" in value.patch) {
+    if (typeof value.patch.title !== "string" || !value.patch.title.trim()) {
+      return { path: `${path}.patch.title`, message: "expected a non-empty string" };
+    }
+  }
+  if (value.patch.kind === "task") {
+    if ("status" in value.patch && !TASK_STATUSES.includes(value.patch.status as never)) {
+      return { path: `${path}.patch.status`, message: `expected one of ${TASK_STATUSES.join(", ")}` };
+    }
+    if (
+      "priority" in value.patch
+      && value.patch.priority !== null
+      && !TASK_PRIORITIES.includes(value.patch.priority as never)
+    ) {
+      return { path: `${path}.patch.priority`, message: `expected one of ${TASK_PRIORITIES.join(", ")} or null` };
+    }
+    if (
+      "due" in value.patch
+      && value.patch.due !== null
+      && typeof value.patch.due !== "string"
+    ) {
+      return { path: `${path}.patch.due`, message: "expected string or null" };
+    }
+  }
+  if (
+    value.patch.kind === "meeting"
+    && "date" in value.patch
+    && value.patch.date !== null
+    && typeof value.patch.date !== "string"
+  ) {
+    return { path: `${path}.patch.date`, message: "expected string or null" };
+  }
+  return null;
+}
+
+function validateEditorRef(value: unknown, path: string): DeskRpcValidationIssue | null {
+  if (!isRecord(value)) return { path, message: "expected an object" };
+  if (!EDITOR_KINDS.includes(value.kind as never)) {
+    return { path: `${path}.kind`, message: `expected one of ${EDITOR_KINDS.join(", ")}` };
+  }
+  const required = value.kind === "workspace-overview"
+    ? ["workspaceId"]
+    : value.kind === "project-overview"
+      ? ["workspaceId", "projectId"]
+      : ["workspaceId", "projectId", "id"];
+  for (const field of required) {
+    const fieldValue = value[field];
+    if (typeof fieldValue !== "string" || !fieldValue) {
+      return { path: `${path}.${field}`, message: "expected a non-empty string" };
+    }
+    const parts = fieldValue.replaceAll("\\", "/").split("/");
+    const allowsFolders = value.kind === "document" && field === "id";
+    if (parts.some((part) => !part || part === "." || part === "..") || (!allowsFolders && parts.length > 1)) {
+      return { path: `${path}.${field}`, message: "contains an invalid path segment" };
+    }
+  }
+  return null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function validateEnumArgument(

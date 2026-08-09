@@ -9,7 +9,12 @@
  * the developer at the seam they should be using. It is NOT a remote proxy: we
  * deliberately do not re-remote SEAM 1 (that reintroduces per-read latency).
  */
-import type { DirEntry, FileStat, StorageProvider } from "./provider";
+import type {
+  AtomicCreateTextResult,
+  DirEntry,
+  FileStat,
+  StorageProvider,
+} from "./provider";
 
 const MESSAGE =
   "getStorage() is unavailable in remote mode — route this through getDeskService() instead. " +
@@ -32,6 +37,15 @@ export class GuardStorageProvider implements StorageProvider {
     return blocked();
   }
   writeTextFile(_path: string, _content: string): Promise<void> {
+    return blocked();
+  }
+  createTextFileAtomically(
+    _path: string,
+    _content: string,
+  ): Promise<AtomicCreateTextResult> {
+    return blocked();
+  }
+  replaceTextFileAtomically(_path: string, _content: string): Promise<void> {
     return blocked();
   }
   writeFile(_path: string, _bytes: Uint8Array): Promise<void> {

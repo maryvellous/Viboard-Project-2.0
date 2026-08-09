@@ -185,7 +185,7 @@ export function MetadataToolbar({
   if (fields.length === 0) return null;
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-1 -ml-1.5", className)}>
+    <div className={cn("flex flex-wrap items-center gap-1", className)}>
       {fields}
     </div>
   );

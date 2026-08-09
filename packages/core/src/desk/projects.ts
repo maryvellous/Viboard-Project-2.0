@@ -2,7 +2,7 @@
  * Projects library - File system operations for projects
  */
 import type { Project, ProjectStatus, ProjectUpdate } from "../types";
-import { parseMarkdown, serializeMarkdown, slugify, todayISO } from "./parser";
+import { parseMarkdown, slugify, todayISO } from "./parser";
 import {
   decodeProjectFrontmatter,
   decodeTaskFrontmatter,
@@ -12,8 +12,12 @@ import { getDeskPath, joinPath } from "./env";
 import { getStorage } from "./storage";
 import { allocateUniqueName, removeDirectoryWithContents } from "./file-operations";
 import { SPECIAL_DIRS, PATH_SEGMENTS } from "./constants";
+import {
+  createMarkdownRecord,
+  mutateMarkdownRecord,
+} from "./markdown-record-repository";
 
-interface ProjectFrontmatter {
+interface ProjectFrontmatter extends Record<string, unknown> {
   name: string;
   status: ProjectStatus;
   description?: string;
@@ -251,8 +255,11 @@ export async function createProject(data: {
     created: project.created,
   };
 
-  const fileContent = serializeMarkdown(frontmatter, "");
-  await getStorage().writeTextFile(await joinPath(projectPath, "project.md"), fileContent);
+  const recordPath = await joinPath(projectPath, "project.md");
+  const created = await createMarkdownRecord(recordPath, frontmatter, "");
+  if (created.status !== "saved") {
+    throw new Error(`Project record already exists: ${recordPath}`);
+  }
 
   return project;
 }
@@ -275,26 +282,26 @@ export async function updateProject(
     "project.md"
   );
 
-  if (!(await getStorage().exists(projectMdPath))) return null;
-
-  const content = await getStorage().readTextFile(projectMdPath);
-  const { data, content: body } = parseMarkdown<Record<string, unknown>>(content);
-
-  const updatedData: Record<string, unknown> = {
-    ...data,
-    ...(updates.name && { name: updates.name }),
-    ...(updates.status && { status: updates.status }),
-    // null clears the field (→ undefined → dropped by serializeMarkdown); undefined leaves it.
-    ...(updates.description !== undefined && { description: updates.description ?? undefined }),
-  };
-
-  // The body IS the overview. Rewrite it when the update carries one (null/"" clears it);
-  // otherwise preserve the on-disk body untouched.
-  const newBody = updates.overview !== undefined ? (updates.overview ?? "") : body;
-
-  const fileContent = serializeMarkdown(updatedData, newBody);
-  await getStorage().writeTextFile(projectMdPath, fileContent);
-  const decoded = decodeProjectFrontmatter(updatedData, projectId).value;
+  const result = await mutateMarkdownRecord<Record<string, unknown>>({
+    filePath: projectMdPath,
+    update: (data, body) => ({
+      frontmatter: {
+        ...data,
+        ...(updates.name && { name: updates.name }),
+        ...(updates.status && { status: updates.status }),
+        // null clears; undefined preserves the existing field.
+        ...(updates.description !== undefined && { description: updates.description ?? undefined }),
+      },
+      // The body is the overview. Omitted updates preserve it byte-for-byte.
+      content: updates.overview !== undefined ? (updates.overview ?? "") : body,
+    }),
+  });
+  if (result.status === "missing") return null;
+  if (result.status === "conflict") {
+    throw new Error(`Concurrent writes did not settle for: ${projectMdPath}`);
+  }
+  const decoded = decodeProjectFrontmatter(result.snapshot.frontmatter, projectId).value;
+  const newBody = result.snapshot.content;
 
   return {
     id: projectId,

@@ -1,8 +1,8 @@
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useTask, useUpdateTask, useDeleteTask, useMoveTaskToProject, useProjects, useRemoveTaskFromOrder } from "@/stores";
-import { useEditorSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorProjectMove, useEditorAIInclusion } from "@/hooks/editor";
+import { useTask, useDeleteTask, useMoveTaskToProject, useProjects, useRemoveTaskFromOrder } from "@/stores";
+import { useEditorDocumentSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorProjectMove, useEditorAIInclusion } from "@/hooks/editor";
 import { useInternalLinkHandler } from "@/hooks";
 import { EditorHeader } from "./editor-header";
 import { EditorPathBar } from "./editor-path-bar";
@@ -17,6 +17,7 @@ import { getEntityTabId } from "@/lib/tab-identity";
 import { useTabStore } from "@/stores/tabs";
 import { cn } from "@/lib/utils";
 import { pageWidthClasses } from "@/lib/enterprise-ui";
+import { EditorConflictDialog } from "./editor-conflict-dialog";
 
 interface TaskEditorProps {
   taskId: string;
@@ -32,19 +33,14 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
   const { data: task, isLoading: isLoadingTask } = useTask(workspaceId, projectId, taskId);
 
   // Mutations
-  const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const moveTaskToProject = useMoveTaskToProject();
   const removeTaskFromOrder = useRemoveTaskFromOrder();
   const moveEntityTabToProject = useTabStore((state) => state.moveEntityTabToProject);
   const { data: projects = [] } = useProjects(workspaceId);
 
-  // Metadata state
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState<TaskStatus>("todo");
-  const [priority, setPriority] = useState<TaskPriority | "none">("none");
-  const [due, setDue] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showConflict, setShowConflict] = useState(false);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
   // Shared hooks
@@ -54,44 +50,12 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
     "task"
   );
 
-  // Initialize metadata from task
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title);
-      setStatus(task.status);
-      setPriority(task.priority || "none");
-      setDue(task.due || "");
-      setIsEditorReady(false);
-    }
-    // Re-init only when the task identity changes, not on every metadata edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [task?.id, workspaceId, projectId]);
-
-  // Hosted/web body save: persist through the update mutation (server merges
-  // frontmatter). Ignored in Tauri, which writes to disk directly.
-  const persistBody = useCallback(
-    async (body: string): Promise<boolean> => {
-      if (!task) return false;
-      try {
-        await updateTask.mutateAsync({
-          taskId: task.id,
-          workspaceId: task.workspaceId,
-          projectId: task.projectId,
-          updates: { content: body },
-        });
-        return true;
-      } catch (error) {
-        console.error("[task-editor] Failed to persist body:", error);
-        return false;
-      }
-    },
-    [task, updateTask]
-  );
-
   const {
     content,
     setContent,
-    getCurrentContent,
+    metadata,
+    setMetadata,
+    restoreEmptyTitle,
     isLoading: isLoadingContent,
     isDirty: contentDirty,
     saveStatus: contentSaveStatus,
@@ -102,17 +66,32 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
     acceptPathChange,
     acknowledgeDeleted,
     save,
+    retry,
+    useExternal: chooseExternal,
+    keepDesk,
+    cancelConflict,
+    discard,
     recover,
-  } = useEditorSession({
-    type: "task",
+    loadError,
+    serverVersionMismatch,
+    retryLoad,
+    recoveryBlocked,
+    state: editorState,
+  } = useEditorDocumentSession({
+    ref: { kind: "task", workspaceId, projectId, id: taskId },
+    editorType: "task",
     entityId: taskId,
-    filePath: task?.filePath,
-    // In Tauri the body is loaded fresh from disk; this fallback is what the
-    // editor shows in browser/hosted mode (from getTask()).
-    initialContent: task?.content ?? "",
-    enabled: !!task,
-    persistBody,
+    sessionKey: tabId,
   });
+
+  const title = typeof metadata.title === "string" ? metadata.title : task?.title ?? "";
+  const status = (metadata.status as TaskStatus | undefined) ?? task?.status ?? "todo";
+  const priority: TaskPriority | "none" = (metadata.priority as TaskPriority | undefined) ?? "none";
+  const due = (metadata.due as string | undefined) ?? "";
+
+  useEffect(() => {
+    if (contentSaveStatus === "conflict") setShowConflict(true);
+  }, [contentSaveStatus]);
 
   // Shared save hooks
   useEditorSaveShortcut(save);
@@ -139,53 +118,13 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
     }
   }, [task, isLoadingContent, isEditorReady]);
 
-  // Metadata change handler factory
-  const createMetadataHandler = useCallback(
-    <T,>(
-      setter: (value: T) => void,
-      toUpdates: (value: T) => Record<string, unknown>
-    ) => {
-      return async (value: T) => {
-        setter(value);
-        if (task) {
-          try {
-            await updateTask.mutateAsync({
-              taskId: task.id,
-              workspaceId: task.workspaceId,
-              projectId: task.projectId,
-              updates: { ...toUpdates(value), content: getCurrentContent() },
-            });
-          } catch (error) {
-            console.error("[task-editor] Failed to save metadata:", error);
-          }
-        }
-      };
-    },
-    [task, updateTask, getCurrentContent]
+  const handleTitleChange = useCallback((value: string) => setMetadata("title", value), [setMetadata]);
+  const handleStatusChange = useCallback((value: TaskStatus) => setMetadata("status", value, true), [setMetadata]);
+  const handlePriorityChange = useCallback(
+    (value: TaskPriority | "none") => setMetadata("priority", value === "none" ? null : value, true),
+    [setMetadata],
   );
-
-  const handleTitleChange = useMemo(
-    () => createMetadataHandler(setTitle, (v: string) => ({ title: v.trim() || task?.title })),
-    [createMetadataHandler, task?.title]
-  );
-
-  const handleStatusChange = useMemo(
-    () => createMetadataHandler(setStatus, (v: TaskStatus) => ({ status: v })),
-    [createMetadataHandler]
-  );
-
-  const handlePriorityChange = useMemo(
-    // null clears the field; "none" is the dropdown sentinel. See TaskUpdate.
-    () => createMetadataHandler(setPriority, (v: TaskPriority | "none") => ({
-      priority: v === "none" ? null : v,
-    })),
-    [createMetadataHandler]
-  );
-
-  const handleDueChange = useMemo(
-    () => createMetadataHandler(setDue, (v: string) => ({ due: v || null })),
-    [createMetadataHandler]
-  );
+  const handleDueChange = useCallback((value: string) => setMetadata("due", value || null, true), [setMetadata]);
 
   // Manage tab title and dirty state
   const isDirty = contentDirty;
@@ -212,25 +151,27 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
     }
   }, [task, deleteTask, removeTaskFromOrder, onClose, t]);
 
-  const saveStatus = useMemo(() => {
-    if (contentSaveStatus === "saving") return "saving" as const;
-    if (contentSaveStatus === "error") return "error" as const;
-    return "idle" as const;
-  }, [contentSaveStatus]);
+  const saveStatus = contentSaveStatus === "error" ? "error" as const : contentSaveStatus === "saving" ? "saving" as const : "idle" as const;
 
   // Render states (deleted, moved, loading, not found)
   const renderState = EditorRenderStates({
     fileDeleted,
     pathChanged,
     newPath,
-    isLoading: isLoadingTask || (!!task && (isLoadingContent || !isEditorReady)),
+    isLoading: isLoadingTask || isLoadingContent || (!!task && !isEditorReady),
     entity: task,
     entityLabel: "task",
+    loadError,
+    serverVersionMismatch,
+    onRetryLoad: retryLoad,
     onClose,
     acknowledgePathChange,
     acknowledgeDeleted,
     isDirty: contentDirty,
     onRecover: recover,
+    recoveryBlocked,
+    recovering: contentSaveStatus === "saving",
+    onDiscard: discard,
   });
   if (renderState) return renderState;
 
@@ -251,14 +192,15 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <EditorPathBar filePath={task?.filePath} />
+      <EditorPathBar filePath={editorState?.confirmed.filePath ?? task?.filePath} />
       <EditorHeader
         title={title}
         onTitleChange={handleTitleChange}
+        onTitleBlur={restoreEmptyTitle}
         placeholder={t("editors.task.titlePlaceholder")}
         saveStatus={saveStatus}
-        onSave={save}
-        isDirty={isDirty}
+        onRetry={contentSaveStatus === "error" ? retry : undefined}
+        onReview={contentSaveStatus === "conflict" ? () => setShowConflict(true) : undefined}
         onDelete={() => setShowDeleteConfirm(true)}
         authorAI={task?.author === "ai"}
         aiIncluded={!aiExclusionState.isExcluded}
@@ -297,6 +239,12 @@ export function TaskEditor({ taskId, workspaceId, projectId, onClose }: TaskEdit
         confirmLabel={t("common.buttons.delete")}
         variant="destructive"
         onConfirm={handleDeleteConfirm}
+      />
+      <EditorConflictDialog
+        open={showConflict && contentSaveStatus === "conflict"}
+        onUseExternal={() => { setShowConflict(false); chooseExternal(); }}
+        onKeepDesk={() => { setShowConflict(false); keepDesk(); }}
+        onCancel={() => { setShowConflict(false); cancelConflict(); }}
       />
     </div>
   );

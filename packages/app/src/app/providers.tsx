@@ -21,6 +21,11 @@ import { EmailDropOverlay } from "@/components/email/email-drop-overlay";
 import { toast } from "sonner";
 import { AppBootScreen } from "./boot-screen";
 import { applyThemePreference } from "@/lib/theme";
+import {
+  flushAllEditorSessions,
+  hasEditorRecoveryFailure,
+  discardAllEditorSessions,
+} from "@/lib/editor-session-controller";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -145,6 +150,8 @@ function WindowCloseProvider({ children }: { children: React.ReactNode }) {
   const [dialogState, setDialogState] = useState<{
     open: boolean;
     dirtyTabs: string[];
+    discardFailed?: boolean;
+    discarding?: boolean;
   }>({ open: false, dirtyTabs: [] });
 
   const handleCloseRequested = useCallback((dirtyTabs: string[]) => {
@@ -154,18 +161,34 @@ function WindowCloseProvider({ children }: { children: React.ReactNode }) {
   const { confirmClose, cancelClose } = useWindowClose(handleCloseRequested);
 
   const handleSave = useCallback(() => {
-    // For window close, we don't have a way to save all tabs automatically,
-    // so we treat "Save" same as cancel - let user save manually
-    // This matches the behavior of most apps where Cmd+Q with unsaved changes
-    // shows a dialog but "Save" just cancels the quit
     setDialogState({ open: false, dirtyTabs: [] });
-    cancelClose();
-  }, [cancelClose]);
+    void flushAllEditorSessions().then((saved) => {
+      if (saved) void confirmClose();
+      else cancelClose();
+    });
+  }, [cancelClose, confirmClose]);
 
   const handleDontSave = useCallback(() => {
-    setDialogState({ open: false, dirtyTabs: [] });
-    confirmClose();
-  }, [confirmClose]);
+    if (dialogState.discarding) return;
+    setDialogState((current) => ({
+      ...current,
+      discardFailed: false,
+      discarding: true,
+    }));
+    void discardAllEditorSessions().then((discarded) => {
+      if (!discarded) {
+        toast.error(t("editors.shared.discardFailed"));
+        setDialogState((current) => ({
+          ...current,
+          discardFailed: true,
+          discarding: false,
+        }));
+        return;
+      }
+      setDialogState({ open: false, dirtyTabs: [] });
+      void confirmClose();
+    });
+  }, [confirmClose, dialogState.discarding, t]);
 
   const handleCancel = useCallback(() => {
     setDialogState({ open: false, dirtyTabs: [] });
@@ -183,15 +206,22 @@ function WindowCloseProvider({ children }: { children: React.ReactNode }) {
         open={dialogState.open}
         onOpenChange={(open) => {
           if (!open) {
+            if (dialogState.discarding) return;
             setDialogState({ open: false, dirtyTabs: [] });
             cancelClose();
           }
         }}
         title={t("unsavedChanges.title")}
-        description={t("unsavedChanges.description", { tabs: tabNames, more: moreCount })}
+        description={dialogState.discardFailed
+          ? t("editors.shared.discardFailed")
+          : t("unsavedChanges.description", { tabs: tabNames, more: moreCount })}
+        dontSaveLabel={dialogState.discardFailed
+          ? t("editors.shared.retryDiscard")
+          : undefined}
         onSave={handleSave}
         onDontSave={handleDontSave}
         onCancel={handleCancel}
+        pending={dialogState.discarding}
       />
     </>
   );
@@ -217,6 +247,31 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function EditorFlushProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    const flush = () => void flushAllEditorSessions();
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasEditorRecoveryFailure()) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("blur", flush);
+    window.addEventListener("online", flush);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("blur", flush);
+      window.removeEventListener("online", flush);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+  return <>{children}</>;
+}
+
 export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -225,12 +280,14 @@ export function Providers({ children }: ProvidersProps) {
           <QueryInvalidatorProvider>
             <SearchIndexProvider>
               <WindowCloseProvider>
-                <ThemeProvider>
-                  <ContextMenuSuppressionProvider>
-                    {children}
-                    <EmailDropOverlay />
-                  </ContextMenuSuppressionProvider>
-                </ThemeProvider>
+                <EditorFlushProvider>
+                  <ThemeProvider>
+                    <ContextMenuSuppressionProvider>
+                      {children}
+                      <EmailDropOverlay />
+                    </ContextMenuSuppressionProvider>
+                  </ThemeProvider>
+                </EditorFlushProvider>
               </WindowCloseProvider>
             </SearchIndexProvider>
           </QueryInvalidatorProvider>

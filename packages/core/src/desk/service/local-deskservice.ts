@@ -25,9 +25,13 @@ import * as indexCacheApi from "../index-cache";
 import * as aiignoreApi from "../aiignore";
 import * as aiUsageApi from "../ai-usage";
 import * as maintenanceApi from "../maintenance";
+import * as editorDocumentsApi from "../editor-documents";
 import type { DeskService } from "./deskservice";
 
 export const localDeskService: DeskService = {
+  getEditorDocument: editorDocumentsApi.getEditorDocument,
+  saveEditorDocument: editorDocumentsApi.saveEditorDocument,
+
   // Tasks
   getTasks: tasksApi.getTasks,
   getTasksByProject: tasksApi.getTasksByProject,

@@ -4,6 +4,10 @@ import { createNativeAuthClient } from "@/lib/native-auth-client";
 import { nativeFetch } from "@/lib/native-http";
 import { AuthScreen } from "./auth-screen";
 import { AppBootScreen } from "@/app/boot-screen";
+import {
+  EditorAuthTransitionNotice,
+  useGuardedEditorAuthSession,
+} from "@/hooks/use-guarded-editor-auth-session";
 
 /**
  * Native remote-mode auth gate — the desktop counterpart of
@@ -24,6 +28,7 @@ export default function NativeAuthGate({ children }: { children: ReactNode }) {
   const client = useMemo(() => createNativeAuthClient(serverUrl), [serverUrl]);
   const { data: session, isPending } = client.useSession();
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
+  const guarded = useGuardedEditorAuthSession(session, isPending);
 
   useEffect(() => {
     let active = true;
@@ -42,11 +47,11 @@ export default function NativeAuthGate({ children }: { children: ReactNode }) {
     };
   }, [serverUrl]);
 
-  if (isPending || hasUsers === null) {
+  if (guarded.initializing || hasUsers === null) {
     return <AppBootScreen />;
   }
 
-  if (!session) {
+  if (!guarded.acceptedSession) {
     return (
       <AuthScreen
         mode={hasUsers ? "login" : "create"}
@@ -55,5 +60,10 @@ export default function NativeAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {guarded.blocked && <EditorAuthTransitionNotice retry={guarded.retry} />}
+    </>
+  );
 }

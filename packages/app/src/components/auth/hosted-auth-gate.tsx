@@ -2,6 +2,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { signIn, signUp, useSession } from "@/lib/auth-client";
 import { AuthScreen } from "./auth-screen";
 import { AppBootScreen } from "@/app/boot-screen";
+import {
+  EditorAuthTransitionNotice,
+  useGuardedEditorAuthSession,
+} from "@/hooks/use-guarded-editor-auth-session";
 
 /**
  * Hosted-mode auth gate — lazy-loaded, so better-auth never enters the
@@ -15,6 +19,7 @@ import { AppBootScreen } from "@/app/boot-screen";
 export default function HostedAuthGate({ children }: { children: ReactNode }) {
   const { data: session, isPending } = useSession();
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
+  const guarded = useGuardedEditorAuthSession(session, isPending);
 
   useEffect(() => {
     let active = true;
@@ -33,13 +38,18 @@ export default function HostedAuthGate({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  if (isPending || hasUsers === null) {
+  if (guarded.initializing || hasUsers === null) {
     return <AppBootScreen />;
   }
 
-  if (!session) {
+  if (!guarded.acceptedSession) {
     return <AuthScreen mode={hasUsers ? "login" : "create"} auth={{ signIn, signUp }} />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {guarded.blocked && <EditorAuthTransitionNotice retry={guarded.retry} />}
+    </>
+  );
 }

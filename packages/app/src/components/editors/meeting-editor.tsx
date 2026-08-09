@@ -1,8 +1,8 @@
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useMeeting, useUpdateMeeting, useDeleteMeeting, useMoveMeetingToProject, useProjects } from "@/stores";
-import { useEditorSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorProjectMove, useEditorAIInclusion } from "@/hooks/editor";
+import { useMeeting, useDeleteMeeting, useMoveMeetingToProject, useProjects } from "@/stores";
+import { useEditorDocumentSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorProjectMove, useEditorAIInclusion } from "@/hooks/editor";
 import { useInternalLinkHandler } from "@/hooks";
 import { EditorHeader } from "./editor-header";
 import { EditorPathBar } from "./editor-path-bar";
@@ -16,6 +16,7 @@ import { getEntityTabId } from "@/lib/tab-identity";
 import { useTabStore } from "@/stores/tabs";
 import { cn } from "@/lib/utils";
 import { pageWidthClasses } from "@/lib/enterprise-ui";
+import { EditorConflictDialog } from "./editor-conflict-dialog";
 
 interface MeetingEditorProps {
   meetingId: string;
@@ -34,16 +35,13 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
     meetingId,
   );
 
-  const updateMeeting = useUpdateMeeting();
   const deleteMeeting = useDeleteMeeting();
   const moveMeetingToProject = useMoveMeetingToProject();
   const moveEntityTabToProject = useTabStore((state) => state.moveEntityTabToProject);
   const { data: projects = [] } = useProjects(workspaceId);
 
-  // Metadata state
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showConflict, setShowConflict] = useState(false);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
   // Shared hooks
@@ -53,42 +51,12 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
     "meeting"
   );
 
-  // Initialize metadata from meeting
-  useEffect(() => {
-    if (meeting) {
-      setTitle(meeting.title);
-      setDate(meeting.date ?? "");
-      setIsEditorReady(false);
-    }
-    // Re-init only when the meeting identity changes, not on every metadata edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meeting?.id, workspaceId, projectId]);
-
-  // Hosted/web body save: persist through the update mutation (server merges
-  // frontmatter). Ignored in Tauri, which writes to disk directly.
-  const persistBody = useCallback(
-    async (body: string): Promise<boolean> => {
-      if (!meeting) return false;
-      try {
-        await updateMeeting.mutateAsync({
-          meetingId: meeting.id,
-          workspaceId: meeting.workspaceId,
-          projectId: meeting.projectId,
-          updates: { content: body },
-        });
-        return true;
-      } catch (error) {
-        console.error("[meeting-editor] Failed to persist body:", error);
-        return false;
-      }
-    },
-    [meeting, updateMeeting]
-  );
-
   const {
     content,
     setContent,
-    getCurrentContent,
+    metadata,
+    setMetadata,
+    restoreEmptyTitle,
     isLoading: isLoadingContent,
     isDirty: contentDirty,
     saveStatus: contentSaveStatus,
@@ -99,17 +67,29 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
     acceptPathChange,
     acknowledgeDeleted,
     save,
+    retry,
+    useExternal: chooseExternal,
+    keepDesk,
+    cancelConflict,
+    discard,
     recover,
-  } = useEditorSession({
-    type: "meeting",
+    loadError,
+    serverVersionMismatch,
+    retryLoad,
+    recoveryBlocked,
+    state: editorState,
+  } = useEditorDocumentSession({
+    ref: { kind: "meeting", workspaceId, projectId, id: meetingId },
+    editorType: "meeting",
     entityId: meetingId,
-    filePath: meeting?.filePath,
-    // In Tauri the body is loaded fresh from disk; this is only a fallback.
-    // In browser development it is the content the editor shows.
-    initialContent: meeting?.content ?? "",
-    enabled: !!meeting,
-    persistBody,
+    sessionKey: tabId,
   });
+  const title = typeof metadata.title === "string" ? metadata.title : meeting?.title ?? "";
+  const date = typeof metadata.date === "string" ? metadata.date : "";
+
+  useEffect(() => {
+    if (contentSaveStatus === "conflict") setShowConflict(true);
+  }, [contentSaveStatus]);
 
   // Shared save hooks
   useEditorSaveShortcut(save);
@@ -136,54 +116,14 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
     }
   }, [meeting, isLoadingContent, isEditorReady]);
 
-  // Metadata change handlers
-  const handleTitleChange = useCallback(
-    async (newTitle: string) => {
-      setTitle(newTitle);
-      if (meeting) {
-        try {
-          await updateMeeting.mutateAsync({
-            meetingId: meeting.id,
-            workspaceId: meeting.workspaceId,
-            projectId: meeting.projectId,
-            updates: { title: newTitle.trim() || meeting.title, content: getCurrentContent() },
-          });
-        } catch (error) {
-          console.error("[meeting-editor] Failed to save title:", error);
-        }
-      }
-    },
-    [meeting, updateMeeting, getCurrentContent]
-  );
-
-  const handleDateChange = useCallback(
-    async (newDate: string) => {
-      setDate(newDate);
-      if (meeting) {
-        try {
-          await updateMeeting.mutateAsync({
-            meetingId: meeting.id,
-            workspaceId: meeting.workspaceId,
-            projectId: meeting.projectId,
-            updates: { date: newDate || meeting.date, content: getCurrentContent() },
-          });
-        } catch (error) {
-          console.error("[meeting-editor] Failed to save date:", error);
-        }
-      }
-    },
-    [meeting, updateMeeting, getCurrentContent]
-  );
+  const handleTitleChange = useCallback((value: string) => setMetadata("title", value), [setMetadata]);
+  const handleDateChange = useCallback((value: string) => setMetadata("date", value || null, true), [setMetadata]);
 
   // Manage tab title and dirty state
   const isDirty = contentDirty;
   useEditorTab(tabId, title, isDirty);
 
-  const saveStatus = useMemo(() => {
-    if (contentSaveStatus === "saving") return "saving" as const;
-    if (contentSaveStatus === "error") return "error" as const;
-    return "idle" as const;
-  }, [contentSaveStatus]);
+  const saveStatus = contentSaveStatus === "error" ? "error" as const : contentSaveStatus === "saving" ? "saving" as const : "idle" as const;
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!meeting) return;
@@ -206,27 +146,34 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
     fileDeleted,
     pathChanged,
     newPath,
-    isLoading: isLoadingMeeting || (!!meeting && (isLoadingContent || !isEditorReady)),
+    isLoading: isLoadingMeeting || isLoadingContent || (!!meeting && !isEditorReady),
     entity: meeting,
     entityLabel: "meeting",
+    loadError,
+    serverVersionMismatch,
+    onRetryLoad: retryLoad,
     onClose,
     acknowledgePathChange,
     acknowledgeDeleted,
     isDirty: contentDirty,
     onRecover: recover,
+    recoveryBlocked,
+    recovering: contentSaveStatus === "saving",
+    onDiscard: discard,
   });
   if (renderState) return renderState;
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <EditorPathBar filePath={meeting?.filePath} />
+      <EditorPathBar filePath={editorState?.confirmed.filePath ?? meeting?.filePath} />
       <EditorHeader
         title={title}
         onTitleChange={handleTitleChange}
+        onTitleBlur={restoreEmptyTitle}
         placeholder={t("editors.meeting.titlePlaceholder")}
         saveStatus={saveStatus}
-        onSave={save}
-        isDirty={isDirty}
+        onRetry={contentSaveStatus === "error" ? retry : undefined}
+        onReview={contentSaveStatus === "conflict" ? () => setShowConflict(true) : undefined}
         onDelete={() => setShowDeleteConfirm(true)}
         authorAI={meeting?.author === "ai"}
         aiIncluded={!aiExclusionState.isExcluded}
@@ -272,6 +219,12 @@ export function MeetingEditor({ meetingId, workspaceId, projectId, onClose }: Me
         confirmLabel={t("common.buttons.delete")}
         variant="destructive"
         onConfirm={handleDeleteConfirm}
+      />
+      <EditorConflictDialog
+        open={showConflict && contentSaveStatus === "conflict"}
+        onUseExternal={() => { setShowConflict(false); chooseExternal(); }}
+        onKeepDesk={() => { setShowConflict(false); keepDesk(); }}
+        onCancel={() => { setShowConflict(false); cancelConflict(); }}
       />
     </div>
   );

@@ -37,20 +37,17 @@
 
 ## Why I built Desk
 
-I wanted a place to manage projects, tasks, documents, meetings, quick capture, and weekly planning without giving up the files underneath.
-I had used Obsidian, Notion, and a few other tools, but kept running into the
-same trade-off: flexible tools that needed a lot of setup or plugins, or a ready-made app that locked me into its own format and interface.
+I wanted a way to manage all my work in one place, with a clear structure and interface, without giving up the files underneath.
+I had used Obsidian, Notion, and a few other tools, but kept running into trade-offs: flexible tools needed a lot of setup or plugins, ready-made apps locked me into their own format and interface.
 Desk gives me the structure and interface I was missing, while the workspace
 itself stays ordinary Markdown.
 
-That also means local agents can work with the folder directly. When Desk is
-self-hosted, the same content is available through an OAuth-protected MCP endpoint.
+That also means local agents can work with the local folder directly. Desk has an integrated agent layer that generates guidance for local agents, and a self-hosted MCP endpoint for external agents.
 
 ## Built for one person running real work
 
-Desk is especially useful for freelancers, consultants, developers, makers,
-and other independent professionals who manage several streams of work and
-care about owning their data.
+Desk is intentionally a single-user app.
+It's especially useful for people who manage several streams of work and care about owning their data.
 
 - **Projects with orientation.** Every workspace and project has a user-owned
   Markdown overview, focused current work, and a lightweight schedule/history
@@ -64,15 +61,12 @@ care about owning their data.
 - **Files that remain files.** Ordinary filesystem tools can open, back up, sync,
   search, and version the workspace.
 
-Desk is intentionally a single-user product today. It is not a team PM system
-with assignments, permissions, or real-time collaboration.
 
 ## Agent access
 
-Desk does not put a chatbot in the middle of your work. It gives the AI tools
-you already use a controlled way to read the context behind it.
-Desk organizes durable source material for external
-AI tools — but it does not try to be an AI workspace itself.
+Desk organizes durable source material for external AI tools, but it does not try to be an AI workspace itself.
+It simply gives the AI tools you already use a controlled way to read the context of your work.
+The idea is to enable agents to be more useful and accurate when consulting your work.
 
 - **Local filesystem access.** Desk can generate `CLAUDE.md`, `AGENTS.md`,
   `GEMINI.md`, and per-workspace `WORKSPACE_INDEX.md` files so local agents

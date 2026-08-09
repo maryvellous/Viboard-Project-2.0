@@ -1,5 +1,8 @@
+use fs2::FileExt;
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
+use std::{fs, io::Write, path::Path};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{Emitter, Manager, WindowEvent};
 use tauri_plugin_fs::FsExt;
@@ -121,14 +124,106 @@ fn reveal_in_finder(path: String) -> Result<(), String> {
 /// Dynamically expand the file system scope to allow access to a directory.
 /// Called by the frontend on startup with the user's configured data path.
 #[tauri::command]
-fn expand_fs_scope(app_handle: tauri::AppHandle, path: String) -> Result<(), String> {
+fn expand_fs_scope(
+    app_handle: tauri::AppHandle,
+    ownership: tauri::State<'_, Mutex<Option<DataRootOwnership>>>,
+    path: String,
+) -> Result<(), String> {
     let p = std::path::PathBuf::from(&path);
-    data_root::set_data_root(p.clone());
-    app_config::store_data_path(&path)?;
+    fs::create_dir_all(&p).map_err(|error| {
+        format!(
+            "Failed to create DeskMD data folder {}: {error}",
+            p.display()
+        )
+    })?;
+    let canonical = p.canonicalize().map_err(|error| {
+        format!(
+            "Failed to resolve DeskMD data folder {}: {error}",
+            p.display()
+        )
+    })?;
+    let mut current = ownership
+        .lock()
+        .map_err(|_| "Data-root ownership state is unavailable".to_string())?;
+    let changing_root = match current.as_ref() {
+        Some(owner) => owner.canonical_root != canonical,
+        None => true,
+    };
+    let candidate = if changing_root {
+        Some(acquire_data_root_ownership(&p)?)
+    } else {
+        None
+    };
     app_handle
         .fs_scope()
         .allow_directory(&p, true)
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    app_config::store_data_path(&path)?;
+    data_root::set_data_root(p);
+    if let Some(candidate) = candidate {
+        *current = Some(candidate);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn release_data_root_ownership(
+    ownership: tauri::State<'_, Mutex<Option<DataRootOwnership>>>,
+) -> Result<(), String> {
+    let mut current = ownership
+        .lock()
+        .map_err(|_| "Data-root ownership state is unavailable".to_string())?;
+    *current = None;
+    Ok(())
+}
+
+struct DataRootOwnership {
+    _file: fs::File,
+    canonical_root: std::path::PathBuf,
+}
+
+fn acquire_data_root_ownership(root: &Path) -> Result<DataRootOwnership, String> {
+    fs::create_dir_all(root).map_err(|error| {
+        format!(
+            "Failed to create DeskMD data folder {}: {error}",
+            root.display()
+        )
+    })?;
+    let canonical_root = root.canonicalize().map_err(|error| {
+        format!(
+            "Failed to resolve DeskMD data folder {}: {error}",
+            root.display()
+        )
+    })?;
+    let lock_directory = canonical_root.join(".desk");
+    fs::create_dir_all(&lock_directory).map_err(|error| {
+        format!(
+            "Failed to create DeskMD lock directory {}: {error}",
+            lock_directory.display()
+        )
+    })?;
+    let lock_path = lock_directory.join("writer.lock");
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .read(true)
+        .write(true)
+        .open(&lock_path)
+        .map_err(|error| {
+            format!(
+                "Failed to open DeskMD writer lock {}: {error}",
+                lock_path.display()
+            )
+        })?;
+    file.try_lock_exclusive().map_err(|error| {
+        format!(
+            "DeskMD data folder is already owned by another process or does not support locking: {}. Stop the other DeskMD instance and try again. ({error})",
+            canonical_root.display(),
+        )
+    })?;
+    Ok(DataRootOwnership {
+        _file: file,
+        canonical_root,
+    })
 }
 
 /// Canonicalize a path that may not exist yet. Walks up to the nearest existing
@@ -206,6 +301,139 @@ fn allow_data_path(app_handle: tauri::AppHandle, path: String) -> Result<(), Str
         .map_err(|e| e.to_string())
 }
 
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "status", rename_all = "lowercase")]
+enum AtomicCreateTextResult {
+    Created,
+    Exists { current: Option<String> },
+}
+
+fn read_optional_text(path: &Path) -> Result<Option<String>, String> {
+    match fs::read_to_string(path) {
+        Ok(content) => Ok(Some(content)),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(format!("Failed to read {}: {error}", path.display())),
+    }
+}
+
+#[tauri::command]
+fn create_text_file_atomically(
+    ownership: tauri::State<'_, Mutex<Option<DataRootOwnership>>>,
+    path: String,
+    content: String,
+) -> Result<AtomicCreateTextResult, String> {
+    let _owner = lock_owned_data_root(&ownership)?;
+    create_text_file_atomically_impl(path, content)
+}
+
+fn create_text_file_atomically_impl(
+    path: String,
+    content: String,
+) -> Result<AtomicCreateTextResult, String> {
+    let target = atomic_write_target(&path)?;
+    let parent = target
+        .parent()
+        .ok_or_else(|| format!("File has no parent directory: {}", target.display()))?;
+    let temporary = prepare_atomic_text_file(&target, &content)?;
+    match temporary.persist_noclobber(&target) {
+        Ok(_) => {
+            sync_parent_directory(parent);
+            Ok(AtomicCreateTextResult::Created)
+        }
+        Err(error) if error.error.kind() == std::io::ErrorKind::AlreadyExists => {
+            Ok(AtomicCreateTextResult::Exists {
+                current: read_optional_text(&target)?,
+            })
+        }
+        Err(error) => Err(format!("Failed to atomically create file: {}", error.error)),
+    }
+}
+
+#[tauri::command]
+fn replace_text_file_atomically(
+    ownership: tauri::State<'_, Mutex<Option<DataRootOwnership>>>,
+    path: String,
+    content: String,
+) -> Result<(), String> {
+    let _owner = lock_owned_data_root(&ownership)?;
+    replace_text_file_atomically_impl(path, content)
+}
+
+fn replace_text_file_atomically_impl(path: String, content: String) -> Result<(), String> {
+    let target = atomic_write_target(&path)?;
+    let parent = target
+        .parent()
+        .ok_or_else(|| format!("File has no parent directory: {}", target.display()))?;
+    prepare_atomic_text_file(&target, &content)?
+        .persist(&target)
+        .map_err(|error| format!("Failed to atomically replace file: {}", error.error))?;
+    sync_parent_directory(parent);
+    Ok(())
+}
+
+fn lock_owned_data_root(
+    ownership: &Mutex<Option<DataRootOwnership>>,
+) -> Result<std::sync::MutexGuard<'_, Option<DataRootOwnership>>, String> {
+    let owner = ownership
+        .lock()
+        .map_err(|_| "Data-root ownership state is unavailable".to_string())?;
+    let Some(active) = owner.as_ref() else {
+        return Err("DeskMD does not own the local data folder; writes are disabled".to_string());
+    };
+    let configured = lenient_canonicalize(&data_root::get_data_root())?;
+    if active.canonical_root != configured {
+        return Err("DeskMD data-root ownership does not match the configured folder".to_string());
+    }
+    Ok(owner)
+}
+
+fn atomic_write_target(path: &str) -> Result<std::path::PathBuf, String> {
+    let requested = std::path::PathBuf::from(path);
+    let target = lenient_canonicalize(&requested)?;
+    let root = lenient_canonicalize(&data_root::get_data_root())?;
+    if !target.starts_with(&root) {
+        return Err(format!(
+            "Path is outside the Desk data root: {}",
+            requested.display()
+        ));
+    }
+    Ok(target)
+}
+
+fn prepare_atomic_text_file(
+    target: &Path,
+    content: &str,
+) -> Result<tempfile::NamedTempFile, String> {
+    let parent = target
+        .parent()
+        .ok_or_else(|| format!("File has no parent directory: {}", target.display()))?;
+    let mut temporary = tempfile::Builder::new()
+        .prefix(".deskmd-write-")
+        .suffix(".tmp")
+        .tempfile_in(parent)
+        .map_err(|error| format!("Failed to create temporary file: {error}"))?;
+    if let Ok(metadata) = fs::metadata(target) {
+        temporary
+            .as_file()
+            .set_permissions(metadata.permissions())
+            .map_err(|error| format!("Failed to preserve file permissions: {error}"))?;
+    }
+    temporary
+        .write_all(content.as_bytes())
+        .map_err(|error| format!("Failed to write temporary file: {error}"))?;
+    temporary
+        .as_file()
+        .sync_all()
+        .map_err(|error| format!("Failed to flush temporary file: {error}"))?;
+    Ok(temporary)
+}
+
+fn sync_parent_directory(parent: &Path) {
+    if let Ok(directory) = fs::File::open(parent) {
+        let _ = directory.sync_all();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[allow(unused_mut)]
@@ -219,7 +447,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             confirm_close,
             expand_fs_scope,
+            release_data_root_ownership,
             allow_data_path,
+            create_text_file_atomically,
+            replace_text_file_atomically,
             read_eml_file,
             read_dropped_file,
             delete_dropped_file,
@@ -234,6 +465,9 @@ pub fn run() {
         .setup(|app| {
             let initial_root = data_root::resolve_data_root(None);
             data_root::set_data_root(initial_root);
+            // Local bootstrap claims the configured root through expand_fs_scope.
+            // Native remote mode deliberately never claims the local folder.
+            app.manage(Mutex::new(None::<DataRootOwnership>));
 
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -344,4 +578,72 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod atomic_write_tests {
+    use super::*;
+
+    static TEST_ROOT_LOCK: Mutex<()> = Mutex::new(());
+
+    #[test]
+    fn atomic_create_does_not_clobber_and_replace_cleans_up() {
+        let _guard = TEST_ROOT_LOCK.lock().expect("test root lock");
+        let directory = tempfile::tempdir().expect("temp directory");
+        data_root::set_data_root(directory.path().to_path_buf());
+        let target = directory.path().join("record.md");
+        fs::write(&target, "original").expect("seed record");
+
+        let conflict = create_text_file_atomically_impl(
+            target.to_string_lossy().into_owned(),
+            "wrong".to_string(),
+        )
+        .expect("conflict result");
+        assert!(matches!(
+            conflict,
+            AtomicCreateTextResult::Exists { current: Some(value) } if value == "original"
+        ));
+        assert_eq!(
+            fs::read_to_string(&target).expect("unchanged record"),
+            "original"
+        );
+
+        replace_text_file_atomically_impl(
+            target.to_string_lossy().into_owned(),
+            "saved".to_string(),
+        )
+        .expect("written result");
+        assert_eq!(fs::read_to_string(&target).expect("saved record"), "saved");
+        assert_eq!(
+            fs::read_dir(directory.path())
+                .expect("directory entries")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn data_root_ownership_is_exclusive_and_released_on_drop() {
+        let _guard = TEST_ROOT_LOCK.lock().expect("test root lock");
+        let directory = tempfile::tempdir().expect("temp directory");
+        let first = acquire_data_root_ownership(directory.path()).expect("first owner");
+        let error = acquire_data_root_ownership(directory.path())
+            .err()
+            .expect("second owner must fail");
+        assert!(error.contains("already owned"));
+        drop(first);
+        acquire_data_root_ownership(directory.path()).expect("owner after release");
+    }
+
+    #[test]
+    fn rejected_root_claim_does_not_change_the_active_root() {
+        let _guard = TEST_ROOT_LOCK.lock().expect("test root lock");
+        let first = tempfile::tempdir().expect("first root");
+        let blocked = tempfile::tempdir().expect("blocked root");
+        data_root::set_data_root(first.path().to_path_buf());
+        let _blocker = acquire_data_root_ownership(blocked.path()).expect("blocking owner");
+
+        assert!(acquire_data_root_ownership(blocked.path()).is_err());
+        assert_eq!(data_root::get_data_root(), first.path());
+    }
 }

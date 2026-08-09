@@ -29,6 +29,8 @@
       "back": "Back",
       "continue": "Continue",
       "retry": "Retry",
+      "discard": "Discard",
+      "done": "Done",
       "dontSave": "Don't Save",
       "create": "Create",
       "rename": "Rename",
@@ -41,14 +43,18 @@
       "reloadPage": "Reload Page",
       "clear": "Clear"
     },
-    "aiBadge": "AI"
+    "aiBadge": "AI",
+    "bootErrorTitle": "DeskMD could not open the data folder"
   },
   "overviews": {
     "discardTitle": "Discard overview changes?",
     "discardDescription": "Your unsaved overview changes will be lost.",
     "discardAction": "Discard changes",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "loadFailed": "Desk could not load this overview. Your file was not changed.",
+    "missing": "This overview file no longer exists.",
+    "unsavedHint": "Your unsaved overview edits are protected and can be restored."
   },
   "nav": {
     "sidebar": {
@@ -579,6 +585,9 @@
         "confirmLabel": "Reset"
       },
       "pathDialog": {
+        "confirmTitle": "Switch data folder?",
+        "confirmDescription": "Desk will save open editors, switch to {{path}}, and reload.",
+        "confirmSwitch": "Switch and Reload",
         "existingTitle": "Existing Data Found",
         "existingDescription_one": "Found {{count}} workspace at this location.",
         "existingDescription_other": "Found {{count}} workspaces at this location.",
@@ -841,7 +850,25 @@
         "meeting": "Meeting"
       },
       "entityNotFound": "{{entity}} not found",
-      "closeTab": "Close tab"
+      "closeTab": "Close tab",
+      "discardFailed": "Could not discard the recovery draft. Your edits remain open; please try again.",
+      "retryDiscard": "Retry discard",
+      "contextTransitionBlocked": "Resolve or discard unsaved editor changes before switching data context.",
+      "loadFailed": {
+        "title": "Couldn't load {{entity}} content",
+        "description": "Desk did not open an empty copy, and your file was not changed. Check the connection and retry."
+      },
+      "versionMismatch": {
+        "title": "Desk client and server need the same version",
+        "description": "This client uses a newer editor API that the server does not support yet. No file was changed. Update the server, then retry."
+      },
+      "review": "Review",
+      "conflict": {
+        "title": "This file changed outside Desk",
+        "description": "Choose which version to keep. Desk will not overwrite the external change automatically.",
+        "useExternal": "Use External",
+        "keepDesk": "Keep Desk"
+      }
     }
   },
   "entities": {
@@ -1310,6 +1337,7 @@
         "title": "File Deleted",
         "description": "This file has been deleted from the file system.",
         "unsavedHint": "You have unsaved edits. Restore them to re-create the file.",
+        "parentMissing": "The containing folder no longer exists. Desk will keep your draft but will not rebuild a deleted workspace or project.",
         "restoreFromEdits": "Restore from edits",
         "closeTab": "Close Tab"
       },

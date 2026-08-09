@@ -4,13 +4,12 @@
  * Published from the record-write funnel in `file-operations.ts` (write/update/delete/move),
  * so every path that mutates a record fires here with no per-surface code:
  *   - app UI mutations (stores → domain functions)
- *   - editor body saves (`saveMarkdownBody`)
+ *   - versioned editor document saves
  *   - RPC writes from web / native-remote clients (server-side domain calls)
  *   - future MCP write tools (they call domain functions → funnel → here)
  *
- * NOT published (v1): binary asset imports, and the project.md / workspace.md entity writes —
- * no subscriber consumes entity events today; add the publish calls when one does. Recursive
- * directory ops (folder rename/move/delete, project/workspace delete) DO publish: they funnel
+ * NOT published (v1): binary asset imports. Recursive directory ops (folder rename/move/delete,
+ * project/workspace delete) DO publish: they funnel
  * through `moveDirectoryWithContents` / `removeDirectoryWithContents`, which enumerate the
  * contained markdown files and fire one event per record.
  *

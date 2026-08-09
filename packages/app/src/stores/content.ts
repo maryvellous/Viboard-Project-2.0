@@ -1,9 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Doc, ContentScope, Asset } from "@desk/core/types";
-import { getDeskService, isSameEntity } from "@desk/core";
+import { getDeskService, isSameEntity, WORKSPACE_LEVEL_PROJECT_ID } from "@desk/core";
 import type { ConvertibleAction, DocLocation } from "@desk/core";
 import { invalidateDashboardOverview } from "./dashboard";
 import { invalidateProjectInsights } from "./project-insights-invalidation";
+import { invalidateEditorDocuments } from "@/lib/query-client";
+import { flushEditorSession } from "@/lib/editor-session-controller";
+import { useTabStore, type TabItem } from "./tabs";
 
 // Query keys for content (docs, assets, folders)
 export const contentKeys = {
@@ -95,6 +98,7 @@ export function useUpdateDoc() {
       updates: Partial<Pick<Doc, "title" | "content">>;
     }) => getDeskService().updateDoc(doc, updates),
     onSuccess: (updatedDoc) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (updatedDoc) {
         invalidateProjectInsights(queryClient, updatedDoc.workspaceId);
@@ -128,6 +132,7 @@ export function useDeleteDoc() {
   return useMutation({
     mutationFn: (doc: Doc) => getDeskService().deleteDoc(doc),
     onSuccess: (success, doc) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (success) {
         invalidateProjectInsights(queryClient, doc.workspaceId);
@@ -234,6 +239,7 @@ export function useCreateFolder() {
       projectId?: string;
     }) => getDeskService().createFolder(scope, folderPath, workspaceId, projectId),
     onSuccess: (_result, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       queryClient.invalidateQueries({
         queryKey: contentKeys.tree(
@@ -257,7 +263,7 @@ export function useRenameFolder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       scope,
       oldPath,
       newName,
@@ -269,8 +275,19 @@ export function useRenameFolder() {
       newName: string;
       workspaceId?: string;
       projectId?: string;
-    }) => getDeskService().renameFolder(scope, oldPath, newName, workspaceId, projectId),
-    onSuccess: (_result, variables) => {
+    }) => {
+      await flushDocumentTabsInFolder(scope, oldPath, workspaceId, projectId);
+      return getDeskService().renameFolder(scope, oldPath, newName, workspaceId, projectId);
+    },
+    onSuccess: (result, variables) => {
+      relocateDocumentTabsInFolder(
+        variables.scope,
+        variables.oldPath,
+        result.path,
+        variables.workspaceId,
+        variables.projectId,
+      );
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       queryClient.invalidateQueries({
         queryKey: contentKeys.tree(
@@ -306,6 +323,7 @@ export function useDeleteFolder() {
       projectId?: string;
     }) => getDeskService().deleteFolder(scope, folderPath, workspaceId, projectId),
     onSuccess: (_result, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       queryClient.invalidateQueries({
         queryKey: contentKeys.tree(
@@ -329,7 +347,7 @@ export function useMoveFolder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       scope,
       fromPath,
       toParentPath,
@@ -341,8 +359,25 @@ export function useMoveFolder() {
       toParentPath: string;
       workspaceId?: string;
       projectId?: string;
-    }) => getDeskService().moveFolder(scope, fromPath, toParentPath, workspaceId, projectId),
-    onSuccess: (_result, variables) => {
+    }) => {
+      await flushDocumentTabsInFolder(scope, fromPath, workspaceId, projectId);
+      return getDeskService().moveFolder(scope, fromPath, toParentPath, workspaceId, projectId);
+    },
+    onSuccess: (moved, variables) => {
+      if (moved) {
+        const folderName = variables.fromPath.split("/").pop() ?? variables.fromPath;
+        const targetPath = variables.toParentPath
+          ? `${variables.toParentPath}/${folderName}`
+          : folderName;
+        relocateDocumentTabsInFolder(
+          variables.scope,
+          variables.fromPath,
+          targetPath,
+          variables.workspaceId,
+          variables.projectId,
+        );
+      }
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       queryClient.invalidateQueries({
         queryKey: contentKeys.tree(
@@ -366,7 +401,7 @@ export function useMoveDoc() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       docId,
       workspaceId,
       from,
@@ -376,8 +411,21 @@ export function useMoveDoc() {
       workspaceId: string;
       from: DocLocation;
       to: DocLocation;
-    }) => getDeskService().moveDoc(docId, workspaceId, from, to),
-    onSuccess: (_result, variables) => {
+    }) => {
+      await flushDocumentTab(docId, workspaceId, from);
+      return getDeskService().moveDoc(docId, workspaceId, from, to);
+    },
+    onSuccess: (result, variables) => {
+      if (result) {
+        const tab = findDocumentTab(variables.docId, variables.workspaceId, variables.from);
+        if (tab) {
+          useTabStore.getState().relocateEntityTab(tab.id, {
+            entityId: result.id,
+            projectId: result.projectId,
+          });
+        }
+      }
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       const { workspaceId, from, to } = variables;
       invalidateProjectInsights(queryClient, workspaceId);
@@ -390,6 +438,77 @@ export function useMoveDoc() {
       queryClient.invalidateQueries({ queryKey: contentKeys.shell(workspaceId) });
     },
   });
+}
+
+function editorProjectId(scope: ContentScope, projectId?: string): string | null {
+  if (scope === "workspace") return WORKSPACE_LEVEL_PROJECT_ID;
+  return projectId ?? null;
+}
+
+function documentTabsForLocation(
+  workspaceId: string | undefined,
+  scope: ContentScope,
+  projectId?: string,
+): TabItem[] {
+  if (!workspaceId) return [];
+  const expectedProjectId = editorProjectId(scope, projectId);
+  return useTabStore.getState().tabs.filter((tab) =>
+    tab.type === "doc"
+    && tab.workspaceId === workspaceId
+    && (expectedProjectId === null || tab.projectId === expectedProjectId)
+  );
+}
+
+function findDocumentTab(
+  docId: string,
+  workspaceId: string,
+  location: DocLocation,
+): TabItem | undefined {
+  return documentTabsForLocation(workspaceId, location.scope, location.projectId)
+    .find((tab) => tab.entityId === docId);
+}
+
+async function flushDocumentTab(
+  docId: string,
+  workspaceId: string,
+  location: DocLocation,
+): Promise<void> {
+  const tab = findDocumentTab(docId, workspaceId, location);
+  if (tab && !(await flushEditorSession(tab.id))) {
+    throw new Error("Resolve the open document's save before moving it");
+  }
+}
+
+async function flushDocumentTabsInFolder(
+  scope: ContentScope,
+  folderPath: string,
+  workspaceId?: string,
+  projectId?: string,
+): Promise<void> {
+  const prefix = `${folderPath}/`;
+  const tabs = documentTabsForLocation(workspaceId, scope, projectId)
+    .filter((tab) => tab.entityId?.startsWith(prefix));
+  const results = await Promise.all(tabs.map((tab) => flushEditorSession(tab.id)));
+  if (results.some((saved) => !saved)) {
+    throw new Error("Resolve open document saves before moving this folder");
+  }
+}
+
+function relocateDocumentTabsInFolder(
+  scope: ContentScope,
+  oldPath: string,
+  newPath: string,
+  workspaceId?: string,
+  projectId?: string,
+): void {
+  const prefix = `${oldPath}/`;
+  const tabs = documentTabsForLocation(workspaceId, scope, projectId)
+    .filter((tab) => tab.entityId?.startsWith(prefix));
+  for (const tab of tabs) {
+    useTabStore.getState().relocateEntityTab(tab.id, {
+      entityId: `${newPath}/${tab.entityId!.slice(prefix.length)}`,
+    });
+  }
 }
 
 /**

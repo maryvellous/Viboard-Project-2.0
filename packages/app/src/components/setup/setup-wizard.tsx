@@ -12,9 +12,12 @@ import { getDeskService } from "@desk/core";
 import {
   expandHostFsScope,
   initializeHostDeskDirectory,
+  releaseHostDataRootOwnership,
 } from "@/lib/host-files";
 import { FolderSearch, HardDrive, Server } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
+import { runOwnershipReleasingTransition } from "@/lib/editor-context-transition";
 import { normalizeServerUrl } from "@/lib/server-url";
 import type { Workspace } from "@desk/core/types";
 
@@ -70,6 +73,7 @@ export function SetupWizard() {
   const handleCheckDataFolder = async () => {
     setIsLoading(true);
     setError(null);
+    const previousSettingsPath = useBootStore.getState().dataPath;
 
     try {
       setSettingsDataPath(dataPath);
@@ -87,7 +91,13 @@ export function SetupWizard() {
       setStep("workspace");
     } catch (err) {
       console.error("Error checking data folder:", err);
+      setSettingsDataPath(previousSettingsPath);
       if (isTauri()) {
+        try {
+          await expandHostFsScope(previousSettingsPath);
+        } catch (rollbackError) {
+          console.error("Failed to restore previous DeskMD data folder:", rollbackError);
+        }
         setError(t("errors.setup.checkDataFolder", { path: dataPath }));
         return;
       }
@@ -97,7 +107,7 @@ export function SetupWizard() {
     }
   };
 
-  const handleConnectServer = () => {
+  const handleConnectServer = async () => {
     const normalized = normalizeServerUrl(serverUrlInput);
     if (!normalized) {
       setError(
@@ -109,8 +119,27 @@ export function SetupWizard() {
     }
     // Switch to remote mode and reload: main.tsx wires RemoteDeskService and the
     // native auth gate takes over for login / first-run account creation.
-    setConnection("remote", normalized);
-    window.location.reload();
+    try {
+      const previousBoot = useBootStore.getState();
+      const result = await runOwnershipReleasingTransition({
+        prepare: prepareEditorContextTransition,
+        release: releaseHostDataRootOwnership,
+        commit: async () => {
+          setConnection("remote", normalized);
+          window.location.reload();
+        },
+        rollback: async () => {
+          setConnection(previousBoot.connectionMode, previousBoot.serverUrl);
+          await expandHostFsScope(previousBoot.dataPath);
+        },
+      });
+      if (result === "blocked") {
+        setError(t("editors.shared.contextTransitionBlocked"));
+        return;
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
   };
 
   const handleUseExisting = () => {

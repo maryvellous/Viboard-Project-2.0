@@ -2,18 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Pencil, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import type { EditorDocumentRef } from "@desk/core";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SectionLabel } from "@/components/patterns";
-import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { useEditorDocumentSession } from "@/hooks/editor";
 import { cn } from "@/lib/utils";
+import { EditorConflictDialog } from "@/components/editors/editor-conflict-dialog";
+import { InlineProgress } from "@/components/ui/inline-progress";
+import { resolveEntityOverviewMode } from "@/lib/entity-overview-state";
 
 interface EntityOverviewProps {
   title: string;
   value: string;
   placeholder: string;
-  onSave: (overview: string) => Promise<void>;
+  documentRef: Extract<EditorDocumentRef, { kind: "workspace-overview" | "project-overview" }>;
   /** Caps read mode and offers inline expansion. Editing is always expanded. */
   collapsedClassName?: string;
   /** Resets local expansion when the owning entity changes. */
@@ -25,24 +28,29 @@ export function EntityOverview({
   title,
   value,
   placeholder,
-  onSave,
+  documentRef,
   collapsedClassName,
   resetKey,
 }: EntityOverviewProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const [saving, setSaving] = useState(false);
-  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [showConflict, setShowConflict] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const dirty = draft.trim() !== value.trim();
-  const empty = value.trim().length === 0;
+  const session = useEditorDocumentSession({ ref: documentRef });
+  const currentValue = session.state ? session.content : value;
+  const empty = currentValue.trim().length === 0;
+  const mode = resolveEntityOverviewMode({
+    hasState: Boolean(session.state),
+    isLoading: session.isLoading,
+    loadError: session.loadError,
+    fileDeleted: session.fileDeleted,
+  });
 
   useEffect(() => {
-    if (!editing) setDraft(value);
-  }, [editing, value]);
+    if (session.saveStatus === "conflict") setShowConflict(true);
+  }, [session.saveStatus]);
 
   useEffect(() => setExpanded(false), [resetKey]);
 
@@ -57,38 +65,29 @@ export function EntityOverview({
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [collapsedClassName, editing, expanded, value]);
+  }, [collapsedClassName, editing, expanded, currentValue]);
 
-  useUnsavedChangesGuard(
-    editing && dirty,
-    t("overviews.discardDescription"),
-    true,
-    title,
-  );
-
-  const finishCancel = () => {
-    setDraft(value);
-    setEditing(false);
-    setConfirmDiscard(false);
-  };
-
-  const cancel = () => {
-    if (dirty) setConfirmDiscard(true);
-    else finishCancel();
-  };
-
-  const save = async () => {
-    if (!dirty || saving) return;
-    setSaving(true);
+  const done = async () => {
     try {
-      await onSave(draft);
-      setEditing(false);
+      if (await session.save()) {
+        setEditing(false);
+      } else if (session.saveStatus === "conflict") {
+        setShowConflict(true);
+      } else {
+        toast.error(t("toasts.overview.update.error"));
+      }
     } catch (error) {
       console.error("Failed to save overview:", error);
       toast.error(t("toasts.overview.update.error"));
-    } finally {
-      setSaving(false);
     }
+  };
+
+  const recover = async () => {
+    await session.recover();
+  };
+
+  const discard = async () => {
+    if (!(await session.discard())) toast.error(t("editors.shared.discardFailed"));
   };
 
   return (
@@ -96,7 +95,8 @@ export function EntityOverview({
       <section className="space-y-2">
         <div className="flex items-center justify-between gap-3">
           <SectionLabel>{title}</SectionLabel>
-          {!editing && (
+          {mode === "loading" && <InlineProgress />}
+          {mode === "ready" && !editing && (
             <Button
               type="button"
               variant="ghost"
@@ -118,22 +118,50 @@ export function EntityOverview({
               !editing && !expanded && collapsedClassName && "overflow-hidden",
             )}
           >
-            {!editing && empty ? (
+            {mode === "load-error" ? (
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
+                <p>{t("overviews.loadFailed")}</p>
+                <Button variant="outline" size="sm" className="mt-2" onClick={session.retryLoad}>
+                  {t("common.buttons.retry")}
+                </Button>
+              </div>
+            ) : mode === "missing" ? (
+              <div className="rounded-md border bg-muted/30 p-3 text-sm text-muted-foreground">
+                <p>{t("overviews.missing")}</p>
+                {session.isDirty && <p className="mt-1">{t("overviews.unsavedHint")}</p>}
+                {session.recoveryBlocked === "parent-missing" && (
+                  <p className="mt-1 text-destructive">{t("ui.editorBanners.fileDeleted.parentMissing")}</p>
+                )}
+                {session.isDirty && (
+                  <div className="mt-3 flex gap-2">
+                    <Button size="sm" onClick={() => void recover()} disabled={session.saveStatus === "saving"}>
+                      {session.recoveryBlocked === "parent-missing"
+                        ? t("common.buttons.tryAgain")
+                        : t("ui.editorBanners.fileDeleted.restoreFromEdits")}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => void discard()}>
+                      {t("overviews.discardAction")}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : !editing && empty ? (
               <button
                 type="button"
                 className="py-1 text-left text-sm italic text-muted-foreground/60 hover:text-muted-foreground"
-                onClick={() => setEditing(true)}
+                onClick={() => mode === "ready" && setEditing(true)}
+                disabled={mode !== "ready"}
               >
                 {placeholder}
               </button>
             ) : (
               <RichTextEditor
-                value={editing ? draft : value}
-                onChange={editing ? setDraft : () => {}}
+                value={currentValue}
+                onChange={editing && mode === "ready" ? session.setContent : () => {}}
                 placeholder={placeholder}
                 borderless={!editing}
-                editable={editing}
-                autofocus={editing}
+                editable={editing && mode === "ready"}
+                autofocus={editing && mode === "ready"}
                 minHeight="60px"
                 maxHeight={editing ? "480px" : undefined}
                 className={editing ? undefined : "bg-transparent"}
@@ -160,23 +188,22 @@ export function EntityOverview({
 
         {editing && (
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={cancel} disabled={saving}>
-              {t("common.buttons.cancel")}
-            </Button>
-            <Button type="button" size="sm" onClick={save} disabled={!dirty || saving}>
-              {saving ? t("common.buttons.saving") : t("common.buttons.save")}
+            {session.saveStatus === "error" && (
+              <Button type="button" variant="outline" size="sm" onClick={session.retry}>
+                {t("common.buttons.retry")}
+              </Button>
+            )}
+            <Button type="button" size="sm" onClick={() => void done()} disabled={session.saveStatus === "saving"}>
+              {session.saveStatus === "saving" ? t("common.buttons.saving") : t("common.buttons.done")}
             </Button>
           </div>
         )}
       </section>
-
-      <ConfirmDialog
-        open={confirmDiscard}
-        onOpenChange={setConfirmDiscard}
-        title={t("overviews.discardTitle")}
-        description={t("overviews.discardDescription")}
-        confirmLabel={t("overviews.discardAction")}
-        onConfirm={finishCancel}
+      <EditorConflictDialog
+        open={showConflict && session.saveStatus === "conflict"}
+        onUseExternal={() => { setShowConflict(false); session.useExternal(); }}
+        onKeepDesk={() => { setShowConflict(false); session.keepDesk(); }}
+        onCancel={() => { setShowConflict(false); session.cancelConflict(); }}
       />
     </>
   );

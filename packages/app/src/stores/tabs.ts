@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import i18next from "i18next";
-import { getEntityTabId } from "@/lib/tab-identity";
+import { getEntityTabId } from "../lib/tab-identity";
 
-import type { IncomingEmail } from "@/lib/email/types";
+import type { IncomingEmail } from "../lib/email/types";
 
 export type TabType = "desk" | "doc" | "task" | "meeting" | "email";
 
@@ -25,6 +25,7 @@ interface TabState {
   activeTabId: string;
   /** Tab ID that needs to save before closing */
   pendingSaveAndClose: string | null;
+  failedSaveAndClose: string | null;
 
   // Actions
   openTab: (tab: Omit<TabItem, "id">) => void;
@@ -32,6 +33,10 @@ interface TabState {
   setActiveTab: (tabId: string) => void;
   updateTab: (tabId: string, updates: Partial<TabItem>) => void;
   moveEntityTabToProject: (tabId: string, projectId: string) => void;
+  relocateEntityTab: (
+    tabId: string,
+    location: { entityId?: string; projectId?: string },
+  ) => void;
   setTabDirty: (tabId: string, isDirty: boolean) => void;
   closeOtherTabs: (tabId: string) => void;
   reorderTabs: (fromIndex: number, toIndex: number) => void;
@@ -39,6 +44,8 @@ interface TabState {
   requestSaveAndClose: (tabId: string) => void;
   /** Clear pending save request (after save completes) */
   clearPendingSaveAndClose: () => void;
+  reportFailedSaveAndClose: (tabId: string) => void;
+  clearFailedSaveAndClose: () => void;
 
   // Queries
   getTabByEntityId: (
@@ -109,6 +116,7 @@ export const useTabStore = create<TabState>()(
       tabs: [makeDeskTab()],
       activeTabId: "desk",
       pendingSaveAndClose: null,
+      failedSaveAndClose: null,
 
       openTab: (newTab) => {
         const { tabs } = get();
@@ -198,6 +206,10 @@ export const useTabStore = create<TabState>()(
       },
 
       moveEntityTabToProject: (tabId, projectId) => {
+        get().relocateEntityTab(tabId, { projectId });
+      },
+
+      relocateEntityTab: (tabId, location) => {
         const tab = get().tabs.find((candidate) => candidate.id === tabId);
         if (
           !tab
@@ -207,14 +219,19 @@ export const useTabStore = create<TabState>()(
           || !tab.workspaceId
         ) return;
 
+        const entityId = location.entityId ?? tab.entityId;
+        const projectId = location.projectId ?? tab.projectId;
+        if (!projectId) return;
         const id = getEntityTabId(tab.type, {
-          id: tab.entityId,
+          id: entityId,
           workspaceId: tab.workspaceId,
           projectId,
         });
         set((state) => ({
           tabs: state.tabs.map((candidate) =>
-            candidate.id === tabId ? { ...candidate, id, projectId } : candidate
+            candidate.id === tabId
+              ? { ...candidate, id, entityId, projectId }
+              : candidate
           ),
           activeTabId: state.activeTabId === tabId ? id : state.activeTabId,
         }));
@@ -263,6 +280,12 @@ export const useTabStore = create<TabState>()(
 
       clearPendingSaveAndClose: () => {
         set({ pendingSaveAndClose: null });
+      },
+      reportFailedSaveAndClose: (tabId) => {
+        set({ failedSaveAndClose: tabId });
+      },
+      clearFailedSaveAndClose: () => {
+        set({ failedSaveAndClose: null });
       },
     }),
     {

@@ -14,6 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  discardEditorSession,
+  flushEditorSession,
+  getEditorSessionStatus,
+} from "@/lib/editor-session-controller";
+import { toast } from "sonner";
 
 const TAB_WIDTH = 150;        // px — uniform width for the desk tab and content tabs (w-[150px])
 const TAB_GAP = 4;            // gap-1 between tabs
@@ -62,6 +68,8 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
   const updateTab = useTabStore((state) => state.updateTab);
   const requestSaveAndClose = useTabStore((state) => state.requestSaveAndClose);
   const pendingSaveAndClose = useTabStore((state) => state.pendingSaveAndClose);
+  const failedSaveAndClose = useTabStore((state) => state.failedSaveAndClose);
+  const clearFailedSaveAndClose = useTabStore((state) => state.clearFailedSaveAndClose);
   const currentWorkspace = useCurrentWorkspace();
   const sidebarWidth = usePreferencesStore((state) => state.sidebarWidth);
   const [windowWidth, setWindowWidth] = useState(() => window.innerWidth);
@@ -71,8 +79,25 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
     tabId: string | null;
     tabTitle: string;
     mode: "close-tab" | "close-others";
-  }>({ open: false, tabId: null, tabTitle: "", mode: "close-tab" });
+    saveAction: "save" | "retry" | "review";
+    discardFailed?: boolean;
+    discarding?: boolean;
+  }>({ open: false, tabId: null, tabTitle: "", mode: "close-tab", saveAction: "save" });
   const [closeOthersTargetTabId, setCloseOthersTargetTabId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!failedSaveAndClose) return;
+    const tab = tabs.find((candidate) => candidate.id === failedSaveAndClose);
+    clearFailedSaveAndClose();
+    if (!tab) return;
+    setDirtyCloseDialog({
+      open: true,
+      tabId: tab.id,
+      tabTitle: tab.title,
+      mode: "close-tab",
+      saveAction: getEditorSessionStatus(tab.id) === "conflict" ? "review" : "retry",
+    });
+  }, [failedSaveAndClose, tabs, clearFailedSaveAndClose]);
 
   useEffect(() => {
     const handler = () => setWindowWidth(window.innerWidth);
@@ -100,9 +125,10 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
 
   const handleActivate = useCallback(
     (tabId: string) => {
+      if (activeTabId !== tabId) void flushEditorSession(activeTabId);
       setActiveTab(tabId);
     },
-    [setActiveTab]
+    [activeTabId, setActiveTab]
   );
 
   const handleClose = useCallback(
@@ -111,43 +137,60 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
       if (!tab) return;
 
       if (tab.isDirty) {
-        setDirtyCloseDialog({
-          open: true,
-          tabId,
-          tabTitle: tab.title,
-          mode: "close-tab",
-        });
+        requestSaveAndClose(tabId);
         return;
       }
 
       closeTab(tabId);
     },
-    [tabs, closeTab]
+    [tabs, closeTab, requestSaveAndClose]
   );
 
   const handleDialogSave = useCallback(() => {
     if (dirtyCloseDialog.tabId) {
-      requestSaveAndClose(dirtyCloseDialog.tabId);
+      if (dirtyCloseDialog.saveAction === "review") {
+        setActiveTab(dirtyCloseDialog.tabId);
+      } else {
+        requestSaveAndClose(dirtyCloseDialog.tabId);
+      }
     }
     setDirtyCloseDialog({
       open: false,
       tabId: null,
       tabTitle: "",
       mode: "close-tab",
+      saveAction: "save",
     });
-  }, [dirtyCloseDialog.tabId, requestSaveAndClose]);
+  }, [dirtyCloseDialog.tabId, dirtyCloseDialog.saveAction, requestSaveAndClose, setActiveTab]);
 
   const handleDialogDontSave = useCallback(() => {
-    if (dirtyCloseDialog.tabId) {
-      closeTab(dirtyCloseDialog.tabId);
-    }
-    setDirtyCloseDialog({
-      open: false,
-      tabId: null,
-      tabTitle: "",
-      mode: "close-tab",
+    if (!dirtyCloseDialog.tabId || dirtyCloseDialog.discarding) return;
+    const tabId = dirtyCloseDialog.tabId;
+    setDirtyCloseDialog((current) => ({
+      ...current,
+      discardFailed: false,
+      discarding: true,
+    }));
+    void discardEditorSession(tabId).then((discarded) => {
+      if (!discarded) {
+        toast.error(t("editors.shared.discardFailed"));
+        setDirtyCloseDialog((current) => ({
+          ...current,
+          discardFailed: true,
+          discarding: false,
+        }));
+        return;
+      }
+      closeTab(tabId);
+      setDirtyCloseDialog({
+        open: false,
+        tabId: null,
+        tabTitle: "",
+        mode: "close-tab",
+        saveAction: "save",
+      });
     });
-  }, [dirtyCloseDialog.tabId, closeTab]);
+  }, [dirtyCloseDialog.tabId, dirtyCloseDialog.discarding, closeTab, t]);
 
   const handleDialogCancel = useCallback(() => {
     if (dirtyCloseDialog.mode === "close-others") {
@@ -158,6 +201,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
       tabId: null,
       tabTitle: "",
       mode: "close-tab",
+      saveAction: "save",
     });
   }, [dirtyCloseDialog.mode]);
 
@@ -174,6 +218,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
           tabId: otherDirtyTabs[0].id,
           tabTitle: otherDirtyTabs[0].title,
           mode: "close-others",
+          saveAction: "save",
         });
         return;
       }
@@ -201,6 +246,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
         tabId: nextDirtyTab.id,
         tabTitle: nextDirtyTab.title,
         mode: "close-others",
+        saveAction: "save",
       });
       return;
     }
@@ -404,6 +450,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
         open={dirtyCloseDialog.open}
         onOpenChange={(open) => {
           if (!open) {
+            if (dirtyCloseDialog.discarding) return;
             if (dirtyCloseDialog.mode === "close-others") {
               setCloseOthersTargetTabId(null);
             }
@@ -412,14 +459,26 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
               tabId: null,
               tabTitle: "",
               mode: "close-tab",
+              saveAction: "save",
             });
           }
         }}
         title={t("unsavedChanges.title")}
-        description={t("menus.tabContextMenu.unsavedTabDescription", { title: dirtyCloseDialog.tabTitle })}
+        description={dirtyCloseDialog.discardFailed
+          ? t("editors.shared.discardFailed")
+          : t("menus.tabContextMenu.unsavedTabDescription", { title: dirtyCloseDialog.tabTitle })}
+        saveLabel={dirtyCloseDialog.saveAction === "review"
+          ? t("editors.shared.review")
+          : dirtyCloseDialog.saveAction === "retry"
+            ? t("common.buttons.retry")
+            : undefined}
+        dontSaveLabel={dirtyCloseDialog.discardFailed
+          ? t("editors.shared.retryDiscard")
+          : t("common.buttons.discard")}
         onSave={handleDialogSave}
         onDontSave={handleDialogDontSave}
         onCancel={handleDialogCancel}
+        pending={dirtyCloseDialog.discarding}
       />
     </>
   );

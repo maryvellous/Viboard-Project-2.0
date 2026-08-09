@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { projectStatusDotColors, projectStatuses } from "@/lib/design-tokens";
 import { countActiveTasks } from "@/lib/task-status";
 import type { Project } from "@desk/core/types";
-import { useProjectSummaries, useDeleteProject, useCurrentWorkspace, useUpdateWorkspace } from "@/stores";
+import { useProjectSummaries, useDeleteProject, useCurrentWorkspace } from "@/stores";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import { NewProjectModal } from "./new-project-modal";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
@@ -39,7 +39,6 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
   const { today } = useMinuteClock();
   const { data: projects = [] } = useProjectSummaries(workspaceId, today);
   const workspace = useCurrentWorkspace();
-  const updateWorkspace = useUpdateWorkspace();
   const deleteProject = useDeleteProject();
   const setSelectedProject = useProjectSelectionStore((s) => s.setSelectedProject);
 
@@ -171,12 +170,7 @@ export function ProjectsBrowse({ workspaceId }: ProjectsBrowseProps) {
               title={t("pages.projects.browse.workspaceOverview.title")}
               value={workspace.overview ?? ""}
               placeholder={t("pages.projects.browse.workspaceOverview.placeholder")}
-              onSave={async (overview) => {
-                await updateWorkspace.mutateAsync({
-                  workspaceId,
-                  updates: { overview },
-                });
-              }}
+              documentRef={{ kind: "workspace-overview", workspaceId }}
               collapsedClassName="max-h-28"
               resetKey={workspaceId}
             />

@@ -10,6 +10,18 @@
 // Domain service and RPC transport codec.
 export { getDeskService, encode, decode } from "./service";
 export type { DeskService } from "./service";
+export type {
+  DocumentEditorMetadata,
+  EditorDocumentPatch,
+  EditorDocumentRef,
+  EditorDocumentSnapshot,
+  MeetingEditorMetadata,
+  ProjectOverviewEditorMetadata,
+  SaveEditorDocumentInput,
+  SaveEditorDocumentResult,
+  TaskEditorMetadata,
+  WorkspaceOverviewEditorMetadata,
+} from "./editor-documents";
 
 // Supported environment and path helpers. Filesystem scope/bootstrap are host-owned.
 export { isTauri, isMacOS, needsTrafficLightPadding, getDeskPath, joinPath } from "./env";

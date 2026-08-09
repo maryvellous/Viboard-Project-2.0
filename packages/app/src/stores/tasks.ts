@@ -5,6 +5,7 @@ import { getDeskService, isSameEntity } from "@desk/core";
 import { plannerKeys } from "./planner";
 import { invalidateDashboardOverview } from "./dashboard";
 import { invalidateProjectInsights } from "./project-insights-invalidation";
+import { invalidateEditorDocuments } from "@/lib/query-client";
 
 // Query keys
 export const taskKeys = {
@@ -113,6 +114,7 @@ export function useUpdateTask() {
       updates: TaskUpdate;
     }) => getDeskService().updateTask(taskId, updates, workspaceId, projectId),
     onSuccess: (updatedTask) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (updatedTask) {
         invalidateProjectInsights(queryClient, updatedTask.workspaceId);
@@ -158,6 +160,7 @@ export function useDeleteTask() {
     mutationFn: ({ taskId, workspaceId, projectId }: { taskId: string; workspaceId: string; projectId: string }) =>
       getDeskService().deleteTask(taskId, workspaceId, projectId).then((success) => ({ success, workspaceId })),
     onSuccess: (result) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (result.success) {
         invalidateProjectInsights(queryClient, result.workspaceId);
@@ -216,6 +219,7 @@ export function useMoveTask() {
       }
     },
     onSuccess: (updatedTask, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       const workspaceId = updatedTask?.workspaceId ?? variables.workspaceId;
       if (workspaceId) invalidateProjectInsights(queryClient, workspaceId);
@@ -244,6 +248,7 @@ export function useMoveTaskToProject() {
       toProjectId: string;
     }) => getDeskService().moveTaskToProject(taskId, workspaceId, fromProjectId, toProjectId),
     onSuccess: (_result, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       invalidateProjectInsights(queryClient, variables.workspaceId);
       // Invalidate workspace tasks to refresh lists (kanban, task list)

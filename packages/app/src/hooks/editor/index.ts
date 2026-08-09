@@ -1,4 +1,4 @@
-export { useEditorSession } from "./use-editor-session";
+export { useEditorDocumentSession, editorDocumentKeys } from "./use-editor-document-session";
 export { useEditorTab } from "./use-editor-tab";
 export { useEditorSaveShortcut } from "./use-editor-save-shortcut";
 export { useEditorSaveAndClose } from "./use-editor-save-and-close";

@@ -13,6 +13,7 @@ import { statSync } from "node:fs";
 import { isAbsolute } from "node:path";
 import { setDataRootResolver, setStorage, setAIKeyResolver } from "@desk/core/host";
 import { NodeFsProvider } from "./node-fs-provider";
+import { DataRootOwnership } from "./data-root-ownership";
 
 export function resolveDataRoot(): string {
   const root = process.env.DESK_DATA_ROOT ?? "/data";
@@ -31,8 +32,9 @@ export function resolveDataRoot(): string {
   return root;
 }
 
-export function boot(): void {
+export function boot(): DataRootOwnership {
   const root = resolveDataRoot();
+  const ownership = DataRootOwnership.acquire(root);
   setStorage(new NodeFsProvider(root));
   // isTauri() is false on Node, so getDeskPath() returns this verbatim (no
   // tilde expansion). It must therefore be an absolute path to the data dir.
@@ -47,4 +49,5 @@ export function boot(): void {
     "ai.openai": process.env.OPENAI_API_KEY,
   };
   setAIKeyResolver(async (ref) => keyEnv[ref]?.trim() || null);
+  return ownership;
 }

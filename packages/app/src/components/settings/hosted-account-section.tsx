@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import { SettingsGroup, SettingsRow, SettingsSection } from "@/components/ui/settings-section";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
 
 /**
  * Hosted-mode "Account" settings — lazy-loaded behind the
@@ -12,6 +14,10 @@ export default function HostedAccountSection() {
   const { t } = useTranslation();
 
   const handleSignOut = async () => {
+    if (!(await prepareEditorContextTransition())) {
+      toast.error(t("editors.shared.contextTransitionBlocked"));
+      return;
+    }
     await signOut();
     // Reload so the app-shell gate re-evaluates and shows the login screen.
     window.location.reload();

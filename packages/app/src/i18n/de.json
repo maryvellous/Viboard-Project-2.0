@@ -29,6 +29,8 @@
       "back": "Zurück",
       "continue": "Weiter",
       "retry": "Erneut versuchen",
+      "discard": "Verwerfen",
+      "done": "Fertig",
       "dontSave": "Nicht speichern",
       "create": "Erstellen",
       "rename": "Umbenennen",
@@ -41,14 +43,18 @@
       "reloadPage": "Seite neu laden",
       "clear": "Leeren"
     },
-    "aiBadge": "AI"
+    "aiBadge": "AI",
+    "bootErrorTitle": "DeskMD konnte den Datenordner nicht öffnen"
   },
   "overviews": {
     "discardTitle": "Änderungen am Überblick verwerfen?",
     "discardDescription": "Deine ungespeicherten Änderungen am Überblick gehen verloren.",
     "discardAction": "Änderungen verwerfen",
     "showMore": "Mehr anzeigen",
-    "showLess": "Weniger anzeigen"
+    "showLess": "Weniger anzeigen",
+    "loadFailed": "Desk konnte diesen Überblick nicht laden. Deine Datei wurde nicht verändert.",
+    "missing": "Diese Überblicksdatei ist nicht mehr vorhanden.",
+    "unsavedHint": "Deine ungespeicherten Änderungen sind geschützt und können wiederhergestellt werden."
   },
   "nav": {
     "sidebar": {
@@ -567,6 +573,9 @@
         "confirmLabel": "Zurücksetzen"
       },
       "pathDialog": {
+        "confirmTitle": "Datenordner wechseln?",
+        "confirmDescription": "Desk speichert offene Editoren, wechselt zu {{path}} und lädt neu.",
+        "confirmSwitch": "Wechseln und neu laden",
         "existingTitle": "Vorhandene Daten gefunden",
         "existingDescription_one": "{{count}} Arbeitsbereich an diesem Ort gefunden.",
         "existingDescription_other": "{{count}} Arbeitsbereiche an diesem Ort gefunden.",
@@ -829,7 +838,25 @@
         "meeting": "Meeting"
       },
       "entityNotFound": "{{entity}} nicht gefunden",
-      "closeTab": "Tab schließen"
+      "closeTab": "Tab schließen",
+      "discardFailed": "Der Wiederherstellungsentwurf konnte nicht verworfen werden. Deine Änderungen bleiben geöffnet; versuche es erneut.",
+      "retryDiscard": "Verwerfen erneut versuchen",
+      "contextTransitionBlocked": "Klär oder verwirf ungespeicherte Editor-Änderungen, bevor du den Datenkontext wechselst.",
+      "loadFailed": {
+        "title": "{{entity}}-Inhalt konnte nicht geladen werden",
+        "description": "Desk hat keine leere Kopie geöffnet und deine Datei nicht verändert. Prüfe die Verbindung und versuche es erneut."
+      },
+      "versionMismatch": {
+        "title": "Desk-Client und -Server müssen dieselbe Version verwenden",
+        "description": "Dieser Client verwendet eine neuere Editor-API, die der Server noch nicht unterstützt. Es wurde keine Datei verändert. Aktualisiere den Server und versuche es erneut."
+      },
+      "review": "Prüfen",
+      "conflict": {
+        "title": "Diese Datei wurde außerhalb von Desk geändert",
+        "description": "Wähle die Version aus, die erhalten bleiben soll. Desk überschreibt externe Änderungen nicht automatisch.",
+        "useExternal": "Externe Version verwenden",
+        "keepDesk": "Desk-Version behalten"
+      }
     }
   },
   "entities": {
@@ -1235,6 +1262,7 @@
         "title": "Datei gelöscht",
         "description": "Diese Datei wurde aus dem Dateisystem gelöscht.",
         "unsavedHint": "Du hast ungespeicherte Änderungen. Wiederherstellen, um die Datei neu anzulegen.",
+        "parentMissing": "Der übergeordnete Ordner existiert nicht mehr. Desk behält deinen Entwurf, erstellt aber keinen gelöschten Arbeitsbereich oder kein gelöschtes Projekt neu.",
         "restoreFromEdits": "Aus Änderungen wiederherstellen",
         "closeTab": "Tab schließen"
       },

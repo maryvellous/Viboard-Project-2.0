@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useDoc, useUpdateDoc, useDeleteDoc, useProjects } from "@/stores";
+import { useDoc, useDeleteDoc, useProjects } from "@/stores";
 import { WORKSPACE_LEVEL_PROJECT_ID, SPECIAL_DIRS } from "@desk/core";
-import { useEditorSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorAIInclusion } from "@/hooks/editor";
+import { useEditorDocumentSession, useEditorTab, useEditorSaveShortcut, useEditorSaveAndClose, useEditorAIInclusion } from "@/hooks/editor";
 import { useInternalLinkHandler } from "@/hooks";
 import { EditorHeader } from "./editor-header";
 import { EditorPathBar } from "./editor-path-bar";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { getEntityTabId } from "@/lib/tab-identity";
 import { cn } from "@/lib/utils";
 import { pageWidthClasses } from "@/lib/enterprise-ui";
+import { EditorConflictDialog } from "./editor-conflict-dialog";
 
 interface DocEditorProps {
   docId: string;
@@ -33,12 +34,11 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
   const { data: projects = [] } = useProjects(workspaceId);
 
   // Mutations
-  const updateDoc = useUpdateDoc();
   const deleteDoc = useDeleteDoc();
 
   // Local state
-  const [title, setTitle] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showConflict, setShowConflict] = useState(false);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
   // Shared hooks
@@ -48,36 +48,12 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
     "doc"
   );
 
-  // Initialize local state from doc
-  useEffect(() => {
-    if (doc) {
-      setTitle(doc.title);
-      setIsEditorReady(false);
-    }
-    // Re-init only when the doc identity changes, not on every metadata edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doc?.id, workspaceId, projectId]);
-
-  // Hosted/web body save: persist through the update mutation (server merges
-  // frontmatter). Ignored in Tauri, which writes to disk directly.
-  const persistBody = useCallback(
-    async (body: string): Promise<boolean> => {
-      if (!doc) return false;
-      try {
-        await updateDoc.mutateAsync({ doc, updates: { content: body } });
-        return true;
-      } catch (error) {
-        console.error("[doc-editor] Failed to persist body:", error);
-        return false;
-      }
-    },
-    [doc, updateDoc]
-  );
-
   const {
     content,
     setContent,
-    getCurrentContent,
+    metadata,
+    setMetadata,
+    restoreEmptyTitle,
     isLoading: isLoadingContent,
     isDirty: contentDirty,
     saveStatus,
@@ -87,17 +63,28 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
     acknowledgePathChange,
     acknowledgeDeleted,
     save,
+    retry,
+    useExternal: chooseExternal,
+    keepDesk,
+    cancelConflict,
+    discard,
     recover,
-  } = useEditorSession({
-    type: "doc",
+    loadError,
+    serverVersionMismatch,
+    retryLoad,
+    recoveryBlocked,
+    state: editorState,
+  } = useEditorDocumentSession({
+    ref: { kind: "document", workspaceId, projectId, id: docId },
+    editorType: "doc",
     entityId: docId,
-    filePath: doc?.filePath,
-    // In Tauri the body is loaded fresh from disk; this is only a fallback.
-    // In browser development it is the content the editor shows.
-    initialContent: doc?.content ?? "",
-    enabled: !!doc,
-    persistBody,
+    sessionKey: tabId,
   });
+  const title = typeof metadata.title === "string" ? metadata.title : doc?.title ?? "";
+
+  useEffect(() => {
+    if (saveStatus === "conflict") setShowConflict(true);
+  }, [saveStatus]);
 
   // Shared save hooks
   useEditorSaveShortcut(save);
@@ -123,22 +110,7 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
     }
   }, [doc, isLoadingContent, isEditorReady]);
 
-  const handleTitleChange = useCallback(
-    async (newTitle: string) => {
-      setTitle(newTitle);
-      if (doc) {
-        try {
-          await updateDoc.mutateAsync({
-            doc,
-            updates: { title: newTitle.trim() || doc.title, content: getCurrentContent() },
-          });
-        } catch (error) {
-          console.error("[doc-editor] Failed to save title:", error);
-        }
-      }
-    },
-    [doc, updateDoc, getCurrentContent]
-  );
+  const handleTitleChange = useCallback((newTitle: string) => setMetadata("title", newTitle), [setMetadata]);
 
   // Manage tab title and dirty state
   const isDirty = contentDirty;
@@ -157,25 +129,27 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
     }
   }, [doc, deleteDoc, onClose, t]);
 
-  const headerSaveStatus = useMemo(() => {
-    if (saveStatus === "saving") return "saving" as const;
-    if (saveStatus === "error") return "error" as const;
-    return "idle" as const;
-  }, [saveStatus]);
+  const headerSaveStatus = saveStatus === "error" ? "error" as const : saveStatus === "saving" ? "saving" as const : "idle" as const;
 
   // Render states (deleted, moved, loading, not found)
   const renderState = EditorRenderStates({
     fileDeleted,
     pathChanged,
     newPath,
-    isLoading: isLoadingDoc || (!!doc && (isLoadingContent || !isEditorReady)),
+    isLoading: isLoadingDoc || isLoadingContent || (!!doc && !isEditorReady),
     entity: doc,
     entityLabel: "doc",
+    loadError,
+    serverVersionMismatch,
+    onRetryLoad: retryLoad,
     onClose,
     acknowledgePathChange,
     acknowledgeDeleted,
     isDirty: contentDirty,
     onRecover: recover,
+    recoveryBlocked,
+    recovering: saveStatus === "saving",
+    onDiscard: discard,
   });
   if (renderState) return renderState;
 
@@ -184,14 +158,15 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <EditorPathBar filePath={doc.filePath} />
+      <EditorPathBar filePath={editorState?.confirmed.filePath ?? doc.filePath} />
       <EditorHeader
         title={title}
         onTitleChange={handleTitleChange}
+        onTitleBlur={restoreEmptyTitle}
         placeholder={t("editors.doc.titlePlaceholder")}
         saveStatus={headerSaveStatus}
-        onSave={save}
-        isDirty={isDirty}
+        onRetry={saveStatus === "error" ? retry : undefined}
+        onReview={saveStatus === "conflict" ? () => setShowConflict(true) : undefined}
         onDelete={() => setShowDeleteConfirm(true)}
         authorAI={doc.author === "ai"}
         aiIncluded={!aiExclusionState.isExcluded}
@@ -235,6 +210,12 @@ export function DocEditor({ docId, workspaceId, projectId, onClose }: DocEditorP
         confirmLabel={t("common.buttons.delete")}
         variant="destructive"
         onConfirm={handleDeleteConfirm}
+      />
+      <EditorConflictDialog
+        open={showConflict && saveStatus === "conflict"}
+        onUseExternal={() => { setShowConflict(false); chooseExternal(); }}
+        onKeepDesk={() => { setShowConflict(false); keepDesk(); }}
+        onCancel={() => { setShowConflict(false); cancelConflict(); }}
       />
     </div>
   );

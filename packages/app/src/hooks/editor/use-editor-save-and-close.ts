@@ -9,6 +9,7 @@ export function useEditorSaveAndClose(tabId: string, save: () => Promise<boolean
   const pendingSaveAndClose = useTabStore((state) => state.pendingSaveAndClose);
   const clearPendingSaveAndClose = useTabStore((state) => state.clearPendingSaveAndClose);
   const closeTab = useTabStore((state) => state.closeTab);
+  const reportFailedSaveAndClose = useTabStore((state) => state.reportFailedSaveAndClose);
 
   useEffect(() => {
     if (pendingSaveAndClose === tabId) {
@@ -17,11 +18,13 @@ export function useEditorSaveAndClose(tabId: string, save: () => Promise<boolean
           const didSave = await save();
           if (didSave) {
             closeTab(tabId);
+          } else {
+            reportFailedSaveAndClose(tabId);
           }
         } finally {
           clearPendingSaveAndClose();
         }
       })();
     }
-  }, [pendingSaveAndClose, tabId, save, clearPendingSaveAndClose, closeTab]);
+  }, [pendingSaveAndClose, tabId, save, clearPendingSaveAndClose, closeTab, reportFailedSaveAndClose]);
 }

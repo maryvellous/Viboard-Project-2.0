@@ -25,3 +25,21 @@ export const aiMaintenanceKeys = {
   /** `{providerConfigured, running}` from the host that owns the data (getAIMaintenanceInfo). */
   info: ["ai-maintenance-info"] as const,
 };
+
+export const editorDocumentRootKey = ["editor-document"] as const;
+
+/**
+ * TanStack prefix updates can match list and detail queries under one root.
+ * Guard the runtime value before mapping so a detail object is never treated
+ * as an array merely because the caller supplied an array generic.
+ */
+export function mapQueryArray<T>(
+  value: T[] | undefined,
+  mapper: (item: T) => T,
+): T[] | undefined {
+  return Array.isArray(value) ? value.map(mapper) : value;
+}
+
+export function invalidateEditorDocuments(client: QueryClient): void {
+  void client.invalidateQueries({ queryKey: editorDocumentRootKey });
+}

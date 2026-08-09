@@ -4,6 +4,7 @@ import { getDeskService } from "@desk/core";
 import { writeTopLevelAgentFiles, writePerWorkspaceAgentFiles } from "@/lib/smart-index/agent-files";
 import { useNavigationStore } from "./navigation";
 import { invalidateDashboardOverview } from "./dashboard";
+import { invalidateEditorDocuments } from "@/lib/query-client";
 
 // Query keys
 export const workspaceKeys = {
@@ -64,6 +65,7 @@ export function useUpdateWorkspace() {
         return workspace;
       }),
     onSuccess: (updatedWorkspace, { workspaceId }) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       queryClient.invalidateQueries({ queryKey: workspaceKeys.all });
       // Regenerate agent files (name/description may have changed)

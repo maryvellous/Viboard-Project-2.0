@@ -38,6 +38,23 @@ class RejectTaskWritesProvider extends NodeFsProvider {
     }
     await super.writeTextFile(path, content);
   }
+
+  override async replaceTextFileAtomically(
+    path: string,
+    content: string,
+  ) {
+    if (path.includes("/tasks/")) {
+      throw new Error("simulated task write failure");
+    }
+    return super.replaceTextFileAtomically(path, content);
+  }
+
+  override async createTextFileAtomically(path: string, content: string) {
+    if (path.includes("/tasks/")) {
+      throw new Error("simulated task write failure");
+    }
+    return super.createTextFileAtomically(path, content);
+  }
 }
 
 describe("persistence safety", () => {

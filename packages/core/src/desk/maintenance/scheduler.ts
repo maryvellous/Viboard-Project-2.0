@@ -8,7 +8,7 @@
  * and trigger the server's engine.
  *
  * Trigger: the domain-write bus (every record write on this host — app UI, editor saves via
- * `saveMarkdownBody`, RPC, future MCP write tools) plus, in local mode, the Tauri watcher
+ * editor saves, RPC, future MCP write tools) plus, in local mode, the Tauri watcher
  * feeding EXTERNAL file edits through `notifyExternalChanges`. The app's own funnel writes
  * arrive on both channels there; the debounce absorbs the double-fire.
  *

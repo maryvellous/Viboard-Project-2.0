@@ -3,6 +3,7 @@ import type { Meeting } from "@desk/core/types";
 import { getDeskService, isSameEntity } from "@desk/core";
 import { invalidateDashboardOverview } from "./dashboard";
 import { invalidateProjectInsights } from "./project-insights-invalidation";
+import { invalidateEditorDocuments } from "@/lib/query-client";
 
 // Query keys
 export const meetingKeys = {
@@ -106,6 +107,7 @@ export function useUpdateMeeting() {
       updates: Partial<Pick<Meeting, "title" | "date" | "content">>;
     }) => getDeskService().updateMeeting(meetingId, updates, workspaceId, projectId),
     onSuccess: (updatedMeeting) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (updatedMeeting) {
         invalidateProjectInsights(queryClient, updatedMeeting.workspaceId);
@@ -150,6 +152,7 @@ export function useMoveMeetingToProject() {
       toProjectId: string;
     }) => getDeskService().moveMeetingToProject(meetingId, workspaceId, fromProjectId, toProjectId),
     onSuccess: (_result, variables) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       invalidateProjectInsights(queryClient, variables.workspaceId);
       queryClient.invalidateQueries({
@@ -176,6 +179,7 @@ export function useDeleteMeeting() {
     mutationFn: ({ meetingId, workspaceId, projectId }: { meetingId: string; workspaceId: string; projectId: string }) =>
       getDeskService().deleteMeeting(meetingId, workspaceId, projectId).then((success) => ({ success, workspaceId })),
     onSuccess: (result) => {
+      invalidateEditorDocuments(queryClient);
       invalidateDashboardOverview(queryClient);
       if (result.success) {
         invalidateProjectInsights(queryClient, result.workspaceId);

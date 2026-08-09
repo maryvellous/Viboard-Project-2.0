@@ -13,6 +13,9 @@ import { useBootStore } from "@/stores/boot";
 import { createNativeAuthClient } from "@/lib/native-auth-client";
 import { clearSessionToken } from "@/lib/session-token";
 import { normalizeServerUrl } from "@/lib/server-url";
+import { expandHostFsScope, releaseHostDataRootOwnership } from "@/lib/host-files";
+import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
+import { runOwnershipReleasingTransition } from "@/lib/editor-context-transition";
 
 /**
  * Native remote-mode "Connection" settings — lazy-loaded in every
@@ -36,7 +39,7 @@ export default function ConnectionSection() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     const normalized = normalizeServerUrl(urlInput);
     if (!normalized) {
       setError(
@@ -48,12 +51,38 @@ export default function ConnectionSection() {
     }
     // Remote mode + reload → main.tsx wires RemoteDeskService and the native gate
     // shows login/create against the new server.
-    setConnection("remote", normalized);
-    window.location.reload();
+    setBusy(true);
+    try {
+      const result = await runOwnershipReleasingTransition({
+        prepare: prepareEditorContextTransition,
+        release: releaseHostDataRootOwnership,
+        commit: async () => {
+          setConnection("remote", normalized);
+          window.location.reload();
+        },
+        rollback: async () => {
+          setConnection(connectionMode, serverUrl);
+          await expandHostFsScope(dataPath);
+        },
+      });
+      if (result === "blocked") {
+        setError(t("editors.shared.contextTransitionBlocked"));
+        setBusy(false);
+        return;
+      }
+    } catch (error) {
+      setBusy(false);
+      setError(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const handleSwitchToLocal = async () => {
     setBusy(true);
+    if (!(await prepareEditorContextTransition())) {
+      setError(t("editors.shared.contextTransitionBlocked"));
+      setBusy(false);
+      return;
+    }
     await clearSessionToken();
     setConnection("local");
     window.location.reload();
@@ -61,6 +90,11 @@ export default function ConnectionSection() {
 
   const handleSignOut = async () => {
     setBusy(true);
+    if (!(await prepareEditorContextTransition())) {
+      setError(t("editors.shared.contextTransitionBlocked"));
+      setBusy(false);
+      return;
+    }
     try {
       await createNativeAuthClient(serverUrl).signOut();
     } catch {

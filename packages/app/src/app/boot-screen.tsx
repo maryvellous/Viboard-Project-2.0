@@ -25,3 +25,22 @@ export function AppBootScreen() {
     </div>
   );
 }
+
+export function AppBootError({ message }: { message: string }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-background px-6">
+      <div className="max-w-lg text-center">
+        <h1 className="text-lg font-semibold text-foreground">{t("common.bootErrorTitle")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+        <button
+          type="button"
+          className="mt-5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          onClick={() => window.location.reload()}
+        >
+          {t("common.buttons.retry")}
+        </button>
+      </div>
+    </div>
+  );
+}

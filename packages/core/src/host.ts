@@ -13,6 +13,7 @@ export {
   InMemoryStorageProvider,
 } from "./desk/storage";
 export type {
+  AtomicCreateTextResult,
   DirEntry,
   FileStat,
   MemorySeedFile,
