@@ -8,6 +8,11 @@
 import Fuse, { type IFuseOptions } from "fuse.js";
 import type { Task, Doc, Meeting, Project } from "../types";
 import { compareDatesDesc } from "./parser";
+import { getWorkspaces } from "./workspaces";
+import { getProjects } from "./projects";
+import { getTasks } from "./tasks";
+import { getDocs } from "./content";
+import { getMeetings } from "./meetings";
 
 // Unified search item type
 export type SearchItemType = "task" | "doc" | "meeting" | "project";
@@ -26,6 +31,7 @@ export interface SearchItem {
   priority?: string;
   due?: string;
   created?: string;
+  updated?: string;
   /** Provenance: 'ai' when an agent wrote the file (docs only; absent = the user). */
   author?: "ai";
   // Full path for navigation
@@ -35,20 +41,24 @@ export interface SearchItem {
 export interface SearchResult {
   item: SearchItem;
   score: number; // 0 = perfect match, 1 = no match
+  matchKind?: SearchMatchKind;
   matches?: Array<{
     key: string;
     indices: Array<[number, number]>;
   }>;
 }
 
+export type SearchMatchKind = "title" | "project" | "workspace" | "content";
+
 // Fuse.js configuration for fuzzy search
 const FUSE_OPTIONS: IFuseOptions<SearchItem> = {
   keys: [
     { name: "title", weight: 0.6 },
-    { name: "content", weight: 0.3 },
-    { name: "projectName", weight: 0.1 },
+    { name: "content", weight: 0.15 },
+    { name: "projectName", weight: 0.15 },
+    { name: "workspaceName", weight: 0.1 },
   ],
-  threshold: 0.4, // 0 = exact, 1 = match anything
+  threshold: 0.35, // 0 = exact, 1 = match anything
   includeScore: true,
   includeMatches: true,
   minMatchCharLength: 2,
@@ -96,7 +106,7 @@ export function search(
     return getRecentItems(options?.limit ?? 10, options?.types, options?.workspaceId);
   }
 
-  let results = fuse.search(query);
+  let results = fuse.search(query.trim());
 
   // Apply filters
   if (options?.types && options.types.length > 0) {
@@ -107,19 +117,19 @@ export function search(
     results = results.filter((r) => r.item.workspaceId === options.workspaceId);
   }
 
-  // Apply limit
-  if (options?.limit) {
-    results = results.slice(0, options.limit);
-  }
-
-  return results.map((r) => ({
+  let mapped = results.map((r) => ({
     item: r.item,
     score: r.score ?? 0,
+    matchKind: getPrimaryMatchKind(r.matches),
     matches: r.matches?.map((m) => ({
       key: m.key ?? "",
       indices: m.indices as Array<[number, number]>,
     })),
   }));
+
+  mapped.sort((a, b) => compareSearchResults(a, b, query));
+  if (options?.limit) mapped = mapped.slice(0, options.limit);
+  return mapped;
 }
 
 /**
@@ -140,8 +150,13 @@ export function getRecentItems(
     filtered = filtered.filter((i) => i.workspaceId === workspaceId);
   }
 
-  // Sort by created date descending (undated last)
-  const sorted = [...filtered].sort((a, b) => compareDatesDesc(a.created, b.created));
+  // Sort by the last known content activity (undated last).
+  const sorted = [...filtered].sort((a, b) => {
+    const byActivity = compareDatesDesc(a.updated ?? a.created, b.updated ?? b.created);
+    if (byActivity !== 0) return byActivity;
+    const byTitle = a.title.localeCompare(b.title);
+    return byTitle !== 0 ? byTitle : stableSearchItemKey(a).localeCompare(stableSearchItemKey(b));
+  });
 
   return sorted.slice(0, limit).map((item) => ({
     item,
@@ -154,6 +169,68 @@ export function getRecentItems(
  */
 export function isIndexReady(): boolean {
   return isInitialized;
+}
+
+function normalizeSearchText(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+}
+
+function getPrimaryMatchKind(
+  matches: readonly { key?: string }[] | undefined
+): SearchMatchKind | undefined {
+  const keys = new Set(matches?.map((match) => match.key));
+  if (keys.has("title")) return "title";
+  if (keys.has("projectName")) return "project";
+  if (keys.has("workspaceName")) return "workspace";
+  if (keys.has("content")) return "content";
+  return undefined;
+}
+
+function getMatchRank(result: SearchResult, query: string): number {
+  const title = normalizeSearchText(result.item.title);
+  const normalizedQuery = normalizeSearchText(query);
+  if (title === normalizedQuery) return 0;
+  if (title.startsWith(normalizedQuery)) return 1;
+  if (title.includes(normalizedQuery)) return 2;
+  if (result.matchKind === "title") return 3;
+  if (result.matchKind === "project" || result.matchKind === "workspace") return 4;
+  return 5;
+}
+
+function compareSearchResults(a: SearchResult, b: SearchResult, query: string): number {
+  const byMatch = getMatchRank(a, query) - getMatchRank(b, query);
+  if (byMatch !== 0) return byMatch;
+  if (a.score !== b.score) return a.score - b.score;
+  const byActivity = compareDatesDesc(
+    a.item.updated ?? a.item.created,
+    b.item.updated ?? b.item.created
+  );
+  if (byActivity !== 0) return byActivity;
+  const byTitle = a.item.title.localeCompare(b.item.title);
+  return byTitle !== 0
+    ? byTitle
+    : stableSearchItemKey(a.item).localeCompare(stableSearchItemKey(b.item));
+}
+
+function stableSearchItemKey(item: SearchItem): string {
+  return [item.workspaceId, item.projectId, item.type, item.id].join("\0");
+}
+
+/** Convert Markdown into compact text that can be searched and excerpted. */
+export function markdownToSearchText(markdown: string): string {
+  return markdown
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/^- \[[ xX]\]\s*/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/(\*\*|__|~~)(.*?)\1/g, "$2")
+    .replace(/([*_])(.*?)\1/g, "$2")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /**
@@ -187,7 +264,7 @@ export function taskToSearchItem(
     id: task.id,
     type: "task",
     title: task.title,
-    content: task.content?.slice(0, 200) ?? "",
+    content: markdownToSearchText(task.content ?? ""),
     workspaceId: task.workspaceId,
     workspaceName,
     projectId: task.projectId,
@@ -196,6 +273,7 @@ export function taskToSearchItem(
     priority: task.priority,
     due: task.due,
     created: task.created,
+    updated: task.updated,
     filePath: task.filePath,
   };
 }
@@ -209,12 +287,13 @@ export function docToSearchItem(
     id: doc.id,
     type: "doc",
     title: doc.title,
-    content: doc.content?.slice(0, 200) ?? "",
+    content: markdownToSearchText(doc.content ?? ""),
     workspaceId: doc.workspaceId,
     workspaceName,
     projectId: doc.projectId,
     projectName,
     created: doc.created,
+    updated: doc.updated,
     author: doc.author,
     filePath: doc.filePath,
   };
@@ -229,12 +308,13 @@ export function meetingToSearchItem(
     id: meeting.id,
     type: "meeting",
     title: meeting.title,
-    content: meeting.content?.slice(0, 200) ?? "",
+    content: markdownToSearchText(meeting.content ?? ""),
     workspaceId: meeting.workspaceId,
     workspaceName,
     projectId: meeting.projectId,
     projectName,
     created: meeting.created,
+    updated: meeting.updated,
     filePath: meeting.filePath,
   };
 }
@@ -247,7 +327,9 @@ export function projectToSearchItem(
     id: project.id,
     type: "project",
     title: project.name,
-    content: project.description ?? "",
+    content: markdownToSearchText(
+      [project.description, project.overview].filter(Boolean).join("\n\n")
+    ),
     workspaceId: project.workspaceId,
     workspaceName,
     projectId: project.id,
@@ -255,4 +337,38 @@ export function projectToSearchItem(
     status: project.status,
     created: project.created,
   };
+}
+
+/**
+ * Read one complete cross-workspace snapshot for the UI search index.
+ * Through DeskService this stays one RPC in hosted mode.
+ */
+export async function getSearchItems(): Promise<SearchItem[]> {
+  const workspaces = await getWorkspaces();
+  const perWorkspace = await Promise.all(
+    workspaces.map(async (workspace) => {
+      const [projects, tasks, docs, meetings] = await Promise.all([
+        getProjects(workspace.id),
+        getTasks(workspace.id),
+        getDocs(workspace.id),
+        getMeetings(workspace.id),
+      ]);
+      const projectNames = new Map(projects.map((project) => [project.id, project.name]));
+
+      return [
+        ...projects.map((project) => projectToSearchItem(project, workspace.name)),
+        ...tasks.map((task) =>
+          taskToSearchItem(task, workspace.name, projectNames.get(task.projectId))
+        ),
+        ...docs.map((doc) =>
+          docToSearchItem(doc, workspace.name, projectNames.get(doc.projectId))
+        ),
+        ...meetings.map((meeting) =>
+          meetingToSearchItem(meeting, workspace.name, projectNames.get(meeting.projectId))
+        ),
+      ];
+    })
+  );
+
+  return perWorkspace.flat();
 }

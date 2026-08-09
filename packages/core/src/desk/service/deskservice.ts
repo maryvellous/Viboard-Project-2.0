@@ -36,8 +36,12 @@ import type * as aiignoreApi from "../aiignore";
 import type * as aiUsageApi from "../ai-usage";
 import type * as maintenanceApi from "../maintenance";
 import type * as editorDocumentsApi from "../editor-documents";
+import type * as searchIndexApi from "../search-index";
 
 export interface DeskService {
+  // ── Cross-workspace UI search snapshot ─────────────────────────────
+  getSearchItems: typeof searchIndexApi.getSearchItems;
+
   // ── Versioned editor persistence ───────────────────────────────────
   getEditorDocument: typeof editorDocumentsApi.getEditorDocument;
   saveEditorDocument: typeof editorDocumentsApi.saveEditorDocument;

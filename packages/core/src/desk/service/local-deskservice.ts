@@ -26,9 +26,12 @@ import * as aiignoreApi from "../aiignore";
 import * as aiUsageApi from "../ai-usage";
 import * as maintenanceApi from "../maintenance";
 import * as editorDocumentsApi from "../editor-documents";
+import * as searchIndexApi from "../search-index";
 import type { DeskService } from "./deskservice";
 
 export const localDeskService: DeskService = {
+  getSearchItems: searchIndexApi.getSearchItems,
+
   getEditorDocument: editorDocumentsApi.getEditorDocument,
   saveEditorDocument: editorDocumentsApi.saveEditorDocument,
 
