@@ -35,6 +35,16 @@ export function resolveDataRoot(): string {
 export function boot(): DataRootOwnership {
   const root = resolveDataRoot();
   const ownership = DataRootOwnership.acquire(root);
+  configureHost(root);
+  return ownership;
+}
+
+/** Configure the Node host for a read-only process without claiming writer ownership. */
+export function bootReadOnly(): void {
+  configureHost(resolveDataRoot());
+}
+
+function configureHost(root: string): void {
   setStorage(new NodeFsProvider(root));
   // isTauri() is false on Node, so getDeskPath() returns this verbatim (no
   // tilde expansion). It must therefore be an absolute path to the data dir.
@@ -49,5 +59,4 @@ export function boot(): DataRootOwnership {
     "ai.openai": process.env.OPENAI_API_KEY,
   };
   setAIKeyResolver(async (ref) => keyEnv[ref]?.trim() || null);
-  return ownership;
 }

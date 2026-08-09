@@ -9,7 +9,7 @@
 import { getDeskService } from "@desk/core";
 import type { DeskService } from "@desk/core";
 import { pathToFileURL } from "node:url";
-import { boot } from "../packages/server/src/boot";
+import { bootReadOnly } from "../packages/server/src/boot";
 
 type ReadService = Pick<
   DeskService,
@@ -61,6 +61,6 @@ export async function verifyDeployedRead(service: ReadService): Promise<Deployed
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
-  boot();
+  bootReadOnly();
   console.log(JSON.stringify(await verifyDeployedRead(getDeskService())));
 }
