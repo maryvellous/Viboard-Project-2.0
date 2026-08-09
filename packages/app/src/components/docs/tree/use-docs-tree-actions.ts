@@ -201,21 +201,8 @@ export function useDocsTreeActions({
     () => ({
       onSelectDoc: onOpenDoc,
       onOpenAsset,
-      onRenameDoc: async (doc, newTitle) => {
-        await updateDoc.mutateAsync({ doc, updates: { title: newTitle } });
-      },
       onDeleteDoc: (doc) => deleteDoc.mutate(doc),
       onDeleteAsset: (asset) => deleteAsset.mutate(asset),
-      onRenameFolder: async (treePath, newName) => {
-        const resolved = resolveTreePath(treePath);
-        await renameFolder.mutateAsync({
-          scope: resolved.scope,
-          oldPath: resolved.scopeTreePath,
-          newName,
-          workspaceId,
-          projectId: resolved.projectId,
-        });
-      },
       onDeleteFolder: (treePath) => {
         const resolved = resolveTreePath(treePath);
         deleteFolder.mutate({
@@ -244,10 +231,8 @@ export function useDocsTreeActions({
     [
       onOpenDoc,
       onOpenAsset,
-      updateDoc,
       deleteDoc,
       deleteAsset,
-      renameFolder,
       deleteFolder,
       moveDoc,
       onCreateDocIn,

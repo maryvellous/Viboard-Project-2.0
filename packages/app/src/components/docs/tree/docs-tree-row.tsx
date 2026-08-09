@@ -30,10 +30,8 @@ import { isProjectStub, type ArboristNode } from "./arborist-adapter";
 export interface DocsTreeHandlers {
   onSelectDoc: (doc: Doc) => void;
   onOpenAsset: (asset: Asset) => void;
-  onRenameDoc: (doc: Doc, newTitle: string) => Promise<void> | void;
   onDeleteDoc: (doc: Doc) => void;
   onDeleteAsset: (asset: Asset) => void;
-  onRenameFolder: (treePath: string, newName: string) => Promise<void> | void;
   onDeleteFolder: (treePath: string) => void;
   onCreateDocIn: (treePath: string) => void;
   onCreateFolderIn: (treePath: string) => void;
@@ -120,10 +118,9 @@ function FolderRow({ node, style, dragHandle }: DocsTreeRowProps) {
 
   const handleCommitRename = useCallback(
     (newName: string) => {
-      handlers.onRenameFolder(data.treePath, newName);
-      node.reset();
+      node.submit(newName);
     },
-    [handlers, data.treePath, node],
+    [node],
   );
 
   if (data.kind !== "folder") return null;
@@ -231,10 +228,9 @@ function DocRow({ node, style, dragHandle }: DocsTreeRowProps) {
 
   const handleCommitRename = useCallback(
     (newTitle: string) => {
-      if (doc) handlers.onRenameDoc(doc, newTitle);
-      node.reset();
+      node.submit(newTitle);
     },
-    [handlers, doc, node],
+    [node],
   );
 
   if (!doc) return null;
