@@ -1,7 +1,6 @@
 
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { Sidebar, SecondarySidebar } from "@/components/layout";
 import { SetupWizard } from "@/components/setup";
 import { TabBar, TabContent } from "@/components/tabs";
@@ -13,9 +12,7 @@ import { useSecondarySidebarStore } from "@/stores/secondary-sidebar";
 import { useNavigationStore } from "@/stores/navigation";
 import { useProjectSelectionStore } from "@/stores/project-selection";
 import { needsTrafficLightPadding, isTauri } from "@desk/core";
-import { openGlobalSearch } from "@/components/global-search";
 import { AIConsentDialog } from "@/components/ai/ai-consent-dialog";
-import { Search } from "lucide-react";
 import { AppBootScreen } from "./boot-screen";
 
 interface AppShellProps {
@@ -39,7 +36,6 @@ const NativeAuthGate = !import.meta.env.VITE_DESK_HOSTED
   : null;
 
 export function AppShell({ children }: AppShellProps) {
-  const { t } = useTranslation();
   const hasMacTrafficLights = needsTrafficLightPadding();
   const setupCompleted = useBootStore((state) => state.setupCompleted);
   const connectionMode = useBootStore((state) => state.connectionMode);
@@ -112,16 +108,6 @@ export function AppShell({ children }: AppShellProps) {
             />
           )}
           <div data-tauri-drag-region className="flex-1 h-full" />
-          {!isCollapsed && (
-            <button
-              type="button"
-              onClick={openGlobalSearch}
-              title={t("tooltips.appShell.search")}
-              className="h-7 w-7 shrink-0 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-colors"
-            >
-              <Search className="h-3.5 w-3.5" />
-            </button>
-          )}
         </div>
         <div data-tauri-drag-region className="h-full" />
         <div className="h-full min-w-0 -ml-0.5">

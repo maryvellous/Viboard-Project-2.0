@@ -14,6 +14,7 @@ interface SidebarNavRowProps {
   role?: SidebarNavRole;
   collapsed?: boolean;
   count?: number;
+  shortcut?: string;
   className?: string;
 }
 
@@ -31,6 +32,7 @@ export function SidebarNavRow({
   role = "global",
   collapsed = false,
   count,
+  shortcut,
   className,
 }: SidebarNavRowProps) {
   const baseClass = cn(
@@ -67,6 +69,9 @@ export function SidebarNavRow({
       {!collapsed && <span className="flex-1 truncate text-left">{label}</span>}
       {!collapsed && count !== undefined && count > 0 && (
         <span className="text-[11px] tabular-nums font-medium text-sidebar-foreground/65">{count}</span>
+      )}
+      {!collapsed && shortcut && (
+        <span className="text-[11px] font-normal text-sidebar-foreground/45">{shortcut}</span>
       )}
     </>
   );

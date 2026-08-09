@@ -1110,8 +1110,14 @@
       "placeholder": "Aufgaben, Dokumente, Projekte durchsuchen...",
       "noResults": "Keine Ergebnisse gefunden.",
       "buildingIndex": "Suchindex wird aufgebaut...",
-      "recentHeading": "Zuletzt",
+      "unavailable": "Die Suche ist nicht verfügbar. Versuche es gleich noch einmal.",
+      "recentHeading": "Zuletzt aktualisiert",
       "resultsHeading": "Ergebnisse",
+      "scope": {
+        "label": "Suchbereich",
+        "all": "Überall",
+        "workspace": "Aktueller Arbeitsbereich"
+      },
       "types": {
         "task": "Aufgabe",
         "doc": "Dokument",
@@ -1239,6 +1245,7 @@
       "placeholder": "Notizen zum Verlinken suchen…",
       "noNotesFound": "Keine Notizen gefunden.",
       "buildingIndex": "Suchindex wird aufgebaut…",
+      "searchUnavailable": "Die Suche ist nicht verfügbar. Versuche es gleich noch einmal.",
       "results": "Ergebnisse",
       "recent": "Zuletzt",
       "types": {

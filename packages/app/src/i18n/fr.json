@@ -1110,8 +1110,14 @@
       "placeholder": "Rechercher tâches, documents, projets...",
       "noResults": "Aucun résultat.",
       "buildingIndex": "Construction de l'index de recherche...",
-      "recentHeading": "Récents",
+      "unavailable": "La recherche est indisponible. Réessayez dans un instant.",
+      "recentHeading": "Récemment mis à jour",
       "resultsHeading": "Résultats",
+      "scope": {
+        "label": "Portée de la recherche",
+        "all": "Partout",
+        "workspace": "Espace actuel"
+      },
       "types": {
         "task": "Tâche",
         "doc": "Document",
@@ -1239,6 +1245,7 @@
       "placeholder": "Rechercher des notes à lier…",
       "noNotesFound": "Aucune note trouvée.",
       "buildingIndex": "Construction de l'index de recherche…",
+      "searchUnavailable": "La recherche est indisponible. Réessayez dans un instant.",
       "results": "Résultats",
       "recent": "Récents",
       "types": {

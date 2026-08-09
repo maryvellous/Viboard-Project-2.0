@@ -13,11 +13,12 @@ import { CheckSquare, FileText, Calendar } from "lucide-react";
 import {
   search,
   getRecentItems,
-  isIndexReady,
   type SearchResult,
   type SearchItemType,
   getScopedEntityKey,
 } from "@desk/core";
+import { useSearchIndexState } from "@/hooks/use-search-index";
+import { searchIndexController } from "@/lib/search-index-controller";
 
 const LINKABLE_TYPES: SearchItemType[] = ["doc", "task", "meeting"];
 
@@ -48,6 +49,7 @@ export function NoteLinkPicker({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
+  const indexState = useSearchIndexState();
 
   const typeLabels: Record<string, string> = {
     task: t("ui.noteLinkPicker.types.task"),
@@ -56,7 +58,7 @@ export function NoteLinkPicker({
   };
 
   useEffect(() => {
-    if (!open || !isIndexReady()) {
+    if (!open || !indexState.hasUsableIndex) {
       setResults([]);
       return;
     }
@@ -65,7 +67,11 @@ export function NoteLinkPicker({
     } else {
       setResults(search(query, { types: LINKABLE_TYPES, limit: 10 }));
     }
-  }, [query, open]);
+  }, [query, open, indexState.hasUsableIndex, indexState.revision]);
+
+  useEffect(() => {
+    if (open) void searchIndexController.refresh();
+  }, [open]);
 
   useEffect(() => {
     if (!open) setQuery("");
@@ -102,7 +108,11 @@ export function NoteLinkPicker({
       />
       <CommandList ref={listRef}>
         <CommandEmpty>
-          {isIndexReady() ? t("ui.noteLinkPicker.noNotesFound") : t("ui.noteLinkPicker.buildingIndex")}
+          {!indexState.hasUsableIndex
+            ? indexState.status === "error"
+              ? t("ui.noteLinkPicker.searchUnavailable")
+              : t("ui.noteLinkPicker.buildingIndex")
+            : t("ui.noteLinkPicker.noNotesFound")}
         </CommandEmpty>
         <CommandGroup heading={query.trim() ? t("ui.noteLinkPicker.results") : t("ui.noteLinkPicker.recent")}>
           {results.map((result) => (

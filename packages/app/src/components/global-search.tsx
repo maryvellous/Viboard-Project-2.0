@@ -1,8 +1,14 @@
-
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { formatDate } from "@/lib/format";
 import { useNavigate } from "react-router-dom";
+import { Calendar, CheckSquare, Clock, FileText, FolderKanban } from "lucide-react";
+import {
+  getRecentItems,
+  getScopedEntityKey,
+  search,
+  type SearchItemType,
+  type SearchResult,
+} from "@desk/core";
 import {
   CommandDialog,
   CommandEmpty,
@@ -12,30 +18,22 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { AIBadge } from "@/components/ui/ai-badge";
-import {
-  CheckSquare,
-  FileText,
-  Calendar,
-  FolderKanban,
-  Clock,
-} from "lucide-react";
-import {
-  search,
-  getRecentItems,
-  isIndexReady,
-  type SearchResult,
-  type SearchItemType,
-  getScopedEntityKey,
-} from "@desk/core";
+import { useSearchIndexState } from "@/hooks/use-search-index";
+import { searchIndexController } from "@/lib/search-index-controller";
+import { buildSearchSnippet, splitHighlightedText } from "@/lib/search-presentation";
+import { confirmUnsavedChanges } from "@/lib/unsaved-changes-guard";
+import { formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { useNavigationStore } from "@/stores/navigation";
 import { useOpenTab } from "@/stores/tabs";
-import { confirmUnsavedChanges } from "@/lib/unsaved-changes-guard";
+
+type SearchScope = "all" | "workspace";
 
 const TYPE_ICONS: Record<SearchItemType, React.ReactNode> = {
-  task: <CheckSquare className="h-4 w-4" />,
-  doc: <FileText className="h-4 w-4" />,
-  meeting: <Calendar className="h-4 w-4" />,
-  project: <FolderKanban className="h-4 w-4" />,
+  task: <CheckSquare className="size-4" />,
+  doc: <FileText className="size-4" />,
+  meeting: <Calendar className="size-4" />,
+  project: <FolderKanban className="size-4" />,
 };
 
 const TYPE_LABEL_KEYS: Record<SearchItemType, string> = {
@@ -45,106 +43,94 @@ const TYPE_LABEL_KEYS: Record<SearchItemType, string> = {
   project: "search.globalSearch.types.project",
 };
 
-/**
- * Open the global search dialog. GlobalSearch has no open-store — it listens
- * for ⌘K / Ctrl+K on the document — so this dispatches that shortcut.
- */
 export function openGlobalSearch() {
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
 }
 
 export function GlobalSearch() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [scope, setScope] = useState<SearchScope>("all");
   const [results, setResults] = useState<SearchResult[]>([]);
-  const navigate = useNavigate();
   const currentWorkspaceId = useNavigationStore((state) => state.currentWorkspaceId);
+  const setCurrentWorkspaceId = useNavigationStore((state) => state.setCurrentWorkspaceId);
+  const indexState = useSearchIndexState();
+  const { openTask, openDoc, openMeeting } = useOpenTab();
 
-  // Handle keyboard shortcut
   useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((open) => !open);
+    const down = (event: KeyboardEvent) => {
+      if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        setOpen((value) => !value);
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Search when query changes
   useEffect(() => {
-    if (!isIndexReady()) {
+    if (open) void searchIndexController.refresh();
+  }, [open]);
+
+  useEffect(() => {
+    if (!indexState.hasUsableIndex) {
       setResults([]);
       return;
     }
+    const workspaceId = scope === "workspace" ? currentWorkspaceId ?? undefined : undefined;
+    setResults(
+      query.trim()
+        ? search(query, { limit: 10, workspaceId })
+        : getRecentItems(8, undefined, workspaceId),
+    );
+  }, [query, scope, currentWorkspaceId, indexState.revision, indexState.hasUsableIndex]);
 
-    if (!query.trim()) {
-      // Show recent items when no query
-      const recent = getRecentItems(8, undefined, currentWorkspaceId ?? undefined);
-      setResults(recent);
-    } else {
-      // Fuzzy search
-      const searchResults = search(query, {
-        limit: 10,
-        workspaceId: currentWorkspaceId ?? undefined,
-      });
-      setResults(searchResults);
-    }
-  }, [query, currentWorkspaceId]);
-
-  // Reset query when dialog closes
   useEffect(() => {
     if (!open) {
       setQuery("");
+      setScope("all");
     }
   }, [open]);
 
-  const { openTask, openDoc, openMeeting } = useOpenTab();
-
-  // Handle item selection
   const handleSelect = useCallback(
     (result: SearchResult) => {
-      if (result.item.type === "project" && !confirmUnsavedChanges()) return;
-      setOpen(false);
-
       const { item } = result;
-
-      // Open in tab for tasks, docs, meetings; navigate for projects
       switch (item.type) {
         case "task":
-          openTask({
-            id: item.id,
-            title: item.title,
-            workspaceId: item.workspaceId,
-            projectId: item.projectId,
-          });
+          setOpen(false);
+          openTask(item);
           break;
         case "doc":
-          openDoc({
-            id: item.id,
-            title: item.title,
-            workspaceId: item.workspaceId,
-            projectId: item.projectId,
-          });
+          setOpen(false);
+          openDoc(item);
           break;
         case "meeting":
-          openMeeting({
-            id: item.id,
-            title: item.title,
-            workspaceId: item.workspaceId,
-            projectId: item.projectId,
-          });
+          setOpen(false);
+          openMeeting(item);
           break;
-        case "project":
+        case "project": {
+          if (item.workspaceId !== currentWorkspaceId) {
+            setCurrentWorkspaceId(item.workspaceId);
+            if (useNavigationStore.getState().currentWorkspaceId !== item.workspaceId) return;
+          } else if (!confirmUnsavedChanges()) {
+            return;
+          }
+          setOpen(false);
           navigate(`/projects?open=${encodeURIComponent(item.id)}`);
           break;
+        }
       }
     },
-    [navigate, openTask, openDoc, openMeeting]
+    [currentWorkspaceId, navigate, openDoc, openMeeting, openTask, setCurrentWorkspaceId],
   );
+
+  const emptyMessage = !indexState.hasUsableIndex
+    ? indexState.status === "error"
+      ? t("search.globalSearch.unavailable")
+      : t("search.globalSearch.buildingIndex")
+    : t("search.globalSearch.noResults");
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
@@ -153,27 +139,37 @@ export function GlobalSearch() {
         value={query}
         onValueChange={setQuery}
       />
+      <div
+        role="group"
+        aria-label={t("search.globalSearch.scope.label")}
+        className="flex items-center gap-1 border-b px-3 py-2"
+      >
+        {(["all", "workspace"] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            disabled={value === "workspace" && !currentWorkspaceId}
+            aria-pressed={scope === value}
+            onClick={() => setScope(value)}
+            className={cn(
+              "rounded-md px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+              scope === value
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+            )}
+          >
+            {t(`search.globalSearch.scope.${value}`)}
+          </button>
+        ))}
+      </div>
       <CommandList>
-        <CommandEmpty>
-          {isIndexReady()
-            ? t("search.globalSearch.noResults")
-            : t("search.globalSearch.buildingIndex")}
-        </CommandEmpty>
-
-        {!query.trim() && results.length > 0 && (
-          <CommandGroup heading={t("search.globalSearch.recentHeading")}>
-            {results.map((result) => (
-              <SearchResultItem
-                key={`${result.item.type}-${getScopedEntityKey(result.item)}`}
-                result={result}
-                onSelect={handleSelect}
-              />
-            ))}
-          </CommandGroup>
-        )}
-
-        {query.trim() && results.length > 0 && (
-          <CommandGroup heading={t("search.globalSearch.resultsHeading")}>
+        <CommandEmpty>{emptyMessage}</CommandEmpty>
+        {results.length > 0 && (
+          <CommandGroup
+            heading={query.trim()
+              ? t("search.globalSearch.resultsHeading")
+              : t("search.globalSearch.recentHeading")}
+          >
             {results.map((result) => (
               <SearchResultItem
                 key={`${result.item.type}-${getScopedEntityKey(result.item)}`}
@@ -197,37 +193,53 @@ function SearchResultItem({
 }) {
   const { t } = useTranslation();
   const { item } = result;
+  const snippet = buildSearchSnippet(result);
+  const titleSegments = useMemo(() => {
+    const titleMatch = result.matches?.find((match) => match.key === "title");
+    return splitHighlightedText(
+      item.title,
+      titleMatch?.indices.map(([start, end]) => [start, end + 1]) ?? [],
+    );
+  }, [item.title, result.matches]);
+  const context = [
+    item.workspaceName,
+    item.type === "project" ? undefined : item.projectName,
+    t(TYPE_LABEL_KEYS[item.type]),
+  ].filter(Boolean).join(" › ");
 
   return (
     <CommandItem
-      value={`${item.type}-${item.id}-${item.title}`}
+      value={`${item.type}-${getScopedEntityKey(item)}-${item.title}`}
       onSelect={() => onSelect(result)}
-      className="flex items-center gap-3 py-2"
+      className="flex items-start gap-3 py-2"
     >
-      <span className="text-muted-foreground">{TYPE_ICONS[item.type]}</span>
-      <div className="flex-1 min-w-0">
+      <span className="mt-0.5 text-muted-foreground">{TYPE_ICONS[item.type]}</span>
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-medium truncate">{item.title}</span>
+          <span className="truncate font-medium">
+            {titleSegments.map((segment, index) => segment.highlighted ? (
+              <mark key={index} className="bg-transparent font-semibold text-foreground">{segment.text}</mark>
+            ) : segment.text)}
+          </span>
           {item.author === "ai" && <AIBadge />}
           {item.status && (
-            <span className="text-xs text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+            <span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
               {item.status}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{t(TYPE_LABEL_KEYS[item.type])}</span>
-          {item.projectName && item.type !== "project" && (
-            <>
-              <span>·</span>
-              <span className="truncate">{item.projectName}</span>
-            </>
-          )}
-        </div>
+        <div className="truncate text-xs text-muted-foreground">{context}</div>
+        {snippet && (
+          <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground/80">
+            {snippet.segments.map((segment, index) => segment.highlighted ? (
+              <mark key={index} className="bg-transparent font-semibold text-foreground/80">{segment.text}</mark>
+            ) : segment.text)}
+          </div>
+        )}
       </div>
       {item.due && (
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="h-3 w-3" />
+        <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+          <Clock className="size-3" />
           {formatDate(item.due)}
         </span>
       )}

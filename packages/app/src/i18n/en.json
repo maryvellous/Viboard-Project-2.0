@@ -1127,8 +1127,14 @@
       "placeholder": "Search tasks, docs, projects...",
       "noResults": "No results found.",
       "buildingIndex": "Building search index...",
-      "recentHeading": "Recent",
+      "unavailable": "Search is unavailable. Try again in a moment.",
+      "recentHeading": "Recently updated",
       "resultsHeading": "Results",
+      "scope": {
+        "label": "Search scope",
+        "all": "Everywhere",
+        "workspace": "Current workspace"
+      },
       "types": {
         "task": "Task",
         "doc": "Doc",
@@ -1314,6 +1320,7 @@
       "placeholder": "Search notes to link…",
       "noNotesFound": "No notes found.",
       "buildingIndex": "Building search index…",
+      "searchUnavailable": "Search is unavailable. Try again in a moment.",
       "results": "Results",
       "recent": "Recent",
       "types": {

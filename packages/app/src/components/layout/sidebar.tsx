@@ -31,6 +31,8 @@ import { useTabStore } from "@/stores/tabs";
 import { openGlobalSearch } from "@/components/global-search";
 import { SidebarNavRow } from "./sidebar-nav-row";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
+import { isMacOS } from "@desk/core";
+import { getSearchShortcutLabel } from "@/lib/search-presentation";
 
 interface SidebarProps {
   width: number;
@@ -95,9 +97,14 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
     >
       <ScrollArea className="flex-1 min-h-0">
         <nav className="px-2 py-2 space-y-1">
-          {collapsed && (
-            <SidebarNavRow label={t("nav.sidebar.search")} icon={Search} collapsed={collapsed} role="global" onClick={openGlobalSearch} />
-          )}
+          <SidebarNavRow
+            label={t("nav.sidebar.search")}
+            icon={Search}
+            collapsed={collapsed}
+            role="global"
+            shortcut={getSearchShortcutLabel(isMacOS())}
+            onClick={openGlobalSearch}
+          />
           <SidebarNavRow to="/" label={t("nav.sidebar.dashboard")} icon={Home} active={pathname === "/"} collapsed={collapsed} role="global" onClick={switchToDesk} />
           <SidebarNavRow to="/planner" label={t("nav.sidebar.planner")} icon={CalendarDays} active={pathname === "/planner"} collapsed={collapsed} role="global" onClick={switchToDesk} />
 
