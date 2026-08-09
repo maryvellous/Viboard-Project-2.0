@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { MenuItem } from "./tree-item-utils";
+import { shouldPreserveTreeMenuActionFocus } from "./tree-menu-focus";
 
 interface TreeItemMenusProps {
   items: MenuItem[];
@@ -40,7 +41,21 @@ export function TreeItemMenus({
       <ContextMenuTrigger asChild>
         {children}
       </ContextMenuTrigger>
-      <ContextMenuContent>
+      <ContextMenuContent
+        onCloseAutoFocus={(event) => {
+          const menuContent = event.currentTarget;
+          if (!(menuContent instanceof HTMLElement)) return;
+          if (
+            shouldPreserveTreeMenuActionFocus(
+              document.activeElement,
+              document.body,
+              menuContent,
+            )
+          ) {
+            event.preventDefault();
+          }
+        }}
+      >
         <RenderContextMenuItems items={items} />
       </ContextMenuContent>
     </ContextMenu>
@@ -121,4 +136,3 @@ function RenderContextMenuItems({ items }: { items: MenuItem[] }) {
     </>
   );
 }
-
