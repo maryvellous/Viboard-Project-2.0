@@ -5,7 +5,6 @@ import { AppShell } from "./app/app-shell";
 import { AppBootScreen } from "./app/boot-screen";
 import { Toaster } from "@/components/ui/sonner";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { GlobalSearch } from "@/components/global-search";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 const DashboardPage = lazy(() => import("./pages/dashboard"));
@@ -27,26 +26,23 @@ const OAuthConsent = import.meta.env.VITE_DESK_HOSTED
   ? lazy(() => import("./pages/oauth-consent"))
   : null;
 
-/** The normal app: shell (with its auth gate) + global search. */
+/** The normal app shell. */
 function AppTree() {
   return (
-    <>
-      <AppShell>
-        <Suspense fallback={<LoadingSkeleton variant="page" />}>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/planner" element={<PlannerPage />} />
-            <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/docs" element={<DocsPage />} />
-            <Route path="/meetings" element={<MeetingsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AppShell>
-      <GlobalSearch />
-    </>
+    <AppShell>
+      <Suspense fallback={<LoadingSkeleton variant="page" />}>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/planner" element={<PlannerPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/meetings" element={<MeetingsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </AppShell>
   );
 }
 

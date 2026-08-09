@@ -154,8 +154,8 @@ export function getRecentItems(
   const sorted = [...filtered].sort((a, b) => {
     const byActivity = compareDatesDesc(a.updated ?? a.created, b.updated ?? b.created);
     if (byActivity !== 0) return byActivity;
-    const byTitle = a.title.localeCompare(b.title);
-    return byTitle !== 0 ? byTitle : stableSearchItemKey(a).localeCompare(stableSearchItemKey(b));
+    const byTitle = compareStableText(a.title, b.title);
+    return byTitle !== 0 ? byTitle : compareStableText(stableSearchItemKey(a), stableSearchItemKey(b));
   });
 
   return sorted.slice(0, limit).map((item) => ({
@@ -206,14 +206,18 @@ function compareSearchResults(a: SearchResult, b: SearchResult, query: string): 
     b.item.updated ?? b.item.created
   );
   if (byActivity !== 0) return byActivity;
-  const byTitle = a.item.title.localeCompare(b.item.title);
+  const byTitle = compareStableText(a.item.title, b.item.title);
   return byTitle !== 0
     ? byTitle
-    : stableSearchItemKey(a.item).localeCompare(stableSearchItemKey(b.item));
+    : compareStableText(stableSearchItemKey(a.item), stableSearchItemKey(b.item));
 }
 
 function stableSearchItemKey(item: SearchItem): string {
   return [item.workspaceId, item.projectId, item.type, item.id].join("\0");
+}
+
+function compareStableText(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 /** Convert Markdown into compact text that can be searched and excerpted. */

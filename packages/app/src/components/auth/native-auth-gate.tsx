@@ -8,6 +8,7 @@ import {
   EditorAuthTransitionNotice,
   useGuardedEditorAuthSession,
 } from "@/hooks/use-guarded-editor-auth-session";
+import { searchIndexController } from "@/lib/search-index-controller";
 
 /**
  * Native remote-mode auth gate — the desktop counterpart of
@@ -29,6 +30,12 @@ export default function NativeAuthGate({ children }: { children: ReactNode }) {
   const { data: session, isPending } = client.useSession();
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
   const guarded = useGuardedEditorAuthSession(session, isPending);
+  const acceptedUserId = guarded.acceptedSession?.user.id ?? null;
+
+  useEffect(() => {
+    searchIndexController.clear();
+    if (acceptedUserId) void searchIndexController.refresh();
+  }, [acceptedUserId, serverUrl]);
 
   useEffect(() => {
     let active = true;

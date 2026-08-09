@@ -21,6 +21,7 @@ import { AIBadge } from "@/components/ui/ai-badge";
 import { useSearchIndexState } from "@/hooks/use-search-index";
 import { searchIndexController } from "@/lib/search-index-controller";
 import { buildSearchSnippet, splitHighlightedText } from "@/lib/search-presentation";
+import { openSearchProject } from "@/lib/search-navigation";
 import { confirmUnsavedChanges } from "@/lib/unsaved-changes-guard";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -57,7 +58,7 @@ export function GlobalSearch() {
   const currentWorkspaceId = useNavigationStore((state) => state.currentWorkspaceId);
   const setCurrentWorkspaceId = useNavigationStore((state) => state.setCurrentWorkspaceId);
   const indexState = useSearchIndexState();
-  const { openTask, openDoc, openMeeting } = useOpenTab();
+  const { openTask, openDoc, openMeeting, openDesk } = useOpenTab();
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
@@ -111,19 +112,20 @@ export function GlobalSearch() {
           openMeeting(item);
           break;
         case "project": {
-          if (item.workspaceId !== currentWorkspaceId) {
-            setCurrentWorkspaceId(item.workspaceId);
-            if (useNavigationStore.getState().currentWorkspaceId !== item.workspaceId) return;
-          } else if (!confirmUnsavedChanges()) {
-            return;
-          }
-          setOpen(false);
-          navigate(`/projects?open=${encodeURIComponent(item.id)}`);
+          const opened = openSearchProject(item, {
+            currentWorkspaceId,
+            setCurrentWorkspaceId,
+            getCurrentWorkspaceId: () => useNavigationStore.getState().currentWorkspaceId,
+            confirmUnsavedChanges,
+            activateDesk: openDesk,
+            navigate,
+          });
+          if (opened) setOpen(false);
           break;
         }
       }
     },
-    [currentWorkspaceId, navigate, openDoc, openMeeting, openTask, setCurrentWorkspaceId],
+    [currentWorkspaceId, navigate, openDesk, openDoc, openMeeting, openTask, setCurrentWorkspaceId],
   );
 
   const emptyMessage = !indexState.hasUsableIndex

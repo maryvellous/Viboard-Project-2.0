@@ -6,6 +6,7 @@ import {
   EditorAuthTransitionNotice,
   useGuardedEditorAuthSession,
 } from "@/hooks/use-guarded-editor-auth-session";
+import { searchIndexController } from "@/lib/search-index-controller";
 
 /**
  * Hosted-mode auth gate — lazy-loaded, so better-auth never enters the
@@ -20,6 +21,12 @@ export default function HostedAuthGate({ children }: { children: ReactNode }) {
   const { data: session, isPending } = useSession();
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
   const guarded = useGuardedEditorAuthSession(session, isPending);
+  const acceptedUserId = guarded.acceptedSession?.user.id ?? null;
+
+  useEffect(() => {
+    searchIndexController.clear();
+    if (acceptedUserId) void searchIndexController.refresh();
+  }, [acceptedUserId]);
 
   useEffect(() => {
     let active = true;

@@ -20,6 +20,8 @@ export function createSearchIndexController(
     hasUsableIndex: false,
   };
   let inFlight: Promise<void> | null = null;
+  let refreshQueued = false;
+  let generation = 0;
   const listeners = new Set<Listener>();
 
   const publish = (next: SearchIndexSnapshot) => {
@@ -34,25 +36,39 @@ export function createSearchIndexController(
       return () => listeners.delete(listener);
     },
     refresh: () => {
+      refreshQueued = true;
       if (inFlight) return inFlight;
 
-      publish({ ...snapshot, status: "building" });
       inFlight = (async () => {
-        try {
-          replaceIndex(await loadItems());
-          publish({
-            status: "ready",
-            revision: snapshot.revision + 1,
-            hasUsableIndex: true,
-          });
-        } catch {
-          publish({ ...snapshot, status: "error" });
-        } finally {
-          inFlight = null;
-        }
+        do {
+          refreshQueued = false;
+          const requestGeneration = generation;
+          publish({ ...snapshot, status: "building" });
+          try {
+            const loadedItems = await loadItems();
+            if (requestGeneration !== generation) continue;
+            replaceIndex(loadedItems);
+            publish({
+              status: "ready",
+              revision: snapshot.revision + 1,
+              hasUsableIndex: true,
+            });
+          } catch {
+            if (requestGeneration === generation) {
+              publish({ ...snapshot, status: "error" });
+            }
+          }
+        } while (refreshQueued);
+        inFlight = null;
       })();
 
       return inFlight;
+    },
+    clear: () => {
+      generation += 1;
+      refreshQueued = false;
+      replaceIndex([]);
+      publish({ status: "idle", revision: snapshot.revision + 1, hasUsableIndex: false });
     },
   };
 }
