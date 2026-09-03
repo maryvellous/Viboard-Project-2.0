@@ -394,15 +394,13 @@
 
 /* Code block styling */
 .tiptap pre {
-  background: oklch(0.96 0.003 90);
+  background: var(--muted);
+  color: var(--foreground);
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
   margin: 0.5rem 0;
   overflow-x: auto;
-}
-
-.dark .tiptap pre {
-  background: oklch(0.22 0.01 260);
 }
 
 .tiptap pre code {
@@ -412,34 +410,70 @@
   color: inherit;
 }
 
+/* Tailwind Typography decorates inline code with literal backticks. That is
+ * useful in rendered prose, but distracting in an editable document. */
+.tiptap code::before,
+.tiptap code::after {
+  content: none;
+}
+
 /* Table styles */
+.tiptap .tableWrapper {
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+
 .tiptap table {
   border-collapse: collapse;
-  margin: 0.5rem 0;
+  margin: 0;
+  overflow: hidden;
+  table-layout: fixed;
   width: 100%;
-  table-layout: auto;
 }
 
 .tiptap table td,
 .tiptap table th {
-  border: 1px solid oklch(0.85 0 0);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  min-width: 25px;
   padding: 0.5rem 0.75rem;
+  position: relative;
   vertical-align: top;
   text-align: left;
 }
 
 .tiptap table th {
   font-weight: 600;
-  background: oklch(0.96 0.003 90);
+  background: var(--muted);
 }
 
-.dark .tiptap table td,
-.dark .tiptap table th {
-  border-color: oklch(0.35 0 0);
+.tiptap table td[data-colwidth],
+.tiptap table th[data-colwidth] {
+  min-width: 0;
 }
 
-.dark .tiptap table th {
-  background: oklch(0.22 0.01 260);
+.tiptap .column-resize-handle {
+  background-color: var(--ring);
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 4px;
+  z-index: 20;
+}
+
+.tiptap.resize-cursor {
+  cursor: col-resize;
+}
+
+.tiptap .selectedCell::after {
+  background: color-mix(in oklch, var(--ring) 24%, transparent);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
 }
 
 /* Link styles */

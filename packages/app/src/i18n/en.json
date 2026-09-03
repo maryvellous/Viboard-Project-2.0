@@ -22,6 +22,7 @@
     },
     "buttons": {
       "save": "Save",
+      "apply": "Apply",
       "cancel": "Cancel",
       "delete": "Delete",
       "confirm": "Confirm",
@@ -1314,7 +1315,35 @@
       "addDate": "Add date"
     },
     "richTextEditor": {
-      "placeholder": "Write something…"
+      "placeholder": "Write something…",
+      "bold": "Bold",
+      "italic": "Italic",
+      "strike": "Strikethrough",
+      "inlineCode": "Inline code",
+      "link": "Add or edit link",
+      "unlink": "Remove link",
+      "linkUrl": "Link URL",
+      "linkPlaceholder": "https://example.com",
+      "table": {
+        "more": "More table actions",
+        "addRowBefore": "Add row before",
+        "addRowAfter": "Add row after",
+        "addColumnBefore": "Add column before",
+        "addColumnAfter": "Add column after",
+        "deleteRow": "Delete row",
+        "deleteColumn": "Delete column",
+        "deleteTable": "Delete table",
+        "mergeCells": "Merge cells",
+        "splitCell": "Split cell",
+        "toggleHeaderRow": "Toggle header row"
+      },
+      "code": {
+        "language": "Code language",
+        "plainText": "Plain text",
+        "copy": "Copy code",
+        "copied": "Code copied",
+        "copyFailed": "Could not copy code"
+      }
     },
     "noteLinkPicker": {
       "placeholder": "Search notes to link…",
@@ -1378,7 +1407,10 @@
       },
       "table": {
         "title": "Table",
-        "description": "Insert a 3×3 table"
+        "description": "Insert a table",
+        "pickerTitle": "Table size",
+        "pickerLabel": "Choose table size",
+        "dimensions": "{{rows}} × {{cols}}"
       },
       "codeBlock": {
         "title": "Code Block",

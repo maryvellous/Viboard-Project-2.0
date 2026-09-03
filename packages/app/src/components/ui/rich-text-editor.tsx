@@ -12,6 +12,7 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { Markdown } from "tiptap-markdown";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { TextSelection } from "@tiptap/pm/state";
 
 // Minimal shape of tiptap-markdown's serializer state for the methods we call.
 // (tiptap-markdown does not export a public type for this.)
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { NoteLinkPicker } from "@/components/ui/note-link-picker";
 import { SlashCommands } from "@/components/ui/slash-commands";
+import { RichTextEditorControls } from "@/components/ui/rich-text-editor-controls";
 import { isTauri } from "@desk/core";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
 import { parseNoteLinkHref, createNoteLinkHref, type NoteLink, type NoteLinkType } from "@desk/core";
@@ -120,6 +122,7 @@ export function RichTextEditor({
           levels: [1, 2, 3],
         },
         paragraph: false,
+        link: false,
       }),
       CustomParagraph,
       Markdown.configure({
@@ -241,7 +244,12 @@ export function RichTextEditor({
       editor.commands.setContent(value);
       // Restore selection if possible (and if not drastically changed)
       if (from <= editor.state.doc.content.size) {
-        editor.commands.setTextSelection({ from, to });
+        const docSize = editor.state.doc.content.size;
+        const nextFrom = editor.state.doc.resolve(Math.min(from, docSize));
+        const nextTo = editor.state.doc.resolve(Math.min(to, docSize));
+        editor.view.dispatch(
+          editor.state.tr.setSelection(TextSelection.between(nextFrom, nextTo)),
+        );
       }
       // Reset flag after a microtask to ensure onUpdate has fired
       queueMicrotask(() => {
@@ -317,6 +325,7 @@ export function RichTextEditor({
         <div className="py-1" onKeyDown={handleKeyDown}>
           <EditorContent editor={editor} />
         </div>
+        {editable && <RichTextEditorControls editor={editor} />}
         <NoteLinkPicker
           open={showLinkPicker}
           onOpenChange={setShowLinkPicker}
@@ -338,6 +347,7 @@ export function RichTextEditor({
         <div className="p-4" onKeyDown={handleKeyDown}>
           <EditorContent editor={editor} />
         </div>
+        {editable && <RichTextEditorControls editor={editor} />}
       </ScrollArea>
       <NoteLinkPicker
         open={showLinkPicker}

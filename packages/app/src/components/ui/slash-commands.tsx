@@ -1,4 +1,4 @@
-import { Extension, type Editor, type Range } from "@tiptap/react";
+import { Extension, ReactRenderer, type Editor, type Range } from "@tiptap/react";
 import Suggestion, {
   type SuggestionOptions,
   type SuggestionProps,
@@ -13,7 +13,6 @@ import {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { createRoot, type Root } from "react-dom/client";
 import {
   Heading1,
   Heading2,
@@ -26,25 +25,48 @@ import {
   Quote,
   Minus,
   Link,
+  ChevronLeft,
 } from "lucide-react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import {
+  DEFAULT_TABLE_SIZE,
+  TABLE_PICKER_LIMIT,
+  moveTablePickerSelection,
+  type TablePickerArrowKey,
+  type TableSize,
+} from "@/lib/editor-command-model";
 
 // ─── Command Items ───────────────────────────────────────────────────────────
 
-interface SlashCommandItem {
+interface SlashCommandItemBase {
   title: string;
   aliases: string[];
   description: string;
   icon: React.ReactNode;
+}
+
+interface EditorSlashCommandItem extends SlashCommandItemBase {
+  kind: "command";
   command: (editor: Editor, range: Range) => void;
 }
+
+interface TableSlashCommandItem extends SlashCommandItemBase {
+  kind: "table";
+}
+
+type SlashCommandItem = EditorSlashCommandItem | TableSlashCommandItem;
+
+type SlashCommandSelection =
+  | { kind: "command"; item: EditorSlashCommandItem }
+  | { kind: "table"; item: TableSlashCommandItem; size: TableSize };
 
 function getSlashCommands(): SlashCommandItem[] {
   const t = i18next.t.bind(i18next);
   return [
     {
+      kind: "command",
       title: t("ui.slashCommands.heading1.title"),
       aliases: ["h1"],
       description: t("ui.slashCommands.heading1.description"),
@@ -54,6 +76,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.heading2.title"),
       aliases: ["h2"],
       description: t("ui.slashCommands.heading2.description"),
@@ -63,6 +86,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.heading3.title"),
       aliases: ["h3"],
       description: t("ui.slashCommands.heading3.description"),
@@ -72,6 +96,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.bulletList.title"),
       aliases: ["bullet", "ul", "unordered"],
       description: t("ui.slashCommands.bulletList.description"),
@@ -81,6 +106,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.numberedList.title"),
       aliases: ["numbered", "ol", "ordered"],
       description: t("ui.slashCommands.numberedList.description"),
@@ -90,6 +116,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.taskList.title"),
       aliases: ["task", "checkbox", "todo", "check"],
       description: t("ui.slashCommands.taskList.description"),
@@ -99,20 +126,14 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "table",
       title: t("ui.slashCommands.table.title"),
       aliases: ["table"],
       description: t("ui.slashCommands.table.description"),
       icon: <TableIcon className="size-4" />,
-      command: (editor, range) => {
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-          .run();
-      },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.codeBlock.title"),
       aliases: ["code", "codeblock", "pre"],
       description: t("ui.slashCommands.codeBlock.description"),
@@ -122,6 +143,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.blockquote.title"),
       aliases: ["quote", "blockquote"],
       description: t("ui.slashCommands.blockquote.description"),
@@ -131,6 +153,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.divider.title"),
       aliases: ["divider", "hr", "rule", "separator"],
       description: t("ui.slashCommands.divider.description"),
@@ -140,6 +163,7 @@ function getSlashCommands(): SlashCommandItem[] {
       },
     },
     {
+      kind: "command",
       title: t("ui.slashCommands.link.title"),
       aliases: ["link", "url"],
       description: t("ui.slashCommands.link.description"),
@@ -172,19 +196,37 @@ function filterCommands(query: string): SlashCommandItem[] {
 // ─── Popup Component ─────────────────────────────────────────────────────────
 
 interface SlashCommandsListProps {
+  editor: Editor;
   items: SlashCommandItem[];
-  command: (item: SlashCommandItem) => void;
+  command: (selection: SlashCommandSelection) => void;
 }
 
 export interface SlashCommandsListRef {
   onKeyDown: (event: KeyboardEvent) => boolean;
 }
 
+function getTableCellKey(size: TableSize) {
+  return `${size.rows}-${size.cols}`;
+}
+
 const SlashCommandsList = forwardRef<SlashCommandsListRef, SlashCommandsListProps>(
-  ({ items, command }, ref) => {
+  ({ editor, items, command }, ref) => {
     const { t } = useTranslation();
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [tableItem, setTableItem] = useState<TableSlashCommandItem | null>(null);
+    const [tableSize, setTableSize] = useState<TableSize>(DEFAULT_TABLE_SIZE);
+    const tableSizeRef = useRef<TableSize>(DEFAULT_TABLE_SIZE);
     const listRef = useRef<HTMLDivElement>(null);
+    const tableCellRefs = useRef(new Map<string, HTMLButtonElement>());
+
+    const focusTableCell = useCallback((size: TableSize) => {
+      tableCellRefs.current.get(getTableCellKey(size))?.focus();
+    }, []);
+
+    const exitTablePicker = useCallback(() => {
+      setTableItem(null);
+      requestAnimationFrame(() => editor.commands.focus());
+    }, [editor]);
 
     // Reset selection when items change
     useEffect(() => {
@@ -197,16 +239,55 @@ const SlashCommandsList = forwardRef<SlashCommandsListRef, SlashCommandsListProp
       el?.scrollIntoView({ block: "nearest" });
     }, [selectedIndex]);
 
+    useEffect(() => {
+      if (tableItem) focusTableCell(DEFAULT_TABLE_SIZE);
+    }, [focusTableCell, tableItem]);
+
+    const handleTablePickerKey = useCallback(
+      (key: string) => {
+        if (!tableItem) return false;
+        if (key === "Escape") {
+          exitTablePicker();
+          return true;
+        }
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)) {
+          const next = moveTablePickerSelection(
+            tableSizeRef.current,
+            key as TablePickerArrowKey,
+          );
+          tableSizeRef.current = next;
+          setTableSize(next);
+          focusTableCell(next);
+          return true;
+        }
+        if (key === "Enter") {
+          command({ kind: "table", item: tableItem, size: tableSizeRef.current });
+          return true;
+        }
+        return false;
+      }, [command, exitTablePicker, focusTableCell, tableItem],
+    );
+
     const selectItem = useCallback(
       (index: number) => {
         const item = items[index];
-        if (item) command(item);
+        if (!item) return;
+        if (item.kind === "table") {
+          setTableItem(item);
+          tableSizeRef.current = DEFAULT_TABLE_SIZE;
+          setTableSize(DEFAULT_TABLE_SIZE);
+          return;
+        }
+        command({ kind: "command", item });
       },
       [items, command]
     );
 
     useImperativeHandle(ref, () => ({
       onKeyDown: (event: KeyboardEvent) => {
+        if (tableItem) {
+          return handleTablePickerKey(event.key);
+        }
         if (event.key === "ArrowUp") {
           setSelectedIndex((i) => (i - 1 + items.length) % items.length);
           return true;
@@ -221,7 +302,83 @@ const SlashCommandsList = forwardRef<SlashCommandsListRef, SlashCommandsListProp
         }
         return false;
       },
-    }));
+    }), [handleTablePickerKey, items.length, selectItem, selectedIndex, tableItem]);
+
+    if (tableItem) {
+      return (
+        <div className="slash-commands-popup p-2">
+          <button
+            type="button"
+            className="mb-2 flex w-full items-center gap-2 rounded-sm px-1 py-1 text-sm font-medium hover:bg-accent"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={exitTablePicker}
+          >
+            <ChevronLeft className="size-4" />
+            {t("ui.slashCommands.table.pickerTitle")}
+          </button>
+          <div
+            role="grid"
+            aria-label={t("ui.slashCommands.table.pickerLabel")}
+            aria-rowcount={TABLE_PICKER_LIMIT}
+            aria-colcount={TABLE_PICKER_LIMIT}
+            className="grid grid-cols-8 gap-1"
+          >
+            {Array.from({ length: TABLE_PICKER_LIMIT }, (_, rowIndex) => {
+              const rows = rowIndex + 1;
+              return (
+                <div key={rows} role="row" className="contents">
+                  {Array.from({ length: TABLE_PICKER_LIMIT }, (_, colIndex) => {
+                    const cols = colIndex + 1;
+                    const size = { rows, cols };
+                    const isActive = rows === tableSize.rows && cols === tableSize.cols;
+                    const isSelected = rows <= tableSize.rows && cols <= tableSize.cols;
+                    return (
+                      <button
+                        key={getTableCellKey(size)}
+                        ref={(element) => {
+                          const key = getTableCellKey(size);
+                          if (element) tableCellRefs.current.set(key, element);
+                          else tableCellRefs.current.delete(key);
+                        }}
+                        type="button"
+                        role="gridcell"
+                        aria-label={t("ui.slashCommands.table.dimensions", size)}
+                        aria-selected={isActive}
+                        tabIndex={isActive ? 0 : -1}
+                        className={cn(
+                          "size-6 rounded-sm border transition-colors",
+                          isSelected
+                            ? "border-primary bg-primary/20"
+                            : "border-border bg-background hover:bg-accent",
+                        )}
+                        onKeyDown={(event) => {
+                          if (!handleTablePickerKey(event.key)) return;
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }}
+                        onMouseEnter={() => {
+                          tableSizeRef.current = size;
+                          setTableSize(size);
+                        }}
+                        onClick={() =>
+                          command({ kind: "table", item: tableItem, size })
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <div className="pt-2 text-center text-xs text-muted-foreground">
+            {t("ui.slashCommands.table.dimensions", {
+              rows: tableSize.rows,
+              cols: tableSize.cols,
+            })}
+          </div>
+        </div>
+      );
+    }
 
     if (items.length === 0) {
       return (
@@ -238,12 +395,14 @@ const SlashCommandsList = forwardRef<SlashCommandsListRef, SlashCommandsListProp
         {items.map((item, index) => (
           <button
             key={item.title}
+            type="button"
             className={cn(
               "flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-sm text-left",
               "hover:bg-accent",
               index === selectedIndex && "bg-accent text-accent-foreground"
             )}
             onClick={() => selectItem(index)}
+            onMouseDown={(event) => event.preventDefault()}
             onMouseEnter={() => setSelectedIndex(index)}
           >
             <span className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background text-muted-foreground">
@@ -266,7 +425,7 @@ SlashCommandsList.displayName = "SlashCommandsList";
 // ─── Positioning Helper ──────────────────────────────────────────────────────
 
 function updatePosition(
-  popup: HTMLDivElement,
+  popup: HTMLElement,
   clientRect: (() => DOMRect | null) | null | undefined
 ) {
   if (!clientRect) return;
@@ -288,58 +447,44 @@ function updatePosition(
 
 // ─── Suggestion Render ───────────────────────────────────────────────────────
 
-function createSuggestionRender(): SuggestionOptions<SlashCommandItem, SlashCommandItem>["render"] {
+function createSuggestionRender(): SuggestionOptions<SlashCommandItem, SlashCommandSelection>["render"] {
   return () => {
-    let popup: HTMLDivElement | null = null;
-    let root: Root | null = null;
-    const refHolder: { current: SlashCommandsListRef | null } = { current: null };
+    let renderer: ReactRenderer<SlashCommandsListRef, SlashCommandsListProps> | null = null;
 
     return {
-      onStart(props: SuggestionProps<SlashCommandItem, SlashCommandItem>) {
-        popup = document.createElement("div");
+      onStart(props: SuggestionProps<SlashCommandItem, SlashCommandSelection>) {
+        renderer = new ReactRenderer(SlashCommandsList, {
+          editor: props.editor,
+          props: {
+            editor: props.editor,
+            items: props.items,
+            command: props.command,
+          },
+        });
+        const popup = renderer.element;
         popup.style.position = "fixed";
         popup.style.zIndex = "50";
         document.body.appendChild(popup);
         updatePosition(popup, props.clientRect);
-
-        root = createRoot(popup);
-        root.render(
-          <SlashCommandsList
-            ref={(handle) => {
-              refHolder.current = handle;
-            }}
-            items={props.items}
-            command={(item) => props.command(item)}
-          />
-        );
       },
 
-      onUpdate(props: SuggestionProps<SlashCommandItem, SlashCommandItem>) {
-        if (!popup || !root) return;
-        updatePosition(popup, props.clientRect);
-        root.render(
-          <SlashCommandsList
-            ref={(handle) => {
-              refHolder.current = handle;
-            }}
-            items={props.items}
-            command={(item) => props.command(item)}
-          />
-        );
+      onUpdate(props: SuggestionProps<SlashCommandItem, SlashCommandSelection>) {
+        if (!renderer) return;
+        updatePosition(renderer.element, props.clientRect);
+        renderer.updateProps({
+          editor: props.editor,
+          items: props.items,
+          command: props.command,
+        });
       },
 
       onKeyDown(props: SuggestionKeyDownProps) {
-        if (props.event.key === "Escape") {
-          return false;
-        }
-        return refHolder.current?.onKeyDown(props.event) ?? false;
+        return renderer?.ref?.onKeyDown(props.event) ?? false;
       },
 
       onExit() {
-        root?.unmount();
-        popup?.remove();
-        root = null;
-        popup = null;
+        renderer?.destroy();
+        renderer = null;
       },
     };
   };
@@ -354,7 +499,7 @@ export const SlashCommands = Extension.create({
 
   addProseMirrorPlugins() {
     return [
-      Suggestion<SlashCommandItem, SlashCommandItem>({
+      Suggestion<SlashCommandItem, SlashCommandSelection>({
         editor: this.editor,
         pluginKey: slashCommandsPluginKey,
         char: "/",
@@ -362,8 +507,21 @@ export const SlashCommands = Extension.create({
         startOfLine: false,
         allowedPrefixes: [" "],
         items: ({ query }) => filterCommands(query),
-        command: ({ editor, range, props: item }) => {
-          item.command(editor, range);
+        command: ({ editor, range, props: selection }) => {
+          if (selection.kind === "table") {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertTable({
+                rows: selection.size.rows,
+                cols: selection.size.cols,
+                withHeaderRow: true,
+              })
+              .run();
+            return;
+          }
+          selection.item.command(editor, range);
         },
         render: createSuggestionRender(),
       }),
