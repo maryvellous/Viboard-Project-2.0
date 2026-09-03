@@ -23,6 +23,8 @@ export interface TabItem {
 interface TabState {
   tabs: TabItem[];
   activeTabId: string;
+  /** Most recently active tabs, newest first. The active tab itself is excluded. */
+  activationHistory: string[];
   /** Tab ID that needs to save before closing */
   pendingSaveAndClose: string | null;
   failedSaveAndClose: string | null;
@@ -71,6 +73,23 @@ function stripSessionOnlyTabData(tab: TabItem): Omit<TabItem, "emailData"> {
   return next;
 }
 
+function activateTab(
+  state: Pick<TabState, "activeTabId" | "activationHistory">,
+  tabId: string,
+): Pick<TabState, "activeTabId" | "activationHistory"> {
+  if (state.activeTabId === tabId) return state;
+
+  return {
+    activeTabId: tabId,
+    activationHistory: [
+      state.activeTabId,
+      ...state.activationHistory.filter(
+        (historyId) => historyId !== state.activeTabId && historyId !== tabId,
+      ),
+    ],
+  };
+}
+
 function migratePersistedTabs(persistedState: unknown): unknown {
   const state = persistedState as Partial<TabState> | undefined;
   if (!state?.tabs) return persistedState;
@@ -78,6 +97,7 @@ function migratePersistedTabs(persistedState: unknown): unknown {
   const previousActiveId = state.activeTabId;
   let nextActiveId = "desk";
   const seen = new Set<string>();
+  const migratedIds = new Map<string, string>();
   const tabs: TabItem[] = [];
 
   for (const oldTab of state.tabs) {
@@ -102,12 +122,21 @@ function migratePersistedTabs(persistedState: unknown): unknown {
 
     if (!tab || seen.has(tab.id)) continue;
     seen.add(tab.id);
+    migratedIds.set(oldTab.id, tab.id);
     tabs.push(tab);
     if (oldTab.id === previousActiveId) nextActiveId = tab.id;
   }
 
   if (!seen.has("desk")) tabs.unshift(makeDeskTab());
-  return { ...state, tabs, activeTabId: nextActiveId };
+  const historySeen = new Set<string>();
+  const activationHistory = (state.activationHistory ?? [])
+    .map((tabId) => migratedIds.get(tabId) ?? tabId)
+    .filter((tabId) => {
+      if (tabId === nextActiveId || !seen.has(tabId) || historySeen.has(tabId)) return false;
+      historySeen.add(tabId);
+      return true;
+    });
+  return { ...state, tabs, activeTabId: nextActiveId, activationHistory };
 }
 
 export const useTabStore = create<TabState>()(
@@ -115,6 +144,7 @@ export const useTabStore = create<TabState>()(
     (set, get) => ({
       tabs: [makeDeskTab()],
       activeTabId: "desk",
+      activationHistory: [],
       pendingSaveAndClose: null,
       failedSaveAndClose: null,
 
@@ -136,7 +166,7 @@ export const useTabStore = create<TabState>()(
               && t.projectId === newTab.projectId
           );
           if (existing) {
-            set({ activeTabId: existing.id });
+            set((state) => activateTab(state, existing.id));
             return;
           }
         }
@@ -160,12 +190,12 @@ export const useTabStore = create<TabState>()(
 
         set((state) => ({
           tabs: [...state.tabs, tab],
-          activeTabId: id,
+          ...activateTab(state, id),
         }));
       },
 
       closeTab: (tabId) => {
-        const { tabs, activeTabId } = get();
+        const { tabs, activeTabId, activationHistory } = get();
         const tab = tabs.find((t) => t.id === tabId);
 
         // Can't close pinned tabs
@@ -173,28 +203,40 @@ export const useTabStore = create<TabState>()(
 
         const tabIndex = tabs.findIndex((t) => t.id === tabId);
         const newTabs = tabs.filter((t) => t.id !== tabId);
+        const remainingIds = new Set(newTabs.map((candidate) => candidate.id));
+        let newActivationHistory = activationHistory.filter(
+          (historyId) => historyId !== tabId && remainingIds.has(historyId),
+        );
 
-        // If closing active tab, activate the previous tab or the next one
+        // If closing the active tab, return to the most recently active tab.
+        // Fall back to the neighboring tab when no usable history exists.
         let newActiveId = activeTabId;
         if (activeTabId === tabId) {
-          if (tabIndex > 0) {
+          const previousActiveId = newActivationHistory[0];
+          if (previousActiveId) {
+            newActiveId = previousActiveId;
+          } else if (tabIndex > 0) {
             newActiveId = newTabs[tabIndex - 1].id;
           } else if (newTabs.length > 0) {
             newActiveId = newTabs[0].id;
           }
+          newActivationHistory = newActivationHistory.filter(
+            (historyId) => historyId !== newActiveId,
+          );
         }
 
         set({
           tabs: newTabs,
           activeTabId: newActiveId,
+          activationHistory: newActivationHistory,
         });
       },
 
       setActiveTab: (tabId) => {
-        const { tabs } = get();
-        if (tabs.some((t) => t.id === tabId)) {
-          set({ activeTabId: tabId });
-        }
+        set((state) => state.tabs.some((tab) => tab.id === tabId)
+          ? activateTab(state, tabId)
+          : state
+        );
       },
 
       updateTab: (tabId, updates) => {
@@ -227,14 +269,26 @@ export const useTabStore = create<TabState>()(
           workspaceId: tab.workspaceId,
           projectId,
         });
-        set((state) => ({
-          tabs: state.tabs.map((candidate) =>
-            candidate.id === tabId
-              ? { ...candidate, id, entityId, projectId }
-              : candidate
-          ),
-          activeTabId: state.activeTabId === tabId ? id : state.activeTabId,
-        }));
+        set((state) => {
+          const activeTabId = state.activeTabId === tabId ? id : state.activeTabId;
+          const historySeen = new Set<string>();
+          const activationHistory = state.activationHistory
+            .map((historyId) => historyId === tabId ? id : historyId)
+            .filter((historyId) => {
+              if (historyId === activeTabId || historySeen.has(historyId)) return false;
+              historySeen.add(historyId);
+              return true;
+            });
+          return {
+            tabs: state.tabs.map((candidate) =>
+              candidate.id === tabId
+                ? { ...candidate, id, entityId, projectId }
+                : candidate
+            ),
+            activeTabId,
+            activationHistory,
+          };
+        });
       },
 
       setTabDirty: (tabId, isDirty) => {
@@ -246,10 +300,18 @@ export const useTabStore = create<TabState>()(
       },
 
       closeOtherTabs: (tabId) => {
-        set((state) => ({
-          tabs: state.tabs.filter((t) => t.id === tabId || t.isPinned),
-          activeTabId: tabId,
-        }));
+        set((state) => {
+          const tabs = state.tabs.filter((tab) => tab.id === tabId || tab.isPinned);
+          const remainingIds = new Set(tabs.map((tab) => tab.id));
+          const activation = activateTab(state, tabId);
+          return {
+            tabs,
+            activeTabId: activation.activeTabId,
+            activationHistory: activation.activationHistory.filter(
+              (historyId) => historyId !== tabId && remainingIds.has(historyId),
+            ),
+          };
+        });
       },
 
       reorderTabs: (fromIndex, toIndex) => {
@@ -290,17 +352,25 @@ export const useTabStore = create<TabState>()(
     }),
     {
       name: "desk-tabs",
-      version: 2,
+      version: 3,
       migrate: migratePersistedTabs,
-      partialize: (state) => ({
-        // Filter out session-only email tabs and strip emailData
-        tabs: state.tabs
+      partialize: (state) => {
+        // Filter out session-only email tabs and strip emailData.
+        const tabs = state.tabs
           .filter((t) => t.type !== "email")
-          .map(stripSessionOnlyTabData),
-        activeTabId: state.activeTabId === "desk" || !state.activeTabId.startsWith("email-")
+          .map(stripSessionOnlyTabData);
+        const persistedIds = new Set(tabs.map((tab) => tab.id));
+        const activeTabId = state.activeTabId === "desk" || !state.activeTabId.startsWith("email-")
           ? state.activeTabId
-          : "desk",
-      }),
+          : "desk";
+        return {
+          tabs,
+          activeTabId,
+          activationHistory: state.activationHistory.filter(
+            (tabId) => tabId !== activeTabId && persistedIds.has(tabId),
+          ),
+        };
+      },
     }
   )
 );
