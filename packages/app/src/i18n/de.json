@@ -22,6 +22,7 @@
     },
     "buttons": {
       "save": "Speichern",
+      "apply": "Anwenden",
       "cancel": "Abbrechen",
       "delete": "Löschen",
       "confirm": "Bestätigen",
@@ -1239,7 +1240,35 @@
       "addDate": "Datum hinzufügen"
     },
     "richTextEditor": {
-      "placeholder": "Schreibe etwas…"
+      "placeholder": "Schreibe etwas…",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "strike": "Durchgestrichen",
+      "inlineCode": "Code im Text",
+      "link": "Link hinzufügen oder bearbeiten",
+      "unlink": "Link entfernen",
+      "linkUrl": "Link-URL",
+      "linkPlaceholder": "https://beispiel.de",
+      "table": {
+        "more": "Weitere Tabellenaktionen",
+        "addRowBefore": "Zeile davor einfügen",
+        "addRowAfter": "Zeile danach einfügen",
+        "addColumnBefore": "Spalte davor einfügen",
+        "addColumnAfter": "Spalte danach einfügen",
+        "deleteRow": "Zeile löschen",
+        "deleteColumn": "Spalte löschen",
+        "deleteTable": "Tabelle löschen",
+        "mergeCells": "Zellen verbinden",
+        "splitCell": "Zelle teilen",
+        "toggleHeaderRow": "Kopfzeile umschalten"
+      },
+      "code": {
+        "language": "Codesprache",
+        "plainText": "Klartext",
+        "copy": "Code kopieren",
+        "copied": "Code kopiert",
+        "copyFailed": "Code konnte nicht kopiert werden"
+      }
     },
     "noteLinkPicker": {
       "placeholder": "Notizen zum Verlinken suchen…",
@@ -1303,7 +1332,10 @@
       },
       "table": {
         "title": "Tabelle",
-        "description": "Eine 3×3-Tabelle einfügen"
+        "description": "Eine Tabelle einfügen",
+        "pickerTitle": "Tabellengröße",
+        "pickerLabel": "Tabellengröße auswählen",
+        "dimensions": "{{rows}} × {{cols}}"
       },
       "codeBlock": {
         "title": "Codeblock",

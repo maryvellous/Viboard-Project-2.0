@@ -22,6 +22,7 @@
     },
     "buttons": {
       "save": "Enregistrer",
+      "apply": "Appliquer",
       "cancel": "Annuler",
       "delete": "Supprimer",
       "confirm": "Confirmer",
@@ -1239,7 +1240,35 @@
       "addDate": "Ajouter une date"
     },
     "richTextEditor": {
-      "placeholder": "Écrivez quelque chose…"
+      "placeholder": "Écrivez quelque chose…",
+      "bold": "Gras",
+      "italic": "Italique",
+      "strike": "Barré",
+      "inlineCode": "Code en ligne",
+      "link": "Ajouter ou modifier le lien",
+      "unlink": "Supprimer le lien",
+      "linkUrl": "URL du lien",
+      "linkPlaceholder": "https://exemple.fr",
+      "table": {
+        "more": "Autres actions du tableau",
+        "addRowBefore": "Ajouter une ligne avant",
+        "addRowAfter": "Ajouter une ligne après",
+        "addColumnBefore": "Ajouter une colonne avant",
+        "addColumnAfter": "Ajouter une colonne après",
+        "deleteRow": "Supprimer la ligne",
+        "deleteColumn": "Supprimer la colonne",
+        "deleteTable": "Supprimer le tableau",
+        "mergeCells": "Fusionner les cellules",
+        "splitCell": "Scinder la cellule",
+        "toggleHeaderRow": "Activer la ligne d’en-tête"
+      },
+      "code": {
+        "language": "Langage du code",
+        "plainText": "Texte brut",
+        "copy": "Copier le code",
+        "copied": "Code copié",
+        "copyFailed": "Impossible de copier le code"
+      }
     },
     "noteLinkPicker": {
       "placeholder": "Rechercher des notes à lier…",
@@ -1303,7 +1332,10 @@
       },
       "table": {
         "title": "Tableau",
-        "description": "Insérer un tableau 3×3"
+        "description": "Insérer un tableau",
+        "pickerTitle": "Taille du tableau",
+        "pickerLabel": "Choisir la taille du tableau",
+        "dimensions": "{{rows}} × {{cols}}"
       },
       "codeBlock": {
         "title": "Bloc de code",
