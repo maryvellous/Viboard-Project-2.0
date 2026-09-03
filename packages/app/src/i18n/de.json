@@ -148,6 +148,18 @@
       "dropZone": {
         "title": "Dateien zum Importieren ablegen"
       },
+      "convertDialog": {
+        "title": "Office-Dateien importieren",
+        "description_one": "{{count}} Datei kann in ein Markdown-Dokument umgewandelt werden. Wie soll sie behandelt werden?",
+        "description_other": "{{count}} Dateien können in Markdown-Dokumente umgewandelt werden. Wie sollen sie behandelt werden?",
+        "moreFiles_one": "und {{count}} weitere",
+        "moreFiles_other": "und {{count}} weitere",
+        "buttons": {
+          "convert": "In Dokumente umwandeln",
+          "keep": "Als Dateien behalten",
+          "both": "Beides"
+        }
+      },
       "tree": {
         "searchPlaceholder": "Dokumente durchsuchen…",
         "fileCount_one": "{{count}} Datei",
@@ -976,7 +988,9 @@
       "importFiles_one": "{{count}} Datei importiert",
       "importFiles_other": "{{count}} Dateien importiert",
       "importMixed": "{{docs}} Dokumente und {{files}} Dateien importiert",
-      "createError": "Datei konnte nicht erstellt werden"
+      "createError": "Datei konnte nicht erstellt werden",
+      "convertFailed_one": "{{name}} konnte nicht umgewandelt werden",
+      "convertFailed_other": "{{count}} Dateien konnten nicht umgewandelt werden"
     },
     "meeting": {
       "created": "Meeting erstellt",
@@ -1012,6 +1026,9 @@
       "title": "Desk konnte nicht starten",
       "description": "Desk konnte seinen Datenordner nicht einrichten. Deine Dateien sind sicher. Dies ist ein Startproblem, kein Datenverlust.",
       "hint": "Stelle sicher, dass der Datenordner existiert und lesbar ist, und versuche es erneut."
+    },
+    "connection": {
+      "notAvailableRemote": "Nicht verfügbar, wenn eine Verbindung zu einem Server besteht."
     },
     "generic": {
       "unexpected": {
@@ -1133,6 +1150,23 @@
       "title": "Willkommen bei Desk.",
       "subtitle": "Deine Projekte, Aufgaben, Dokumente und Meetings als reine Markdown-Dateien, die dir gehören."
     },
+    "location": {
+      "title": "Wo soll Desk deine Arbeit speichern?",
+      "subtitle": "Du kannst dies jederzeit in den Einstellungen ändern.",
+      "localTitle": "Dieser Mac",
+      "localDescription": "Speichere deine Dateien lokal auf diesem Computer.",
+      "remoteTitle": "Ein desk.md-Server",
+      "remoteDescription": "Verbinde dich mit einem bereitgestellten desk.md-Server, etwa auf deinem NAS, um von deinem Telefon und anderen Geräten darauf zuzugreifen."
+    },
+    "server": {
+      "title": "Mit deinem Server verbinden",
+      "subtitle": "Gib die Adresse deines desk.md-Servers ein. Im nächsten Schritt meldest du dich an.",
+      "label": "Serveradresse",
+      "hint": "Ohne Angabe wird https:// verwendet. Die Adresse muss https verwenden.",
+      "connect": "Weiter",
+      "invalidUrl": "Gib eine gültige Serveradresse ein.",
+      "httpsRequired": "Der Server muss https verwenden. Über http würde dein Anmeldetoken unverschlüsselt übertragen."
+    },
     "dataFolder": {
       "title": "Wo sollen wir deine Dateien speichern?",
       "subtitle": "Wähle einen beliebigen Ordner. Desk legt die Struktur für dich an, und du kannst ihn später verschieben.",
@@ -1153,6 +1187,47 @@
       "nameLabel": "Name",
       "namePlaceholder": "Persönlich",
       "finish": "Fertig"
+    }
+  },
+  "auth": {
+    "create": {
+      "title": "Konto erstellen",
+      "subtitle": "Richte das Konto ein, das diesen Desk schützt.",
+      "submit": "Konto erstellen"
+    },
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich bei deinem Desk an.",
+      "submit": "Anmelden"
+    },
+    "fields": {
+      "email": "E-Mail",
+      "password": "Passwort"
+    },
+    "errors": {
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    },
+    "signOut": "Abmelden",
+    "account": {
+      "title": "Konto",
+      "description": "Du bist bei diesem gehosteten Desk angemeldet.",
+      "signOutLabel": "Abmelden",
+      "signOutDescription": "Beende deine Sitzung auf diesem Gerät."
+    },
+    "consent": {
+      "title": "{{app}} möchte eine Verbindung herstellen",
+      "unknownApp": "Eine Anwendung",
+      "subtitle": "Die Anwendung kann deine Arbeitsbereiche, Dokumente, Aufgaben und Meetings über den desk.md-Connector lesen.",
+      "scopesTitle": "Sie kann außerdem:",
+      "scopes": {
+        "openid": "Deine Identität bestätigen",
+        "profile": "Dein grundlegendes Profil sehen",
+        "email": "Deine E-Mail-Adresse sehen",
+        "offline_access": "Verbunden bleiben, ohne dich erneut anzumelden"
+      },
+      "allow": "Erlauben",
+      "deny": "Ablehnen",
+      "error": "Die Anfrage konnte nicht abgeschlossen werden. Bitte versuche es erneut."
     }
   },
   "tooltips": {

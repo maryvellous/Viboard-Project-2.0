@@ -23,9 +23,12 @@ describe("translation resources", () => {
   const englishKeys = new Set(leafKeys(load("en")));
 
   for (const language of ["de", "fr"]) {
-    it(`${language} contains no obsolete or misspelled keys`, () => {
-      const unknown = leafKeys(load(language)).filter((key) => !englishKeys.has(key));
+    it(`${language} has exactly the same translation keys as English`, () => {
+      const localizedKeys = new Set(leafKeys(load(language)));
+      const unknown = [...localizedKeys].filter((key) => !englishKeys.has(key));
+      const missing = [...englishKeys].filter((key) => !localizedKeys.has(key));
       expect(unknown).toEqual([]);
+      expect(missing).toEqual([]);
     });
   }
 });
