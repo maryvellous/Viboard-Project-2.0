@@ -173,11 +173,12 @@ export class EditorSessionController {
       this.clearTimer(this.recoveryTimer);
       this.recoveryTimer = null;
     }
-    await this.persistRecovery();
-    this.savePromise = this.performSave().finally(() => {
-      this.savePromise = null;
+    const saveOperation = this.persistRecovery().then(() => this.performSave());
+    const savePromise = saveOperation.finally(() => {
+      if (this.savePromise === savePromise) this.savePromise = null;
     });
-    const result = await this.savePromise;
+    this.savePromise = savePromise;
+    const result = await savePromise;
     if (result && this.state.dirtyFields.size) return this.flush(automatic);
     return result && this.state.dirtyFields.size === 0;
   }

@@ -79,6 +79,34 @@ describe("EditorSessionController", () => {
     controller.dispose();
   });
 
+  it("coalesces flushes that overlap while recovery is being persisted", async () => {
+    const recoveryWrite = deferred<void>();
+    const save = vi.fn(async () => ({
+      status: "saved" as const,
+      snapshot: taskSnapshot("r2", "Desk edit"),
+    }));
+    const controller = new EditorSessionController({
+      snapshot: taskSnapshot("r1", "original"),
+      save,
+      persistRecovery: vi.fn(() => recoveryWrite.promise),
+      clearRecovery: vi.fn(async () => undefined),
+    });
+
+    controller.editBody("Desk edit");
+    const firstFlush = controller.flush();
+    const secondFlush = controller.flush();
+    recoveryWrite.resolve();
+
+    await expect(Promise.all([firstFlush, secondFlush])).resolves.toEqual([true, true]);
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(controller.getSnapshot()).toMatchObject({
+      status: "idle",
+      confirmed: { revision: "r2", body: "Desk edit" },
+      conflict: null,
+    });
+    controller.dispose();
+  });
+
   it("keeps only Desk-changed fields when resolving a conflict", async () => {
     const external = taskSnapshot("r2", "external body", "External title");
     const save = vi.fn()
