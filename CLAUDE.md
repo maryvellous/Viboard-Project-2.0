@@ -194,7 +194,7 @@ Key features:
 - **Smart Index (AI catalog)**: AI-summarized file catalog for context retrieval, maintained by the engine on whichever host owns the data (local: Keychain key; hosted: server env key — web clients get it too); external agents connect over **MCP** (hosted) or the generated `CLAUDE.md`/`AGENTS.md` (local).
 - **i18n**: all UI copy via i18next/react-i18next from [packages/app/src/i18n/en.json](packages/app/src/i18n/en.json)
 - Cross-platform: macOS, Windows, and Linux (email drag-drop overlay is macOS-only)
-- Global search (Cmd+K)
+- Global search and quick-action command palette (Cmd+K)
 - Manual save with Cmd+S, unsaved changes protection
 
 ## Email Integration

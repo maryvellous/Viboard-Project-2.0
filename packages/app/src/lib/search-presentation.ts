@@ -1,4 +1,5 @@
 import type { SearchResult } from "@desk/core";
+import { getKeyboardShortcutLabel } from "./keyboard-shortcuts";
 
 export interface HighlightedTextSegment {
   text: string;
@@ -11,7 +12,7 @@ export interface SearchSnippet {
 }
 
 export function getSearchShortcutLabel(isMac: boolean): string {
-  return isMac ? "⌘K" : "Ctrl K";
+  return getKeyboardShortcutLabel("palette", isMac);
 }
 
 export function buildSearchSnippet(

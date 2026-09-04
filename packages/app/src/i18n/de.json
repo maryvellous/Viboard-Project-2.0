@@ -1142,6 +1142,62 @@
         "meeting": "Meeting",
         "project": "Projekt"
       }
+    },
+    "commandPalette": {
+      "placeholder": "Arbeit durchsuchen oder Befehl ausführen...",
+      "quickActionsHeading": "Schnellaktionen",
+      "actionsHeading": "Aktionen",
+      "disabled": {
+        "workspace": "Wähle zuerst einen Arbeitsbereich",
+        "meetingProject": "Erstelle zuerst ein Projekt"
+      },
+      "commands": {
+        "captureTask": { "label": "Aufgabe im Eingang erfassen", "aliases": "erfassen|eingang|merken|schnelle aufgabe" },
+        "createTask": { "label": "Aufgabe erstellen", "aliases": "neue aufgabe|aufgabe hinzufügen|todo" },
+        "createDoc": { "label": "Dokument erstellen", "aliases": "neues dokument|dokument hinzufügen|notiz" },
+        "createMeeting": { "label": "Meeting erstellen", "aliases": "neues meeting|meeting hinzufügen|termin" },
+        "createProject": { "label": "Projekt erstellen", "aliases": "neues projekt|projekt hinzufügen" },
+        "switchWorkspace": { "label": "Arbeitsbereich wechseln", "aliases": "arbeitsbereich|bereich wechseln|team|workspace" },
+        "goDashboard": { "label": "Zum Dashboard", "aliases": "start|übersicht" },
+        "goPlanner": { "label": "Zum Planer", "aliases": "planen|kalender|woche|zeitplan" },
+        "goTasks": { "label": "Zu Aufgaben", "aliases": "aufgaben|todos" },
+        "goDocs": { "label": "Zu Dokumenten", "aliases": "dokumente|docs|notizen" },
+        "goMeetings": { "label": "Zu Meetings", "aliases": "meetings|termine" },
+        "goProjects": { "label": "Zu Projekten", "aliases": "projekte" },
+        "openSettings": { "label": "Einstellungen öffnen", "aliases": "präferenzen|konfiguration" },
+        "viewShortcuts": { "label": "Tastenkürzel anzeigen", "aliases": "tasten|shortcuts|hilfe" }
+      },
+      "workspaces": {
+        "placeholder": "Arbeitsbereiche durchsuchen...",
+        "heading": "Arbeitsbereiche",
+        "current": "Aktuell",
+        "noResults": "Keine Arbeitsbereiche gefunden",
+        "back": "Zurück zu den Befehlen"
+      },
+      "capture": {
+        "title": "Aufgabe im Eingang erfassen",
+        "description": "Jetzt hinzufügen und später einordnen.",
+        "placeholder": "Aufgabentitel...",
+        "submit": "Erfassen",
+        "back": "Zurück zur Suche",
+        "success": "Aufgabe im Eingang erfasst",
+        "error": "Aufgabe konnte nicht erfasst werden"
+      },
+      "footer": {
+        "navigate": "↑↓ Navigieren",
+        "open": "↵ Öffnen",
+        "close": "Esc Schließen",
+        "enterCapture": "↵ Erfassen",
+        "escapeBack": "Esc Zurück"
+      },
+      "shortcuts": {
+        "title": "Tastenkürzel",
+        "description": "Verwende Befehl auf macOS und Steuerung unter Windows oder Linux.",
+        "palette": "Suche und Befehle öffnen",
+        "save": "Speichern",
+        "closeTab": "Aktiven Tab schließen",
+        "switchTabs": "Vorheriger / nächster Tab"
+      }
     }
   },
   "smartIndex": {},
@@ -1359,8 +1415,8 @@
       }
     },
     "command": {
-      "searchTitle": "Suche",
-      "searchDescription": "Aufgaben, Dokumente und Projekte durchsuchen"
+      "searchTitle": "Suche und Befehle",
+      "searchDescription": "Arbeit durchsuchen oder einen Befehl ausführen"
     },
     "editorBanners": {
       "fileMoved": {

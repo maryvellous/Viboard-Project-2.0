@@ -27,17 +27,22 @@ Command.displayName = CommandPrimitive.displayName;
 
 interface CommandDialogProps extends DialogProps {
   shouldFilter?: boolean;
+  onEscapeKeyDown?: React.ComponentProps<typeof DialogContent>["onEscapeKeyDown"];
 }
 
 const CommandDialog = ({
   children,
   shouldFilter = true,
+  onEscapeKeyDown,
   ...props
 }: CommandDialogProps) => {
   const { t } = useTranslation();
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
+      <DialogContent
+        className="overflow-hidden p-0 shadow-lg"
+        onEscapeKeyDown={onEscapeKeyDown}
+      >
         <VisuallyHidden.Root>
           <DialogTitle>{t("ui.command.searchTitle")}</DialogTitle>
           <DialogDescription>{t("ui.command.searchDescription")}</DialogDescription>

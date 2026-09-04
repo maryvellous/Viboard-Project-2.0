@@ -28,7 +28,7 @@ import { isActiveStatus } from "@/lib/task-status";
 import { SectionLabel } from "@/components/patterns";
 import { WorkspaceSelector } from "./workspace-selector";
 import { useTabStore } from "@/stores/tabs";
-import { openGlobalSearch } from "@/components/global-search";
+import { openCommandPalette } from "@/components/command-palette";
 import { SidebarNavRow } from "./sidebar-nav-row";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { isMacOS } from "@desk/core";
@@ -103,7 +103,7 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
             collapsed={collapsed}
             role="global"
             shortcut={getSearchShortcutLabel(isMacOS())}
-            onClick={openGlobalSearch}
+            onClick={openCommandPalette}
           />
           <SidebarNavRow to="/" label={t("nav.sidebar.dashboard")} icon={Home} active={pathname === "/"} collapsed={collapsed} role="global" onClick={switchToDesk} />
           <SidebarNavRow to="/planner" label={t("nav.sidebar.planner")} icon={CalendarDays} active={pathname === "/planner"} collapsed={collapsed} role="global" onClick={switchToDesk} />

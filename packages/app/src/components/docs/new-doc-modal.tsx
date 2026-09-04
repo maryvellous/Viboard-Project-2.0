@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import type { ContentScope } from "@desk/core/types";
 import {
   displayTreePath,
+  SPECIAL_DIRS,
   todayISO,
 } from "@desk/core";
 import { useTemplatesStore } from "@/stores/templates";
@@ -60,7 +61,7 @@ export function NewDocModal({
   const { data: projects = [] } = useProjects(workspaceId || null);
 
   const [title, setTitle] = useState("");
-  const [projectId, setProjectId] = useState(defaultProjectId || "");
+  const [projectId, setProjectId] = useState(defaultProjectId || SPECIAL_DIRS.UNASSIGNED);
 
   // Determine scope mode
   const isPersonalScope = defaultScope === "personal";
@@ -76,7 +77,7 @@ export function NewDocModal({
   useEffect(() => {
     if (open) {
       setTitle("");
-      setProjectId(defaultProjectId || "");
+      setProjectId(defaultProjectId || SPECIAL_DIRS.UNASSIGNED);
     }
   }, [open, defaultProjectId]);
 
@@ -129,7 +130,7 @@ export function NewDocModal({
       } else {
         doc = await createDoc.mutateAsync({
           workspaceId: workspaceId!,
-          projectId: projectId || "_unassigned",
+          projectId,
           title: trimmed,
           templateBody: templateBody || undefined,
         });
@@ -189,7 +190,7 @@ export function NewDocModal({
                   <SelectValue placeholder={t("modals.newDoc.placeholders.noProject")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t("modals.newDoc.placeholders.noProject")}</SelectItem>
+                  <SelectItem value={SPECIAL_DIRS.UNASSIGNED}>{t("modals.newDoc.placeholders.noProject")}</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}

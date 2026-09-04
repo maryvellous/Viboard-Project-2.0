@@ -1142,6 +1142,62 @@
         "meeting": "Meeting",
         "project": "Project"
       }
+    },
+    "commandPalette": {
+      "placeholder": "Search your work or run a command...",
+      "quickActionsHeading": "Quick actions",
+      "actionsHeading": "Actions",
+      "disabled": {
+        "workspace": "Select a workspace first",
+        "meetingProject": "Create a project first"
+      },
+      "commands": {
+        "captureTask": { "label": "Capture task to Inbox", "aliases": "capture|inbox|remember|quick task" },
+        "createTask": { "label": "Create task", "aliases": "new task|add task|todo" },
+        "createDoc": { "label": "Create document", "aliases": "new document|add document|doc|note" },
+        "createMeeting": { "label": "Create meeting", "aliases": "new meeting|add meeting|appointment" },
+        "createProject": { "label": "Create project", "aliases": "new project|add project" },
+        "switchWorkspace": { "label": "Switch workspace", "aliases": "workspace|change workspace|team|space" },
+        "goDashboard": { "label": "Go to Dashboard", "aliases": "home|overview" },
+        "goPlanner": { "label": "Go to Planner", "aliases": "plan|calendar|week|schedule" },
+        "goTasks": { "label": "Go to Tasks", "aliases": "tasks|todos" },
+        "goDocs": { "label": "Go to Documents", "aliases": "documents|docs|notes" },
+        "goMeetings": { "label": "Go to Meetings", "aliases": "meetings|appointments" },
+        "goProjects": { "label": "Go to Projects", "aliases": "projects" },
+        "openSettings": { "label": "Open Settings", "aliases": "preferences|configuration" },
+        "viewShortcuts": { "label": "View keyboard shortcuts", "aliases": "keys|hotkeys|help" }
+      },
+      "workspaces": {
+        "placeholder": "Search workspaces...",
+        "heading": "Workspaces",
+        "current": "Current",
+        "noResults": "No workspaces found",
+        "back": "Back to commands"
+      },
+      "capture": {
+        "title": "Capture task to Inbox",
+        "description": "Add it now and organize it later.",
+        "placeholder": "Task title...",
+        "submit": "Capture",
+        "back": "Back to search",
+        "success": "Task captured to Inbox",
+        "error": "Couldn't capture the task"
+      },
+      "footer": {
+        "navigate": "↑↓ Navigate",
+        "open": "↵ Open",
+        "close": "Esc Close",
+        "enterCapture": "↵ Capture",
+        "escapeBack": "Esc Back"
+      },
+      "shortcuts": {
+        "title": "Keyboard shortcuts",
+        "description": "Use Command on macOS and Control on Windows or Linux.",
+        "palette": "Open search and commands",
+        "save": "Save",
+        "closeTab": "Close active tab",
+        "switchTabs": "Previous / next tab"
+      }
     }
   },
   "smartIndex": {},
@@ -1359,8 +1415,8 @@
       }
     },
     "command": {
-      "searchTitle": "Search",
-      "searchDescription": "Search tasks, docs, and projects"
+      "searchTitle": "Search and commands",
+      "searchDescription": "Search your work or run a command"
     },
     "editorBanners": {
       "fileMoved": {

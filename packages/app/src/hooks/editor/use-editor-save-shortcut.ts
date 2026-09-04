@@ -3,6 +3,7 @@
  * Extracted from editor components where this 25-line pattern was duplicated 3 times.
  */
 import { useEffect, useRef } from "react";
+import { matchesKeyboardShortcut } from "@/lib/keyboard-shortcuts";
 
 export function useEditorSaveShortcut(save: (() => void) | (() => Promise<unknown>)) {
   // Use a ref to always capture the latest save function,
@@ -14,7 +15,7 @@ export function useEditorSaveShortcut(save: (() => void) | (() => Promise<unknow
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+      if (matchesKeyboardShortcut(e, "save")) {
         e.preventDefault();
         try {
           const result = saveRef.current?.();

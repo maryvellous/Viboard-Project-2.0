@@ -1142,6 +1142,62 @@
         "meeting": "Réunion",
         "project": "Projet"
       }
+    },
+    "commandPalette": {
+      "placeholder": "Rechercher dans votre travail ou lancer une commande...",
+      "quickActionsHeading": "Actions rapides",
+      "actionsHeading": "Actions",
+      "disabled": {
+        "workspace": "Sélectionnez d’abord un espace",
+        "meetingProject": "Créez d’abord un projet"
+      },
+      "commands": {
+        "captureTask": { "label": "Capturer une tâche dans la boîte de réception", "aliases": "capturer|boîte de réception|retenir|tâche rapide" },
+        "createTask": { "label": "Créer une tâche", "aliases": "nouvelle tâche|ajouter une tâche|todo" },
+        "createDoc": { "label": "Créer un document", "aliases": "nouveau document|ajouter un document|note" },
+        "createMeeting": { "label": "Créer une réunion", "aliases": "nouvelle réunion|ajouter une réunion|rendez-vous" },
+        "createProject": { "label": "Créer un projet", "aliases": "nouveau projet|ajouter un projet" },
+        "switchWorkspace": { "label": "Changer d’espace de travail", "aliases": "espace de travail|changer d’espace|équipe|workspace" },
+        "goDashboard": { "label": "Aller au tableau de bord", "aliases": "accueil|vue d’ensemble" },
+        "goPlanner": { "label": "Aller au planning", "aliases": "planifier|calendrier|semaine|programme" },
+        "goTasks": { "label": "Aller aux tâches", "aliases": "tâches|todos" },
+        "goDocs": { "label": "Aller aux documents", "aliases": "documents|docs|notes" },
+        "goMeetings": { "label": "Aller aux réunions", "aliases": "réunions|rendez-vous" },
+        "goProjects": { "label": "Aller aux projets", "aliases": "projets" },
+        "openSettings": { "label": "Ouvrir les réglages", "aliases": "préférences|configuration" },
+        "viewShortcuts": { "label": "Afficher les raccourcis clavier", "aliases": "touches|raccourcis|aide" }
+      },
+      "workspaces": {
+        "placeholder": "Rechercher des espaces de travail...",
+        "heading": "Espaces de travail",
+        "current": "Actuel",
+        "noResults": "Aucun espace de travail trouvé",
+        "back": "Retour aux commandes"
+      },
+      "capture": {
+        "title": "Capturer une tâche dans la boîte de réception",
+        "description": "Ajoutez-la maintenant et classez-la plus tard.",
+        "placeholder": "Titre de la tâche...",
+        "submit": "Capturer",
+        "back": "Retour à la recherche",
+        "success": "Tâche capturée dans la boîte de réception",
+        "error": "Impossible de capturer la tâche"
+      },
+      "footer": {
+        "navigate": "↑↓ Naviguer",
+        "open": "↵ Ouvrir",
+        "close": "Esc Fermer",
+        "enterCapture": "↵ Capturer",
+        "escapeBack": "Esc Retour"
+      },
+      "shortcuts": {
+        "title": "Raccourcis clavier",
+        "description": "Utilisez Command sur macOS et Contrôle sous Windows ou Linux.",
+        "palette": "Ouvrir la recherche et les commandes",
+        "save": "Enregistrer",
+        "closeTab": "Fermer l’onglet actif",
+        "switchTabs": "Onglet précédent / suivant"
+      }
     }
   },
   "smartIndex": {},
@@ -1359,8 +1415,8 @@
       }
     },
     "command": {
-      "searchTitle": "Recherche",
-      "searchDescription": "Rechercher des tâches, documents et projets"
+      "searchTitle": "Recherche et commandes",
+      "searchDescription": "Rechercher dans votre travail ou lancer une commande"
     },
     "editorBanners": {
       "fileMoved": {

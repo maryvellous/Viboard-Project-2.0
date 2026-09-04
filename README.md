@@ -57,7 +57,7 @@ It's especially useful for people who manage several streams of work and care ab
 - **Documents and meetings.** A WYSIWYG Markdown editor, nested folders, meeting
   notes, and drag-and-drop conversion from Word, PDF, Excel, CSV, and HTML.
 - **Made for daily use.** Workspace switching, persistent editor tabs, global
-  search, keyboard shortcuts, and protection for unsaved work.
+  search and quick actions, keyboard shortcuts, and protection for unsaved work.
 - **Files that remain files.** Ordinary filesystem tools can open, back up, sync,
   search, and version the workspace.
 

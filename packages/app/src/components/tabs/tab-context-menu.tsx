@@ -9,6 +9,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import type { TabItem } from "@/stores/tabs";
+import { isMacOS } from "@desk/core";
+import { getKeyboardShortcutLabel } from "@/lib/keyboard-shortcuts";
 
 interface TabContextMenuProps {
   tab: TabItem;
@@ -42,8 +44,7 @@ export function TabContextMenu({
         {!tab.isPinned && (
           <ContextMenuItem onClick={handleClose}>
             {t("menus.tabContextMenu.close")}
-            {/* eslint-disable-next-line i18next/no-literal-string -- keyboard shortcut label, not translatable */}
-            <ContextMenuShortcut>Cmd+W</ContextMenuShortcut>
+            <ContextMenuShortcut>{getKeyboardShortcutLabel("close-tab", isMacOS())}</ContextMenuShortcut>
           </ContextMenuItem>
         )}
         <ContextMenuItem

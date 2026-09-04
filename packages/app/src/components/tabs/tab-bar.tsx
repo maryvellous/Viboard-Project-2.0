@@ -20,6 +20,7 @@ import {
   getEditorSessionStatus,
 } from "@/lib/editor-session-controller";
 import { toast } from "sonner";
+import { matchesKeyboardShortcut } from "@/lib/keyboard-shortcuts";
 
 const TAB_WIDTH = 150;        // px — uniform width for the desk tab and content tabs (w-[150px])
 const TAB_GAP = 4;            // gap-1 between tabs
@@ -318,7 +319,7 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "w") {
+      if (matchesKeyboardShortcut(e, "close-tab")) {
         const activeTab = tabs.find((t) => t.id === activeTabId);
         if (activeTab && !activeTab.isPinned) {
           e.preventDefault();
@@ -326,12 +327,12 @@ export function TabBar({ inTitleBar = false }: TabBarProps) {
         }
       }
 
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (matchesKeyboardShortcut(e, "previous-tab") || matchesKeyboardShortcut(e, "next-tab")) {
         const currentIndex = tabs.findIndex((t) => t.id === activeTabId);
-        if (e.key === "[" && currentIndex > 0) {
+        if (matchesKeyboardShortcut(e, "previous-tab") && currentIndex > 0) {
           e.preventDefault();
           setActiveTab(tabs[currentIndex - 1].id);
-        } else if (e.key === "]" && currentIndex < tabs.length - 1) {
+        } else if (matchesKeyboardShortcut(e, "next-tab") && currentIndex < tabs.length - 1) {
           e.preventDefault();
           setActiveTab(tabs[currentIndex + 1].id);
         }

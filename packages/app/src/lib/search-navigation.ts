@@ -3,6 +3,25 @@ interface SearchProjectRef {
   workspaceId: string;
 }
 
+interface PaletteRouteNavigation {
+  confirmUnsavedChanges: () => boolean;
+  beforeNavigate?: () => void;
+  activateDesk: () => void;
+  navigate: (path: string) => void;
+}
+
+/** Navigate from the command palette, whose programmatic route change bypasses link guards. */
+export function openPaletteRoute(
+  path: string,
+  navigation: PaletteRouteNavigation,
+): boolean {
+  if (!navigation.confirmUnsavedChanges()) return false;
+  navigation.beforeNavigate?.();
+  navigation.activateDesk();
+  navigation.navigate(path);
+  return true;
+}
+
 interface SearchProjectNavigation {
   currentWorkspaceId: string | null;
   setCurrentWorkspaceId: (workspaceId: string) => void;

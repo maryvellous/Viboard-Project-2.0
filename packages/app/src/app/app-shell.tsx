@@ -14,7 +14,7 @@ import { useProjectSelectionStore } from "@/stores/project-selection";
 import { needsTrafficLightPadding, isTauri } from "@desk/core";
 import { AIConsentDialog } from "@/components/ai/ai-consent-dialog";
 import { AppBootScreen } from "./boot-screen";
-import { GlobalSearch } from "@/components/global-search";
+import { CommandPalette } from "@/components/command-palette";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -151,7 +151,7 @@ export function AppShell({ children }: AppShellProps) {
         </main>
       </div>
       <AIConsentDialog />
-      <GlobalSearch />
+      <CommandPalette />
     </div>
   );
 
