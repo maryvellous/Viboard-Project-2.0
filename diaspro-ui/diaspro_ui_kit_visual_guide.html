@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diaspro UI Kit — Visual Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root{
+      --canvas:#1e1333;
+      --card:#5c2a5c;
+      --plum:#833d6f;
+      --plum-muted:#785076;
+      --sage:#9ca98b;
+      --blue:#a8c6de;
+      --sand:#efdebd;
+      --terracotta:#8f5a5a;
+      --sidebar:#6e5a8e;
+      --lavender:#9a85c0;
+      --glass:rgba(43,28,71,.68);
+      --white:#fff;
+      --radius-bubbly:28px;
+      --radius-inner:18px;
+      --radius-pill:999px;
+      --shadow:0 16px 40px -10px rgba(0,0,0,.5);
+      --shadow-hover:0 24px 48px -10px rgba(0,0,0,.72);
+      --spring:cubic-bezier(.34,1.56,.64,1);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 85% 10%, rgba(154,133,192,.16), transparent 22%),
+        radial-gradient(circle at 10% 30%, rgba(143,90,90,.12), transparent 18%),
+        var(--canvas);
+      color:white;
+      font-family:Inter,system-ui,sans-serif;
+      min-height:100vh;
+    }
+
+    .page{
+      width:min(1180px, calc(100% - 32px));
+      margin:0 auto;
+      padding:42px 0 80px;
+    }
+
+    .eyebrow,
+    .micro{
+      font-family:"JetBrains Mono", monospace;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-weight:700;
+      font-size:11px;
+      color:rgba(168,198,222,.74);
+    }
+
+    h1,h2,h3{
+      font-family:Outfit,system-ui,sans-serif;
+      margin:0;
+    }
+
+    h1{
+      font-size:clamp(42px, 8vw, 86px);
+      line-height:.92;
+      font-weight:900;
+      letter-spacing:-.045em;
+    }
+
+    h2{
+      font-size:clamp(28px,4vw,44px);
+      font-weight:900;
+      letter-spacing:-.025em;
+    }
+
+    h3{
+      font-size:22px;
+      font-weight:800;
+    }
+
+    p{
+      line-height:1.65;
+      color:rgba(255,255,255,.76);
+      margin:0;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      min-height:430px;
+      border-radius:36px;
+      border:1px solid rgba(154,133,192,.28);
+      background:
+        linear-gradient(135deg, rgba(30,19,51,.96), rgba(92,42,92,.72) 55%, rgba(110,90,142,.74));
+      box-shadow:0 28px 70px -24px rgba(0,0,0,.78);
+      padding:44px;
+      display:flex;
+      align-items:flex-end;
+    }
+
+    .hero-copy{
+      position:relative;
+      z-index:5;
+      max-width:720px;
+    }
+
+    .hero p{
+      max-width:650px;
+      margin-top:20px;
+      font-size:17px;
+    }
+
+    .hero-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:7px 13px;
+      border-radius:var(--radius-pill);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:11px;
+      font-weight:800;
+      font-family:"JetBrains Mono",monospace;
+      box-shadow:0 4px 12px rgba(0,0,0,.18);
+    }
+
+    .pill.sand{background:rgba(239,222,189,.14); color:var(--sand); border-color:rgba(239,222,189,.28)}
+    .pill.sage{background:rgba(156,169,139,.14); color:var(--sage); border-color:rgba(156,169,139,.28)}
+    .pill.blue{background:rgba(168,198,222,.14); color:var(--blue); border-color:rgba(168,198,222,.28)}
+
+    .section{
+      margin-top:28px;
+      padding:34px;
+      border-radius:32px;
+      background:rgba(24,14,45,.42);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:24px;
+      align-items:flex-end;
+      margin-bottom:24px;
+    }
+
+    .section-head p{
+      max-width:640px;
+      font-size:14px;
+    }
+
+    .demo-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+    }
+
+    .glass{
+      background:var(--glass);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border:1px solid rgba(157,133,198,.22);
+      border-radius:22px;
+    }
+
+    .demo-box{
+      position:relative;
+      min-height:330px;
+      overflow:hidden;
+      padding:24px;
+    }
+
+    .note{
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .note strong{
+      color:var(--sand);
+      font-family:Outfit,system-ui,sans-serif;
+      font-size:17px;
+    }
+
+    /* LAVA */
+    @keyframes lavalamp{
+      0%{transform:translateY(0) scale(1); border-radius:60% 40% 70% 30%/50% 60% 40% 50%; opacity:0}
+      10%{opacity:1}
+      30%{border-radius:40% 60% 30% 70%/60% 40% 60% 40%; transform:translateY(-25vh) scale(1.15)}
+      55%{border-radius:70% 30% 50% 50%/30% 70% 50% 60%; transform:translateY(-50vh) scale(.9)}
+      75%{border-radius:35% 65% 65% 35%/55% 45% 55% 45%; transform:translateY(-75vh) scale(1.2)}
+      90%{opacity:.6}
+      100%{transform:translateY(-110vh) scale(.8); border-radius:50%; opacity:0}
+    }
+
+    .lava-canvas{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(110,90,142,.9), rgba(30,19,51,.96));
+    }
+
+    .lava-bubble{
+      position:absolute;
+      bottom:-120px;
+      filter:blur(6px);
+      animation:lavalamp linear infinite;
+      will-change:transform,border-radius,opacity;
+    }
+
+    .b1{left:7%;width:92px;height:92px;background:rgba(131,61,111,.55);animation-duration:12s}
+    .b2{left:28%;width:64px;height:64px;background:rgba(154,133,192,.48);animation-duration:15s;animation-delay:-3s}
+    .b3{left:52%;width:118px;height:118px;background:rgba(110,90,142,.5);animation-duration:18s;animation-delay:-7s}
+    .b4{left:72%;width:52px;height:52px;background:rgba(168,198,222,.36);animation-duration:11s;animation-delay:-1.5s}
+    .b5{left:84%;width:80px;height:80px;background:rgba(156,169,139,.4);animation-duration:14s;animation-delay:-9s}
+    .b6{left:40%;width:48px;height:48px;background:rgba(143,90,90,.4);animation-duration:16s;animation-delay:-5s}
+
+    .lava-overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      z-index:3;
+      padding:24px;
+      pointer-events:none;
+      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.12));
+    }
+
+    .lava-mini-ui{
+      display:flex;
+      gap:9px;
+      align-items:center;
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:var(--sand);
+      box-shadow:0 0 0 6px rgba(239,222,189,.08);
+    }
+
+    /* POST IT */
+    .postit-stage{
+      min-height:330px;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 60% 40%, rgba(168,198,222,.06), transparent 24%),
+        linear-gradient(145deg, rgba(92,42,92,.5), rgba(30,19,51,.85));
+    }
+
+    .postit{
+      position:relative;
+      width:min(280px, 80%);
+      min-height:240px;
+      background:linear-gradient(135deg,#efdebd 0%, rgba(239,222,189,.88) 100%);
+      color:var(--canvas);
+      padding:28px 24px 24px;
+      border-radius:16px;
+      box-shadow:0 16px 36px -4px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.08);
+      transform:rotate(-1.7deg);
+      transition:transform .25s var(--spring), box-shadow .25s ease;
+    }
+
+    .postit:hover{
+      transform:rotate(-.6deg) translateY(-5px);
+      box-shadow:0 22px 46px -6px rgba(0,0,0,.68),0 0 0 1px rgba(0,0,0,.08);
+    }
+
+    .postit::before{
+      content:"";
+      position:absolute;
+      top:-9px; left:50%;
+      transform:translateX(-50%);
+      width:66px;height:19px;
+      background:rgba(255,255,255,.58);
+      backdrop-filter:blur(4px);
+      border-radius:4px;
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
+    }
+
+    .postit .micro{color:rgba(30,19,51,.48)}
+    .postit p{color:rgba(30,19,51,.78)}
+    .postit .fake-handle{
+      margin-top:20px;
+      display:flex;
+      gap:8px;
+    }
+
+    .tiny-button{
+      border:0;
+      border-radius:999px;
+      padding:7px 10px;
+      background:rgba(30,19,51,.09);
+      color:var(--canvas);
+      font-family:"JetBrains Mono",monospace;
+      font-size:10px;
+      font-weight:700;
+    }
+
+    /* CARDS */
+    .cards-stage{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      padding:16px;
+      background:rgba(30,19,51,.66);
+      border-radius:26px;
+    }
+
+    .project-card{
+      min-height:185px;
+      border-radius:28px;
+      padding:22px;
+      color:var(--canvas);
+      box-shadow:var(--shadow);
+      transition:all .25s var(--spring);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .project-card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--shadow-hover);
+    }
+
+    .project-card.dark{color:white}
+    .theme-blue{background:var(--blue)}
+    .theme-sage{background:var(--sage)}
+    .theme-sand{background:var(--sand)}
+    .theme-plum{background:var(--plum)}
+    .theme-lavender{background:var(--lavender)}
+    .theme-terracotta{background:var(--terracotta)}
+
+    .inner-panel{
+      margin-top:18px;
+      border-radius:16px;
+      padding:12px;
+      background:rgba(30,19,51,.16);
+      border:1px solid rgba(30,19,51,.08);
+      font-size:12px;
+    }
+
+    .dark .inner-panel{
+      background:rgba(30,19,51,.34);
+      border-color:rgba(255,255,255,.1);
+    }
+
+    .tag-row{
+      display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;
+    }
+
+    .tag{
+      font-size:10px;
+      font-weight:800;
+      border-radius:999px;
+      padding:6px 9px;
+      background:rgba(30,19,51,.12);
+      font-family:"JetBrains Mono",monospace;
+    }
+
+    .dark .tag{background:rgba(255,255,255,.11)}
+
+    /* CALENDAR */
+    .calendar-shell{
+      background:rgba(92,42,92,.7);
+      padding:14px;
+      border-radius:28px;
+      border:1px solid rgba(154,133,192,.3);
+      box-shadow:0 18px 50px -15px rgba(0,0,0,.7);
+      position:relative;
+      min-height:150px;
+    }
+
+    .calendar-strip{
+      display:flex;
+      gap:7px;
+      height:118px;
+      overflow:hidden;
+    }
+
+    .day{
+      min-width:0;
+      flex:1;
+      padding:10px;
+      border-radius:17px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(30,19,51,.8);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      cursor:pointer;
+      transition:all .2s ease;
+    }
+
+    .day:hover{border-color:rgba(154,133,192,.55)}
+    .day.today{background:rgba(131,61,111,.42);border-color:rgba(239,222,189,.55)}
+    .day.selected{background:rgba(131,61,111,.82);border-color:var(--sand);box-shadow:0 10px 24px rgba(0,0,0,.28)}
+
+    .day-name{
+      color:var(--sand);
+      font-family:"JetBrains Mono",monospace;
+      font-size:9px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .day-date{
+      font-family:Outfit,system-ui,sans-serif;
+      font-size:11px;
+      font-weight:800;
+      margin-top:2px;
+    }
+
+    .event-count{
+      float:right;
+      font-family:"JetBrains Mono",monospace;
+      font-size:8px;
+      padding:3px 5px;
+      border-radius:999px;
+      background:rgba(156,169,139,.18);
+      color:var(--sage);
+      border:1px solid rgba(156,169,139,.38);
+    }
+
+    .events{
+      font-size:9px;
+      line-height:1.45;
+      color:rgba(255,255,255,.78);
+      overflow:hidden;
+    }
+
+    .more{
+      color:var(--blue);
+      font-family:"JetBrains Mono",monospace;
+      font-size:8px;
+    }
+
+    .calendar-overlay{
+      position:absolute;
+      inset:0;
+      z-index:20;
+      border-radius:28px;
+      background:linear-gradient(90deg,var(--plum),var(--card),var(--canvas));
+      border:2px solid var(--lavender);
+      box-shadow:0 22px 46px rgba(0,0,0,.55);
+      padding:18px;
+      display:none;
+    }
+
+    .calendar-overlay.show{display:block; animation:fadeIn .18s ease}
+    @keyframes fadeIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+
+    .overlay-head{
+      display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:12px;
+    }
+
+    .close{
+      border:0;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.25);
+      color:rgba(255,255,255,.72);
+      font-family:"JetBrains Mono",monospace;
+      font-size:10px;
+      cursor:pointer;
+    }
+
+    .overlay-events{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+
+    .overlay-event{
+      padding:10px;
+      border-radius:13px;
+      background:rgba(30,19,51,.7);
+      border:1px solid rgba(255,255,255,.09);
+      font-size:11px;
+    }
+
+    /* FOUNDATIONS */
+    .foundation-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .foundation-card{
+      padding:22px;
+      border-radius:22px;
+      background:rgba(43,28,71,.62);
+      border:1px solid rgba(157,133,198,.18);
+      min-height:180px;
+    }
+
+    .swatches{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:7px;
+      margin-top:16px;
+    }
+
+    .swatch{
+      aspect-ratio:1;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+
+    .type-demo{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      margin-top:15px;
+    }
+
+    .type-heading{font-family:Outfit;font-size:28px;font-weight:900}
+    .type-body{font-family:Inter;font-size:14px}
+    .type-mono{font-family:"JetBrains Mono";font-size:11px;color:var(--blue);letter-spacing:.08em;text-transform:uppercase}
+
+    .radius-demo{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+      align-items:end;
+    }
+
+    .r1,.r2,.r3{background:linear-gradient(135deg,var(--lavender),var(--plum));}
+    .r1{width:58px;height:58px;border-radius:12px}
+    .r2{width:72px;height:72px;border-radius:22px}
+    .r3{width:88px;height:88px;border-radius:28px}
+
+    .motion-button{
+      margin-top:18px;
+      display:inline-flex;
+      padding:10px 15px;
+      border-radius:999px;
+      background:var(--lavender);
+      color:white;
+      font-family:Outfit;
+      font-weight:800;
+      box-shadow:0 4px 14px rgba(0,0,0,.28);
+      transition:all .2s var(--spring);
+    }
+
+    .motion-button:hover{
+      transform:translateY(-3px) scale(1.02);
+      box-shadow:0 10px 24px rgba(0,0,0,.38);
+    }
+
+    .footer{
+      margin-top:26px;
+      padding:22px 4px 0;
+      color:rgba(255,255,255,.42);
+      font-size:12px;
+      font-family:"JetBrains Mono",monospace;
+    }
+
+    @media(max-width:900px){
+      .demo-grid,.foundation-grid{grid-template-columns:1fr}
+      .cards-stage{grid-template-columns:1fr}
+      .hero{padding:28px;min-height:360px}
+      .section{padding:24px}
+      .calendar-strip{gap:5px}
+      .day{padding:8px}
+      .day:nth-child(n+7){display:none}
+    }
+
+    @media(max-width:620px){
+      .page{width:min(100% - 18px, 1180px);padding-top:10px}
+      .hero{border-radius:24px}
+      .section{border-radius:24px}
+      .calendar-strip .day:nth-child(n+5){display:none}
+      .overlay-events{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="lava-canvas" aria-hidden="true">
+        <span class="lava-bubble b1"></span>
+        <span class="lava-bubble b2"></span>
+        <span class="lava-bubble b3"></span>
+        <span class="lava-bubble b4"></span>
+        <span class="lava-bubble b5"></span>
+        <span class="lava-bubble b6"></span>
+      </div>
+
+      <div class="lava-overlay" aria-hidden="true">
+        <div class="lava-mini-ui">
+          <span class="dot"></span>
+          <span class="micro" style="color:rgba(255,255,255,.7)">Diaspro ambient layer</span>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <div class="eyebrow">Diaspro UI Kit — Visual Guide</div>
+        <h1>Una UI morbida, scura e un po' fisica.</h1>
+        <p>
+          Questo documento raccoglie gli elementi più riconoscibili emersi da Viboard:
+          movimento ambientale, superfici morbide, oggetti che sembrano reali e microinformazioni compatte.
+        </p>
+        <div class="hero-tags">
+          <span class="pill sand">Lava</span>
+          <span class="pill sage">Post-it</span>
+          <span class="pill blue">Cards</span>
+          <span class="pill sand">Calendar Strip</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">01 · Signature motion</div>
+          <h2>Diaspro Lava</h2>
+        </div>
+        <p>
+          Non semplici pallini: blob semitrasparenti che salgono a velocità diverse,
+          cambiano scala, opacità e forma durante il percorso. Devono vivere dietro al contenuto,
+          come atmosfera, mai come protagonista.
+        </p>
+      </div>
+
+      <div class="demo-grid">
+        <div class="demo-box glass">
+          <div class="lava-canvas">
+            <span class="lava-bubble b1"></span>
+            <span class="lava-bubble b2"></span>
+            <span class="lava-bubble b3"></span>
+            <span class="lava-bubble b4"></span>
+            <span class="lava-bubble b5"></span>
+            <span class="lava-bubble b6"></span>
+          </div>
+          <div class="lava-overlay">
+            <div class="micro" style="color:rgba(255,255,255,.58)">vertical / ambient</div>
+            <div>
+              <h3>Movimento organico</h3>
+              <p style="margin-top:8px;max-width:420px">
+                Il contenuto resta leggibile sopra. La lava serve a dare vita a una superficie piatta.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="note glass">
+          <strong>Cosa va preservato</strong>
+          <p>
+            Blur morbido, palette Diaspro, partenze sfalsate, dimensioni differenti e soprattutto
+            la deformazione continua del border-radius. La sidebar è il riferimento canonico;
+            il banner mostra invece come l'effetto si adatta a superfici larghe.
+          </p>
+          <div class="tag-row">
+            <span class="tag">slow motion</span>
+            <span class="tag">blur</span>
+            <span class="tag">organic</span>
+            <span class="tag">background only</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">02 · Physical object</div>
+          <h2>Diaspro Post-it</h2>
+        </div>
+        <p>
+          Il post-it deve sembrare un oggetto appoggiato sopra l'interfaccia, non una card gialla.
+          La piccola imperfezione visiva è parte del componente.
+        </p>
+      </div>
+
+      <div class="demo-grid">
+        <div class="postit-stage glass">
+          <article class="postit">
+            <div class="micro">nota veloce</div>
+            <h3 style="margin-top:8px">Ricordati di non normalizzarlo troppo.</h3>
+            <p style="margin-top:10px">
+              Carta calda, rotazione minima, ombra forte e nastro adesivo superiore.
+            </p>
+            <div class="fake-handle">
+              <button class="tiny-button">trascina</button>
+              <button class="tiny-button">chiudi</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="note glass">
+          <strong>La sensazione conta più della geometria</strong>
+          <p>
+            Il valore è nell'illusione fisica: sembra indipendente dal layout e appoggiato sopra.
+            Floating e overlay sono due usi dello stesso linguaggio.
+          </p>
+          <div class="tag-row">
+            <span class="tag">paper</span>
+            <span class="tag">tape</span>
+            <span class="tag">rotation</span>
+            <span class="tag">deep shadow</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 · Core surfaces</div>
+          <h2>Diaspro Cards</h2>
+        </div>
+        <p>
+          Le card della pagina Progetti sono la grammatica visiva principale:
+          grandi raggi, colori pastello smorzati, profondità e un hover leggermente elastico.
+        </p>
+      </div>
+
+      <div class="cards-stage">
+        <article class="project-card theme-blue">
+          <div>
+            <div class="micro" style="color:rgba(30,19,51,.52)">Cliente</div>
+            <h3 style="margin-top:6px">Diaspro Website</h3>
+            <div class="tag-row">
+              <span class="tag">astro</span>
+              <span class="tag">brand</span>
+            </div>
+          </div>
+          <div class="inner-panel">Prossimo passo: rifinire portfolio e microinterazioni.</div>
+        </article>
+
+        <article class="project-card theme-sage">
+          <div>
+            <div class="micro" style="color:rgba(30,19,51,.52)">Tool</div>
+            <h3 style="margin-top:6px">Initiative Tracker</h3>
+            <div class="tag-row">
+              <span class="tag">utility</span>
+              <span class="tag">d&d</span>
+            </div>
+          </div>
+          <div class="inner-panel">UI compatta e immediata, niente rumore inutile.</div>
+        </article>
+
+        <article class="project-card theme-plum dark">
+          <div>
+            <div class="micro" style="color:rgba(255,255,255,.5)">Archivio</div>
+            <h3 style="margin-top:6px">Ala Temporis</h3>
+            <div class="tag-row">
+              <span class="tag">worldbuilding</span>
+              <span class="tag">maps</span>
+            </div>
+          </div>
+          <div class="inner-panel">Card scura = più profonda, non più corporate.</div>
+        </article>
+
+        <article class="project-card theme-sand">
+          <div>
+            <div class="micro" style="color:rgba(30,19,51,.52)">Esperimento</div>
+            <h3 style="margin-top:6px">UI Extractor</h3>
+            <div class="tag-row">
+              <span class="tag">system</span>
+              <span class="tag">reuse</span>
+            </div>
+          </div>
+          <div class="inner-panel">Colori diversi, stessa identità.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">04 · Compact information</div>
+          <h2>Diaspro Calendar Strip</h2>
+        </div>
+        <p>
+          Il punto forte è la compattezza: giorni distribuiti nella larghezza disponibile,
+          pochi eventi leggibili subito e dettaglio che appare sopra la strip senza far saltare il layout.
+        </p>
+      </div>
+
+      <div class="calendar-shell">
+        <div class="calendar-strip" id="calendarStrip"></div>
+
+        <div class="calendar-overlay" id="calendarOverlay">
+          <div class="overlay-head">
+            <div>
+              <div class="micro" style="color:var(--sand)">dettaglio giorno</div>
+              <h3 id="overlayTitle" style="margin-top:4px">Mer 9 set</h3>
+            </div>
+            <button class="close" onclick="closeOverlay()">✕ Chiudi</button>
+          </div>
+          <div class="overlay-events" id="overlayEvents"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">05 · Foundations</div>
+          <h2>I dettagli che tengono insieme tutto</h2>
+        </div>
+        <p>
+          Questi non sono componenti autonomi, ma regole da mantenere perché Lava, Post-it,
+          Cards e Calendar continuino a sembrare parte della stessa famiglia.
+        </p>
+      </div>
+
+      <div class="foundation-grid">
+        <div class="foundation-card">
+          <div class="micro">Palette</div>
+          <h3 style="margin-top:6px">Pastelli smorzati su fondo prugna</h3>
+          <div class="swatches">
+            <div class="swatch" style="background:var(--lavender)"></div>
+            <div class="swatch" style="background:var(--blue)"></div>
+            <div class="swatch" style="background:var(--sage)"></div>
+            <div class="swatch" style="background:var(--sand)"></div>
+            <div class="swatch" style="background:var(--terracotta)"></div>
+          </div>
+        </div>
+
+        <div class="foundation-card">
+          <div class="micro">Typography</div>
+          <div class="type-demo">
+            <div class="type-heading">Outfit</div>
+            <div class="type-body">Inter per il corpo e la lettura lunga.</div>
+            <div class="type-mono">JetBrains Mono / micro label</div>
+          </div>
+        </div>
+
+        <div class="foundation-card">
+          <div class="micro">Bubbly geometry</div>
+          <h3 style="margin-top:6px">Raggi morbidi, ma gerarchici</h3>
+          <div class="radius-demo">
+            <div class="r1"></div>
+            <div class="r2"></div>
+            <div class="r3"></div>
+          </div>
+        </div>
+
+        <div class="foundation-card">
+          <div class="micro">Glass surface</div>
+          <h3 style="margin-top:6px">Viola trasparente + blur</h3>
+          <p style="margin-top:10px">
+            Utile quando non serve una card colorata ma vuoi comunque profondità.
+          </p>
+        </div>
+
+        <div class="foundation-card">
+          <div class="micro">Micro labels</div>
+          <h3 style="margin-top:6px">Piccole, mono, dense</h3>
+          <div class="tag-row">
+            <span class="pill blue">3ev</span>
+            <span class="pill sand">Oggi</span>
+            <span class="pill sage">Ctrl+K</span>
+          </div>
+        </div>
+
+        <div class="foundation-card">
+          <div class="micro">Motion</div>
+          <h3 style="margin-top:6px">Hover leggermente elastico</h3>
+          <span class="motion-button">Passami sopra</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Diaspro UI Kit · visual reference prototype · standalone HTML
+    </div>
+  </main>
+
+  <script>
+    const days = [
+      {name:'ven',date:'4 set',events:['Call cliente','Fix homepage'],today:true},
+      {name:'sab',date:'5 set',events:[]},
+      {name:'dom',date:'6 set',events:['Revisione copy']},
+      {name:'lun',date:'7 set',events:['Deploy','Preventivo','Follow-up']},
+      {name:'mar',date:'8 set',events:[]},
+      {name:'mer',date:'9 set',events:['Design review','Contabilità']},
+      {name:'gio',date:'10 set',events:['Consegna asset']},
+      {name:'ven',date:'11 set',events:[]},
+      {name:'sab',date:'12 set',events:['Backup']},
+      {name:'dom',date:'13 set',events:['Planning','Email','Refactor','QA']}
+    ];
+
+    const strip = document.getElementById('calendarStrip');
+    const overlay = document.getElementById('calendarOverlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayEvents = document.getElementById('overlayEvents');
+
+    days.forEach((d, i) => {
+      const el = document.createElement('div');
+      el.className = 'day' + (d.today ? ' today' : '');
+      const visible = d.events.slice(0,2);
+      el.innerHTML = `
+        <div>
+          <span class="event-count">${d.events.length}ev</span>
+          <div class="day-name">${d.name}</div>
+          <div class="day-date">${d.date}</div>
+        </div>
+        <div class="events">
+          ${d.events.length === 0
+            ? '<span style="opacity:.34;font-family:JetBrains Mono,monospace;font-size:9px;font-style:italic">Libero</span>'
+            : visible.map(e => `<div>• ${e}</div>`).join('')
+          }
+          ${d.events.length > 2 ? `<div class="more">+${d.events.length - 2}</div>` : ''}
+        </div>
+      `;
+      el.addEventListener('click', () => openDay(i, el));
+      strip.appendChild(el);
+    });
+
+    function openDay(index, el){
+      document.querySelectorAll('.day').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const d = days[index];
+      overlayTitle.textContent = `${d.name} ${d.date}`;
+      overlayEvents.innerHTML = d.events.length
+        ? d.events.map((e, idx) => `
+            <div class="overlay-event">
+              <strong>${e}</strong>
+              <div style="font-family:JetBrains Mono,monospace;color:var(--blue);font-size:9px;margin-top:3px">
+                ${idx % 2 === 0 ? '10:00' : '15:30'}
+              </div>
+            </div>
+          `).join('')
+        : '<div class="overlay-event">Nessun evento registrato per questa data.</div>';
+
+      overlay.classList.add('show');
+    }
+
+    function closeOverlay(){
+      overlay.classList.remove('show');
+      document.querySelectorAll('.day').forEach(x => x.classList.remove('selected'));
+    }
+  </script>
+</body>
+</html>

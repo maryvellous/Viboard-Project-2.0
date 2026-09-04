@@ -1,0 +1,263 @@
+/**
+ * Diaspro Cards — famiglia di card della pagina Progetti.
+ *
+ * Riferimento canonico: src/index.css + src/components/ProjectsView.jsx
+ *   (.dashboard-card, .theme-*, .badge-pill, .action-pill,
+ *    .card-commit-block, .card-bottom-actions, .task-sticker-badge).
+ *
+ * Namespace `.diaspro-card`. Non è un design system completo: solo la
+ * grammatica visiva necessaria a ricreare la vibe della pagina Progetti.
+ */
+
+/* ── Card base ───────────────────────────────────────────── */
+.diaspro-card {
+  --diaspro-card-fg: #1e1333; /* colore "on" (sovrascritto dalle varianti) */
+
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--diaspro-space-card);
+  border-radius: var(--diaspro-radius-card);
+  box-shadow: var(--diaspro-shadow-card);
+  transition: all 0.25s var(--diaspro-ease-bounce);
+  overflow-wrap: break-word;
+}
+.diaspro-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--diaspro-shadow-card-hover);
+}
+
+/* ── Varianti colore (8 temi della pagina Progetti) ──────── */
+.diaspro-card--blue       { --diaspro-card-fg: #1e1333; background-color: var(--diaspro-blue);       color: #1e1333; }
+.diaspro-card--sage       { --diaspro-card-fg: #1e1333; background-color: var(--diaspro-sage);       color: #1e1333; }
+.diaspro-card--sand       { --diaspro-card-fg: #1e1333; background-color: var(--diaspro-sand);       color: #1e1333; }
+.diaspro-card--lavender   { --diaspro-card-fg: #ffffff; background-color: var(--diaspro-lavender);   color: #ffffff; }
+.diaspro-card--plum       { --diaspro-card-fg: #ffffff; background-color: var(--diaspro-plum);       color: #ffffff; }
+.diaspro-card--terracotta { --diaspro-card-fg: #ffffff; background-color: var(--diaspro-terracotta); color: #ffffff; }
+.diaspro-card--warm-sand  { --diaspro-card-fg: #ffffff; background-color: var(--diaspro-plum-muted); color: #ffffff; }
+.diaspro-card--default    {
+  --diaspro-card-fg: #ffffff;
+  background-color: var(--diaspro-card);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── Blocco titolo ───────────────────────────────────────── */
+.diaspro-card__head {
+  margin-bottom: var(--diaspro-space-section);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.diaspro-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.diaspro-card__title {
+  margin: 0;
+  font-family: var(--diaspro-font-heading);
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1.3;
+  color: inherit;
+}
+.diaspro-card__subtitle {
+  margin-top: 8px;
+  font-family: var(--diaspro-font-code);
+  font-size: 12px;
+  line-height: 1.4;
+  color: inherit;
+  opacity: 0.7;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+.diaspro-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* Piccolo chip icona (es. spilla "fissato") */
+.diaspro-card__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--diaspro-radius-chip);
+  background: var(--diaspro-sand);
+  color: var(--diaspro-canvas);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+/* ── Badge / pill ────────────────────────────────────────── */
+.diaspro-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: var(--diaspro-space-section);
+}
+.diaspro-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  min-height: 28px;
+  border-radius: var(--diaspro-radius-pill);
+  font-family: var(--diaspro-font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  box-shadow: var(--diaspro-shadow-pill);
+}
+
+/* Badge "solido" (elemento scuro interno, testo sabbia) */
+.diaspro-card__badge--solid {
+  background: var(--diaspro-canvas);
+  color: var(--diaspro-sand);
+  border: 1px solid rgba(239, 222, 189, 0.4);
+}
+
+/* Badge "accento" (sidebar + lavanda) */
+.diaspro-card__badge--accent {
+  background: rgba(110, 90, 142, 0.6);
+  color: var(--diaspro-lavender);
+  border: 1px solid rgba(154, 133, 192, 0.4);
+}
+
+/* Badge "ghost" (si adatta al tono della card via --diaspro-card-fg) */
+.diaspro-card__badge--ghost {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+@supports (background: color-mix(in srgb, red 50%, white)) {
+  .diaspro-card__badge--ghost {
+    background: color-mix(in srgb, var(--diaspro-card-fg) 15%, transparent);
+    color: var(--diaspro-card-fg);
+    border-color: color-mix(in srgb, var(--diaspro-card-fg) 25%, transparent);
+  }
+}
+
+/* ── Pannello interno scuro ──────────────────────────────── */
+.diaspro-card__panel {
+  margin-bottom: var(--diaspro-space-section);
+  padding: var(--diaspro-space-panel);
+  border-radius: var(--diaspro-radius-panel);
+  background: rgba(30, 19, 51, 0.6); /* bg-canvas/60 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.diaspro-card__panel-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: var(--diaspro-font-code);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--diaspro-lavender);
+}
+.diaspro-card__panel-text {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Azioni in fondo ─────────────────────────────────────── */
+.diaspro-card__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--diaspro-space-section);
+  padding-top: var(--diaspro-space-section);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+@supports (background: color-mix(in srgb, red 50%, white)) {
+  .diaspro-card__actions {
+    border-top-color: color-mix(in srgb, var(--diaspro-card-fg) 15%, transparent);
+  }
+}
+
+.diaspro-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  min-height: 36px;
+  border: none;
+  border-radius: var(--diaspro-radius-pill);
+  font-family: var(--diaspro-font-heading);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  box-shadow: var(--diaspro-shadow-pill-strong);
+  cursor: pointer;
+  transition: all 0.2s var(--diaspro-ease-bounce);
+}
+.diaspro-card__action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+.diaspro-card__action--solid {
+  background: var(--diaspro-sand);
+  color: var(--diaspro-canvas);
+}
+.diaspro-card__action--accent {
+  background: var(--diaspro-sidebar);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.diaspro-card__action--accent:hover { background: var(--diaspro-plum); }
+.diaspro-card__action--ghost {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+@supports (background: color-mix(in srgb, red 50%, white)) {
+  .diaspro-card__action--ghost {
+    background: color-mix(in srgb, var(--diaspro-card-fg) 10%, transparent);
+    color: var(--diaspro-card-fg);
+    border-color: color-mix(in srgb, var(--diaspro-card-fg) 20%, transparent);
+  }
+}
+
+/* ── Badge "sticker" a gradiente ─────────────────────────── */
+.diaspro-card__sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 28px;
+  border: none;
+  border-radius: var(--diaspro-radius-chip);
+  background: linear-gradient(135deg, var(--diaspro-plum) 0%, var(--diaspro-lavender) 100%);
+  color: #ffffff;
+  font-family: var(--diaspro-font-body);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(131, 61, 111, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.diaspro-card__sticker:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(131, 61, 111, 0.5);
+}
+

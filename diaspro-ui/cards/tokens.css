@@ -1,0 +1,46 @@
+/**
+ * Diaspro Cards — token condivisi (colori e valori necessari alle card).
+ *
+ * Riferimento: src/index.css (:root, @theme) di Diaspro Viboard.
+ * Tutti i token sono prefissati `--diaspro-` per convivere senza collisioni
+ * con le variabili originali di Viboard.
+ */
+
+:root {
+  /* ── Palette (10 colori ufficiali) ─────────────────────── */
+  --diaspro-canvas: #1e1333;
+  --diaspro-card: #5c2a5c;
+  --diaspro-plum: #833d6f;
+  --diaspro-plum-muted: #785076;
+  --diaspro-sage: #9ca98b;
+  --diaspro-blue: #a8c6de;
+  --diaspro-sand: #efdebd;
+  --diaspro-terracotta: #8f5a5a;
+  --diaspro-sidebar: #6e5a8e;
+  --diaspro-lavender: #9a85c0;
+
+  /* ── Tipografia ────────────────────────────────────────── */
+  --diaspro-font-heading: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --diaspro-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --diaspro-font-code: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* ── Border-radius ─────────────────────────────────────── */
+  --diaspro-radius-card: 28px;
+  --diaspro-radius-panel: 18px;
+  --diaspro-radius-chip: 12px;
+  --diaspro-radius-pill: 9999px;
+
+  /* ── Ombre / profondità ────────────────────────────────── */
+  --diaspro-shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.5);
+  --diaspro-shadow-card-hover: 0 24px 48px -10px rgba(0, 0, 0, 0.7);
+  --diaspro-shadow-pill: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --diaspro-shadow-pill-strong: 0 4px 14px rgba(0, 0, 0, 0.3);
+
+  /* ── Spaziature ricorrenti ─────────────────────────────── */
+  --diaspro-space-card: 32px;
+  --diaspro-space-section: 24px;
+  --diaspro-space-panel: 16px;
+
+  /* ── Easing "giocoso" ──────────────────────────────────── */
+  --diaspro-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}

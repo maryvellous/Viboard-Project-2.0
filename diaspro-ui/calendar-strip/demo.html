@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diaspro Calendar Strip — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./calendar-strip.css" />
+  <style>
+    /* Scaffolding demo — NON fa parte del componente riutilizzabile */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: #1e1333; color: #fff;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      padding: 48px 24px 96px;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { max-width: 900px; margin: 0 auto 40px; text-align: center; }
+    header h1 {
+      margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #efdebd, #9a85c0, #a8c6de);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    header p { margin: 8px 0 0; color: rgba(255,255,255,0.55); font-size: 13px; letter-spacing: 0.5px; }
+    .demo-wrap { max-width: 900px; margin: 0 auto; }
+    .demo-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: #9a85c0; margin-bottom: 14px;
+    }
+    .demo-hint { color: rgba(255,255,255,0.45); font-size: 12px; margin-top: 14px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diaspro Calendar Strip</h1>
+    <p>Striscia 10 giorni — stati normale / oggi / selezionato, eventi e overlay</p>
+  </header>
+
+  <main class="demo-wrap">
+    <div class="demo-label">Striscia 10 Giorni · clicca un giorno per il dettaglio</div>
+    <div id="strip"></div>
+    <p class="demo-hint">
+      Giorni vuoti → «Libero» (0ev) · giorni con 1–2 eventi · giorni pieni → «+N» · «Oggi» evidenziato.
+      L'overlay si apre in assoluto sopra la strip senza cambiare altezza o layout.
+    </p>
+  </main>
+
+  <script src="./calendar-strip.js"></script>
+  <script>
+    function iso(offset) {
+      var d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
+    }
+
+    var events = [
+      { date: iso(1), title: 'Standup team', time: '09:30' },
+      { date: iso(2), title: 'Revisione design', time: '11:00' },
+      { date: iso(2), title: 'Lunch con Giulia', time: '13:00' },
+      { date: iso(3), title: 'Call cliente', time: '10:00' },
+      { date: iso(3), title: 'Deep work', time: '14:00' },
+      { date: iso(3), title: 'Sync progetto', time: '16:30' },
+      { date: iso(3), title: 'Retro', time: '18:00' },
+      { date: iso(3), title: 'Pianificazione', time: '19:00' },
+      { date: iso(6), title: 'Scadenza bozza', time: '12:00' }
+    ];
+
+    var strip = DiasproCalendarStrip.create(document.getElementById('strip'), {
+      startDate: new Date(),
+      events: events,
+      onSelect: function (day) { console.log('giorno selezionato', day.iso, day.events.length + ' eventi'); }
+    });
+
+    // Overlay aperto di default sul giorno "pieno" (+3)
+    strip.select(iso(3));
+  </script>
+</body>
+</html>
