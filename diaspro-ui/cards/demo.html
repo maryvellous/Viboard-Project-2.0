@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diaspro Cards — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./tokens.css" />
+  <link rel="stylesheet" href="./cards.css" />
+  <style>
+    /* Scaffolding demo — NON fa parte del componente riutilizzabile */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: var(--diaspro-canvas); color: #fff;
+      font-family: var(--diaspro-font-body);
+      padding: 48px 24px 96px;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { max-width: 1080px; margin: 0 auto 40px; text-align: center; }
+    header h1 {
+      margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.5px;
+      background: linear-gradient(90deg, var(--diaspro-sand), var(--diaspro-lavender), var(--diaspro-blue));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    header p { margin: 8px 0 0; color: rgba(255,255,255,0.55); font-size: 13px; letter-spacing: 0.5px; }
+    .demo-grid {
+      max-width: 1080px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 32px; align-items: start;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diaspro Cards</h1>
+    <p>La grammatica visiva della pagina Progetti — card colorate, pill, badge e pannelli interni</p>
+  </header>
+
+  <main class="demo-grid">
+    <!-- 1 · Sabbia (chiara) -->
+    <article class="diaspro-card diaspro-card--sand">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">Atelier Diaspro</h3>
+          <span class="diaspro-card__chip">◆</span>
+        </div>
+        <p class="diaspro-card__subtitle">~/dev/atelier-diaspro</p>
+        <div class="diaspro-card__meta">◷ aggiornato 2 giorni fa</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--accent">Locale</span>
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ main</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ c3d4e5f</div>
+        <p class="diaspro-card__panel-text">feat(ui): card a 3 colonne con hover morbido</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--solid">Fetch</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+      </div>
+    </article>
+    <!-- 2 · Prugna (scura) -->
+    <article class="diaspro-card diaspro-card--plum">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">Diaspro Viboard</h3>
+          <span class="diaspro-card__chip">◆</span>
+        </div>
+        <p class="diaspro-card__subtitle">~/dev/diaspro-viboard</p>
+        <div class="diaspro-card__meta">◷ aggiornato oggi</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--solid">GitHub</span>
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ develop</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ a1b2c3d</div>
+        <p class="diaspro-card__panel-text">refactor(oauth): ciclo di vita callback single-use</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--accent">GitHub Web</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+        <span class="diaspro-card__sticker">3 task</span>
+      </div>
+    </article>
+
+    <!-- 3 · Azzurro (chiara) -->
+    <article class="diaspro-card diaspro-card--blue">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">Moodboard</h3>
+        </div>
+        <p class="diaspro-card__subtitle">~/projects/moodboard-2026</p>
+        <div class="diaspro-card__meta">◷ aggiornato 5 giorni fa</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ main</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ f6a7b8c</div>
+        <p class="diaspro-card__panel-text">docs: aggiunto quick start al README</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--solid">Apri</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+      </div>
+    </article>
+
+    <!-- 4 · Salvia (chiara) -->
+    <article class="diaspro-card diaspro-card--sage">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">CodeQuest</h3>
+          <span class="diaspro-card__chip">◆</span>
+        </div>
+        <p class="diaspro-card__subtitle">~/dev/codequest-sandbox</p>
+        <div class="diaspro-card__meta">◷ aggiornato 1 settimana fa</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--accent">Locale</span>
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ main</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ 9d0e1f2</div>
+        <p class="diaspro-card__panel-text">fix(sandbox): runner JS in Web Worker con lockdown</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--solid">Fetch</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+      </div>
+    </article>
+
+    <!-- 5 · Terracotta (scura) -->
+    <article class="diaspro-card diaspro-card--terracotta">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">Pinterest Hub</h3>
+        </div>
+        <p class="diaspro-card__subtitle">~/dev/pinterest-hub</p>
+        <div class="diaspro-card__meta">◷ aggiornato 3 ore fa</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--solid">GitHub</span>
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ release</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ 2b3c4d5</div>
+        <p class="diaspro-card__panel-text">feat(pinterest): bacheca moodboard sincronizzata</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--accent">GitHub Web</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+      </div>
+    </article>
+
+    <!-- 6 · Scuro cozy (default) -->
+    <article class="diaspro-card diaspro-card--default">
+      <header class="diaspro-card__head">
+        <div class="diaspro-card__title-row">
+          <h3 class="diaspro-card__title">Vault Personale</h3>
+          <span class="diaspro-card__chip">◆</span>
+        </div>
+        <p class="diaspro-card__subtitle">~/dev/vault-personale</p>
+        <div class="diaspro-card__meta">◷ aggiornato ieri</div>
+      </header>
+      <div class="diaspro-card__badges">
+        <span class="diaspro-card__badge diaspro-card__badge--accent">Locale</span>
+        <span class="diaspro-card__badge diaspro-card__badge--ghost">⎇ main</span>
+      </div>
+      <div class="diaspro-card__panel">
+        <div class="diaspro-card__panel-label">◈ e4f5a6b</div>
+        <p class="diaspro-card__panel-text">chore(vault): rotazione chiavi PBKDF2</p>
+      </div>
+      <div class="diaspro-card__actions">
+        <button class="diaspro-card__action diaspro-card__action--solid">Fetch</button>
+        <button class="diaspro-card__action diaspro-card__action--ghost">Dettagli</button>
+        <span class="diaspro-card__sticker">1 task</span>
+      </div>
+    </article>
+  </main>
+</body>
+</html>
+

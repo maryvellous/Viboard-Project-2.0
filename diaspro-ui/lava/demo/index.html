@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diaspro Lava — Demo</title>
+  <link rel="stylesheet" href="../lava.css" />
+  <style>
+    /* Demo scaffolding only — NOT part of the reusable component */
+    :root {
+      --canvas: #1e1333;
+      --card: #2b1c47;
+      --sidebar: #6e5a8e;
+      --lavender: #9a85c0;
+      --sand: #efdebd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--canvas);
+      color: #fff;
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      padding: 48px 24px;
+    }
+    header { max-width: 900px; margin: 0 auto 40px; text-align: center; }
+    header h1 {
+      margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -0.5px;
+      background: linear-gradient(90deg, var(--sand), var(--lavender), #a8c6de);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    header p { margin: 8px 0 0; color: rgba(255,255,255,0.55); font-size: 13px; letter-spacing: 0.5px; }
+    .demo { max-width: 900px; margin: 0 auto 48px; }
+    .demo-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--lavender); margin-bottom: 12px;
+    }
+    .demo-panel {
+      position: relative; overflow: hidden; width: 300px; height: 560px;
+      margin: 0 auto; background: var(--sidebar); border-radius: 22px;
+      box-shadow: 0 24px 60px -20px rgba(0,0,0,0.7);
+    }
+    .demo-banner {
+      position: relative; overflow: hidden; width: 100%; max-width: 900px;
+      height: 220px; margin: 0 auto; border-radius: 18px;
+      background: linear-gradient(135deg, #1e1333 0%, #2b1c47 55%, #6b5887 100%);
+      box-shadow: 0 24px 60px -20px rgba(0,0,0,0.7);
+    }
+    .demo-content {
+      position: relative; z-index: 1; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-panel .demo-content { flex-direction: column; gap: 14px; padding: 24px; }
+    .demo-chip {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: rgba(91, 42, 92, 0.85); border: 1px solid rgba(154,133,192,0.5);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .demo-banner .demo-title { text-align: center; }
+    .demo-banner h2 {
+      margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px;
+      background: linear-gradient(90deg, var(--sand), var(--lavender), #a8c6de);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .demo-banner .subtitle {
+      margin-top: 8px; font-size: 11px; font-weight: 600; letter-spacing: 4px;
+      color: rgba(232,209,158,0.65); text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diaspro Lava</h1>
+    <p>Effetto lava-lamp riutilizzabile — due configurazioni</p>
+  </header>
+
+  <section class="demo">
+    <div class="demo-label">1 · Pannello verticale — variant="panel"</div>
+    <div class="demo-panel" id="demo-panel">
+      <div class="demo-content">
+        <div class="demo-chip">◆</div>
+        <div class="demo-chip">◉</div>
+        <div class="demo-chip">▣</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo">
+    <div class="demo-label">2 · Hero / banner largo — variant="banner"</div>
+    <div class="demo-banner" id="demo-banner">
+      <div class="demo-content">
+        <div class="demo-title">
+          <h2>Diaspro Viboard</h2>
+          <div class="subtitle">Vibe &amp; Gamified Desktop Dashboard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    // Config mirrors DiasproLava.jsx presets (single source of truth).
+    const PANEL_BUBBLES = [
+      { size: 90, left: '12%', delay: 0, duration: 12 },
+      { size: 60, left: '55%', delay: 3.5, duration: 15 },
+      { size: 110, left: '30%', delay: 7, duration: 18 },
+      { size: 50, left: '70%', delay: 1.5, duration: 11 },
+      { size: 75, left: '45%', delay: 9, duration: 14 },
+      { size: 45, left: '20%', delay: 5, duration: 16 },
+    ];
+
+    const BANNER_BUBBLES = [
+      { size: 90, left: '12%', delay: 0, duration: 12 },
+      { size: 60, left: '55%', delay: -3.5, duration: 15 },
+      { size: 110, left: '30%', delay: -7, duration: 18 },
+      { size: 50, left: '70%', delay: -1.5, duration: 11 },
+      { size: 75, left: '45%', delay: -9, duration: 14 },
+      { size: 45, left: '20%', delay: -5, duration: 16 },
+      { size: 76, left: '84%', delay: -2, duration: 13 },
+      { size: 56, left: '94%', delay: -6, duration: 17 },
+    ];
+
+    const BUBBLE_COLORS = [
+      'rgba(131, 61, 111, 0.55)',
+      'rgba(154, 133, 192, 0.45)',
+      'rgba(110, 90, 142, 0.50)',
+      'rgba(168, 198, 222, 0.35)',
+      'rgba(156, 169, 139, 0.40)',
+      'rgba(143, 90, 90, 0.40)',
+    ];
+
+    const BANNER_COLORS = [
+      ...BUBBLE_COLORS,
+      'rgba(131, 61, 111, 0.38)',
+      'rgba(154, 133, 192, 0.32)',
+    ];
+
+    // Vanilla-JS renderer: identical output to <DiasproLava />.
+    function renderLava(host, bubbles, colors) {
+      const layer = document.createElement('div');
+      layer.className = 'diaspro-lava';
+      layer.setAttribute('aria-hidden', 'true');
+
+      bubbles.forEach((b, i) => {
+        const el = document.createElement('div');
+        el.className = 'diaspro-lava__bubble';
+        el.style.width = `${b.size}px`;
+        el.style.height = `${b.size}px`;
+        el.style.left = b.left;
+        el.style.bottom = `-${b.size}px`;
+        el.style.background = colors[i % colors.length];
+        el.style.animationDuration = `${b.duration}s`;
+        el.style.animationDelay = `${b.delay}s`;
+        layer.appendChild(el);
+      });
+
+      host.insertBefore(layer, host.firstChild);
+    }
+
+    renderLava(document.getElementById('demo-panel'), PANEL_BUBBLES, BUBBLE_COLORS);
+    renderLava(document.getElementById('demo-banner'), BANNER_BUBBLES, BANNER_COLORS);
+  </script>
+</body>
+</html>

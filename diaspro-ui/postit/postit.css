@@ -1,0 +1,251 @@
+/**
+ * Diaspro Post-it — elemento UI riutilizzabile.
+ *
+ * Riferimenti canonici:
+ *   - nota flottante : src/components/StickyNote.jsx (vista Oggi)
+ *   - post-it overlay: src/components/ProjectsView.jsx + src/index.css
+ *     (.postit-floating-overlay, .task-sticker-badge)
+ *
+ * Questo file è l'unica fonte di verità per l'aspetto. Tutto è namespace-izzato
+ * sotto `.diaspro-postit` (più `.diaspro-postit-trigger`) così convive senza
+ * collisioni con gli stili originali di Viboard.
+ */
+
+.diaspro-postit {
+  /* Token dell'elemento (sovrascrivibili dall'integratore) */
+  --diaspro-postit-paper: #efdebd;
+  --diaspro-postit-paper-soft: rgba(239, 222, 189, 0.93);
+  --diaspro-postit-ink: #1e1333;
+  --diaspro-postit-border: rgba(120, 80, 118, 0.55);
+  --diaspro-postit-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(154, 133, 192, 0.18);
+  --diaspro-postit-rotation: 0deg;
+
+  --diaspro-postit-font-code: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --diaspro-postit-font-heading: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  position: absolute;
+  box-sizing: border-box;
+  transform: rotate(var(--diaspro-postit-rotation));
+  will-change: transform;
+}
+
+/* ── Carta ───────────────────────────────────────────────── */
+.diaspro-postit__paper {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--diaspro-postit-border);
+  color: var(--diaspro-postit-ink);
+  box-shadow: var(--diaspro-postit-shadow);
+}
+
+/* Nastro adesivo superiore */
+.diaspro-postit__paper::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
+  z-index: 1;
+}
+
+/* ── Pulsante di chiusura ────────────────────────────────── */
+.diaspro-postit__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: rgba(30, 19, 51, 0.4);
+  border-radius: 6px;
+  transition: color 0.2s ease;
+}
+.diaspro-postit__close:hover {
+  color: #8f5a5a; /* terracotta */
+}
+
+/* ── Variante FLOTTANTE (vista Oggi) ─────────────────────── */
+.diaspro-postit--floating {
+  width: 210px;
+  min-height: 160px;
+  z-index: 20;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.diaspro-postit--floating .diaspro-postit__paper {
+  gap: 6px;
+  padding: 10px 12px 12px;
+  background: var(--diaspro-postit-paper-soft);
+  border-radius: 14px;
+}
+
+.diaspro-postit--dragging {
+  cursor: grabbing;
+}
+.diaspro-postit--dragging .diaspro-postit__paper {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(154, 133, 192, 0.22);
+}
+
+.diaspro-postit__bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.diaspro-postit__textarea {
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  width: 100%;
+  min-height: 100px;
+  font-family: var(--diaspro-postit-font-code);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--diaspro-postit-ink);
+  cursor: text;
+  touch-action: auto;
+}
+.diaspro-postit__textarea::placeholder {
+  color: rgba(30, 19, 51, 0.4);
+}
+/* ── Variante OVERLAY (card Progetti) ────────────────────── */
+.diaspro-postit--overlay {
+  --diaspro-postit-rotation: -1.5deg;
+  top: 16px;
+  right: 16px;
+  z-index: 40;
+  width: 260px;
+}
+.diaspro-postit--overlay .diaspro-postit__paper {
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #efdebd 0%, rgba(239, 222, 189, 0.85) 100%);
+  border-radius: 16px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  animation: diaspro-postit-fade-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes diaspro-postit-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.diaspro-postit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(120, 53, 15, 0.2); /* amber-900/20 */
+  padding-bottom: 10px;
+}
+
+.diaspro-postit__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--diaspro-postit-font-heading);
+  font-weight: 900;
+  font-size: 12px;
+  color: #451a03; /* amber-950 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+.diaspro-postit__title svg { flex-shrink: 0; }
+
+.diaspro-postit__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 192px; /* max-h-48 */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.diaspro-postit__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.diaspro-postit__footer:empty { display: none; }
+
+.diaspro-postit__form { display: flex; gap: 8px; }
+
+.diaspro-postit__input {
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
+  background: rgba(254, 243, 199, 0.9); /* amber-100/90 */
+  border: 1px solid rgba(120, 53, 15, 0.3); /* amber-900/30 */
+  color: #451a03; /* amber-950 */
+  font-family: inherit;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 8px 12px;
+  outline: none;
+}
+.diaspro-postit__input::placeholder { color: rgba(120, 53, 15, 0.5); }
+
+.diaspro-postit__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: #78350f; /* amber-900 */
+  color: #fef3c7; /* amber-100 */
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s ease;
+}
+.diaspro-postit__submit:hover { background: #451a03; } /* amber-950 */
+
+/* Scrollbar del body, coerente col tema */
+.diaspro-postit__body::-webkit-scrollbar { width: 6px; }
+.diaspro-postit__body::-webkit-scrollbar-track { background: transparent; }
+.diaspro-postit__body::-webkit-scrollbar-thumb {
+  background: rgba(120, 53, 15, 0.25);
+  border-radius: 9999px;
+}
+
+/* ── Trigger (facoltativo) per aprire/chiudere l'overlay ────
+   Replica del badge "task-sticker-badge" originale.        */
+.diaspro-postit-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #833d6f 0%, #9a85c0 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(131, 61, 111, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.diaspro-postit-trigger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(131, 61, 111, 0.5);
+}
+.diaspro-postit-trigger svg { flex-shrink: 0; }
+

@@ -1,0 +1,72 @@
+/**
+ * Diaspro Lava — reusable lava-lamp bubble layer.
+ *
+ * Canonical reference: src/components/Sidebar.jsx + src/index.css
+ *   (@keyframes lavalamp, .lava-bubble).
+ * Wide-container reference: public/banner.svg.
+ *
+ * This file is the single source of truth for the effect. It is fully
+ * namespaced under `.diaspro-lava` so it can live side-by-side with the
+ * original sidebar styles without collisions.
+ */
+
+/* The bubble layer fills its positioned parent (which must be
+   `position: relative` and have a definite size). */
+.diaspro-lava {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+
+  /* `container-type: size` unlocks container-relative units (cqh) so the
+     rise distance below scales to ANY container height, not the viewport.
+     In the canonical full-height sidebar `1cqh === 1vh`, so the result is
+     pixel-identical to the original there, and correct for short banners. */
+  container-type: size;
+}
+
+/*
+ * Exact replica of the canonical sidebar `@keyframes lavalamp`.
+ * The only change is vh → cqh (travel tracks the container height).
+ * Movement, deformation (border-radius morph), blur, opacity, scale and
+ * timing are unchanged.
+ */
+@keyframes diaspro-lava-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%;
+    transform: translateY(-25cqh) scale(1.15);
+  }
+  55% {
+    border-radius: 70% 30% 50% 50% / 30% 70% 50% 60%;
+    transform: translateY(-50cqh) scale(0.9);
+  }
+  75% {
+    border-radius: 35% 65% 65% 35% / 55% 45% 55% 45%;
+    transform: translateY(-75cqh) scale(1.2);
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-110cqh) scale(0.8);
+    border-radius: 50% 50% 50% 50%;
+    opacity: 0;
+  }
+}
+
+.diaspro-lava__bubble {
+  position: absolute;
+  border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+  animation: diaspro-lava-rise linear infinite;
+  will-change: transform, border-radius, opacity;
+  filter: blur(6px);
+}

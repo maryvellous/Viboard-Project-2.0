@@ -1,0 +1,253 @@
+/**
+ * Diaspro Calendar Strip — striscia 10 giorni riutilizzabile.
+ *
+ * Riferimento canonico: src/components/GoogleCalendarWidget.jsx
+ *   (VIEW MODE 2 "Striscia 10 Giorni": ribbon orizzontale + overlay click).
+ *
+ * Namespace `.diaspro-strip`. Nessuna dipendenza da Google Calendar,
+ * Electron, gamification o logica applicativa.
+ */
+
+.diaspro-strip {
+  /* Token dell'elemento (palette originale, autosufficiente) */
+  --ds-canvas: #1e1333;
+  --ds-card: #5c2a5c;
+  --ds-plum: #833d6f;
+  --ds-sand: #efdebd;
+  --ds-lavender: #9a85c0;
+  --ds-sage: #9ca98b;
+  --ds-blue: #a8c6de;
+  --ds-font-heading: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ds-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ds-font-code: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 140px;
+  padding: 12px;
+  border-radius: 24px;
+  background: var(--ds-card);
+  border: 1px solid rgba(154, 133, 192, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Ribbon (10 giorni, larghezza piena, altezza fissa) ── */
+.diaspro-strip__ribbon {
+  display: flex;
+  gap: 8px;
+  overflow-x: hidden; /* mai scroll orizzontale */
+  align-items: stretch;
+  height: 116px;
+}
+
+/* ── Giorno ─────────────────────────────────────────────── */
+.diaspro-strip__day {
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid;
+  background: var(--ds-canvas);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: var(--ds-font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+}
+.diaspro-strip__day:hover { border-color: rgba(154, 133, 192, 0.5); }
+
+.diaspro-strip__day--today {
+  background: rgba(131, 61, 111, 0.4);
+  border-color: rgba(239, 222, 189, 0.5);
+}
+.diaspro-strip__day--today:hover { border-color: rgba(239, 222, 189, 0.8); }
+
+.diaspro-strip__day--selected {
+  background: rgba(131, 61, 111, 0.8);
+  border-color: var(--ds-sand);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+.diaspro-strip__day-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+.diaspro-strip__day-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.diaspro-strip__day-name {
+  font-family: var(--ds-font-code);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--ds-sand);
+}
+.diaspro-strip__day-date {
+  font-family: var(--ds-font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.diaspro-strip__badge {
+  flex-shrink: 0;
+  font-family: var(--ds-font-code);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1.5px 6px;
+  border-radius: 9999px;
+  border: 1px solid;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.diaspro-strip__badge--filled {
+  background: rgba(156, 169, 139, 0.3);
+  color: var(--ds-sage);
+  border-color: rgba(156, 169, 139, 0.5);
+}
+
+/* ── Eventi del giorno ──────────────────────────────────── */
+.diaspro-strip__day-events {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.diaspro-strip__event {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.diaspro-strip__more {
+  font-family: var(--ds-font-code);
+  font-size: 9px;
+  color: var(--ds-blue);
+}
+.diaspro-strip__free {
+  font-family: var(--ds-font-code);
+  font-size: 10px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.3);
+}
+/* ── Overlay dettaglio (assoluto, sopra la strip) ──────── */
+.diaspro-strip__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 24px;
+  background: linear-gradient(90deg, var(--ds-plum), var(--ds-card), var(--ds-canvas));
+  border: 2px solid var(--ds-lavender);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: diaspro-strip-fade-in 0.2s ease;
+}
+@keyframes diaspro-strip-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.diaspro-strip__overlay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.diaspro-strip__overlay-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ds-font-heading);
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--ds-sand);
+}
+.diaspro-strip__today-badge {
+  font-family: var(--ds-font-code);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ds-sage);
+  background: rgba(156, 169, 139, 0.2);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(156, 169, 139, 0.4);
+}
+.diaspro-strip__close {
+  font-family: var(--ds-font-code);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.diaspro-strip__close:hover { color: #fff; background: rgba(0, 0, 0, 0.5); }
+
+.diaspro-strip__overlay-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-content: start;
+}
+@media (max-width: 560px) {
+  .diaspro-strip__overlay-list { grid-template-columns: 1fr; }
+}
+
+.diaspro-strip__overlay-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(30, 19, 51, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+.diaspro-strip__overlay-event-title {
+  margin: 0;
+  font-weight: 700;
+  color: #fff;
+}
+.diaspro-strip__overlay-event-time {
+  font-family: var(--ds-font-code);
+  font-size: 10px;
+  color: var(--ds-blue);
+}
+.diaspro-strip__overlay-empty {
+  grid-column: 1 / -1;
+  font-family: var(--ds-font-code);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 0;
+  margin: 0;
+}
+
