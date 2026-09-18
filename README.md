@@ -1,172 +1,105 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">
-    <img src="assets/banner-light.png" alt="desk.md, personal work management in plain Markdown" width="55%">
-  </picture>
-</p>
+# Viboard Project 2.0
 
-<p align="center">
-  <a href="./LICENSE"><img alt="License: GPL-3.0-or-later" src="https://img.shields.io/badge/license-GPL--3.0-blue.svg"></a>
-  <img alt="Built with Tauri" src="https://img.shields.io/badge/built%20with-Tauri-24C8DB.svg?logo=tauri&logoColor=white">
-  <img alt="React 19" src="https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=white">
-</p>
+Repository di esplorazione per una possibile seconda generazione di Viboard, basato su **desk.md**.
 
-<p align="center">
-  A calm personal workspace for projects, tasks, documents, meetings, and weekly planning.<br>
-  The source of truth stays plain Markdown, accessible to you and the agents you choose.
-</p>
+Questo repository è un fork di `v1lling/desk.md`: la codebase principale conserva ancora struttura, naming e architettura di Desk, mentre la cartella `diaspro-ui/` raccoglie materiale e prove visive per l'adattamento all'identità Diaspro/Viboard.
 
-<p align="center">
-  <a href="https://github.com/v1lling/desk.md/releases/latest"><b>Download Desk</b></a>
-  &nbsp;·&nbsp;
-  <a href="#self-host"><b>Self-host</b></a>
-  &nbsp;·&nbsp;
-  <a href="#run-from-source"><b>Run from source</b></a>
-</p>
+## Base tecnica
 
-<p align="center">
-  <picture>
-    <source media="(prefers-reduced-motion: reduce) and (prefers-color-scheme: dark)" srcset="assets/dashboard-dark.png">
-    <source media="(prefers-reduced-motion: reduce)" srcset="assets/dashboard-light.png">
-    <source media="(prefers-color-scheme: dark)" srcset="assets/tour-dark.gif">
-    <img src="assets/tour-light.gif" alt="A short tour through the dashboard, planner, tasks, documents, meetings, and a project in desk.md" width="100%">
-  </picture>
-</p>
+La base upstream è un workspace manager local-first in cui progetti, task, documenti e meeting restano file Markdown normali.
 
-<p align="center"><sub>Dashboard · Planner · Tasks · Documents · Meetings · Project</sub></p>
+L'architettura è un monorepo npm con:
 
-## Why I built Desk
+- `@desk/core` — dominio e accesso ai dati;
+- `@desk/app` — client React + Tauri;
+- `@desk/server` — server Node per modalità self-hosted, auth e MCP.
 
-I wanted a way to manage all my work in one place, with a clear structure and interface, without giving up the files underneath.
-I had used Obsidian, Notion, and a few other tools, but kept running into trade-offs: flexible tools needed a lot of setup or plugins, ready-made apps locked me into their own format and interface.
-Desk gives me the structure and interface I was missing, while the workspace
-itself stays ordinary Markdown.
+Il progetto supporta sia uso desktop locale sia una modalità self-hosted.
 
-That also means local agents can work with the local folder directly. Desk has an integrated agent layer that generates guidance for local agents, and a self-hosted MCP endpoint for external agents.
+## Stato di questo fork
 
-## Built for one person running real work
+Il fork non è ancora una riscrittura completa di Viboard.
 
-Desk is intentionally a single-user app.
-It's especially useful for people who manage several streams of work and care about owning their data.
+Al momento:
 
-- **Projects with orientation.** Every workspace and project has a user-owned
-  Markdown overview, focused current work, and a lightweight schedule/history
-  timeline assembled from its tasks, documents, and meetings.
-- **Tasks and planning.** Kanban and list views, priorities, due dates, quick
-  capture, status filters, and a weekly time-block planner.
-- **Documents and meetings.** A WYSIWYG Markdown editor, nested folders, meeting
-  notes, and drag-and-drop conversion from Word, PDF, Excel, CSV, and HTML.
-- **Made for daily use.** Workspace switching, persistent editor tabs, global
-  search and quick actions, keyboard shortcuts, and protection for unsaved work.
-- **Files that remain files.** Ordinary filesystem tools can open, back up, sync,
-  search, and version the workspace.
+- il codice applicativo principale è ancora quello di Desk;
+- package, namespace e documentazione tecnica interna usano ancora il naming `desk`;
+- `diaspro-ui/` contiene il lavoro di esplorazione visuale e componenti di riferimento;
+- non va quindi presentato come una release autonoma di Viboard già pronta.
 
+## Stack ereditato
 
-## Agent access
+- React 19
+- TypeScript
+- Vite
+- Tauri 2
+- Rust
+- Zustand
+- TanStack Query
+- Tiptap
+- Tailwind CSS
+- Vitest
+- Node 22
+- Hono per il server self-hosted
 
-Desk organizes durable source material for external AI tools, but it does not try to be an AI workspace itself.
-It simply gives the AI tools you already use a controlled way to read the context of your work.
-The idea is to enable agents to be more useful and accurate when consulting your work.
+## Struttura
 
-- **Local filesystem access.** Desk can generate `CLAUDE.md`, `AGENTS.md`,
-  `GEMINI.md`, and per-workspace `WORKSPACE_INDEX.md` files so local agents
-  understand the structure and read the right overview first.
-- **Hosted MCP access.** A self-hosted server lets Claude, ChatGPT, Claude Code,
-  and other MCP clients get workspace/project context, search globally, browse a
-  structured catalog, and read exact sources over OAuth.
-- **Optional Smart Index.** An Anthropic or OpenAI API key enables a summarized file
-  catalog that helps agents find relevant files quickly.
-- **Explicit boundaries.** `.aiignore` excludes content from the Smart Index and
-  Desk's agent read layer, while generated local guidance carries the same
-  boundary.
-
-## Local or self-hosted
-
-Both modes use the same Markdown structure. The difference is where the files
-live and how they are reached.
-
-| | **Local desktop** | **Self-hosted server** |
-|---|---|---|
-| Use it from | Native app on macOS, Windows, or Linux | Hosted web app, or the native app connected to the server |
-| Data location | A folder on the local machine | A bind-mounted folder on the server |
-| Network and login | Fully offline, no account | Account-protected, available across devices |
-| Multi-device access | External sync if needed | One shared server-side copy |
-| Agent connection | Filesystem plus generated agent files | OAuth-protected, read-only MCP |
-| Smart Index key | Operating-system keychain | Server environment variable |
-
-Moving between the two does not require a content migration. Hosting adds
-`.desk/auth.sqlite` for accounts and sessions; workspaces remain Markdown files.
-
-## Get started
-
-### Install the desktop app
-
-Desktop builds are available from the
-[latest release](https://github.com/v1lling/desk.md/releases/latest). Desk keeps
-itself up to date after installation.
-
-Desk is developed and tested primarily on macOS. Windows and Linux builds are
-**beta**, and the desktop builds are not code-signed yet.
-
-<details>
-<summary>Unsigned build notes</summary>
-
-- **macOS:** Download `Desk_*.dmg` and drag **Desk** into Applications. If macOS
-  says the app is damaged, run
-  `xattr -dr com.apple.quarantine /Applications/Desk.app` once.
-- **Windows:** Download the `.exe` installer. In the SmartScreen warning, choose
-  **More info → Run anyway**.
-- **Linux:** Use the `.AppImage`, `.deb`, or `.rpm`. Make an AppImage executable
-  with `chmod +x Desk_*.AppImage`. AI keys require a desktop secret service such
-  as GNOME Keyring or KWallet.
-
-</details>
-
-### Self-host
-
-One Docker container serves the web app, domain API, OAuth server, and MCP
-endpoint while keeping work content as Markdown on the server:
-
-```bash
-cd deploy
-cp .env.example .env
-# set BETTER_AUTH_SECRET
-docker compose up -d
+```text
+Viboard-Project-2.0/
+├── packages/
+│   ├── core/            # Dominio condiviso
+│   ├── app/             # Applicazione React + Tauri
+│   └── server/          # Backend self-hosted e MCP
+├── diaspro-ui/          # Esperimenti e riferimenti visuali Diaspro
+├── deploy/              # Configurazione self-hosting
+├── docs/
+├── tests/
+└── package.json
 ```
 
-See the [self-hosting guide](./deploy/README.md) for HTTPS, reverse-proxy, AI,
-and MCP setup.
+## Sviluppo locale
 
-## Roadmap
-
-Ideas being explored:
-
-- MCP write tools for explicitly requested notes and tasks
-- Local-model support for the Smart Index
-- Better mobile-web capture and review
-- Optional task relationships and richer mobile-web capture
-
-## Run from source
-
-Desk is an npm-workspaces monorepo: `@desk/core` contains the shared domain,
-`@desk/app` contains the React/Tauri client, and `@desk/server` provides the
-self-hosted web, API, OAuth, and MCP services.
+La codebase upstream richiede Node 22.
 
 ```bash
 npm install
-npm run dev          # browser with development fixtures
-npm run tauri:dev    # desktop app with the real filesystem
+npm run dev
 ```
 
-Use Node 22. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the complete setup and
-project guidelines.
+Per eseguire l'app desktop con filesystem reale:
 
-## Contributing
+```bash
+npm run tauri:dev
+```
 
-Bug reports, feature ideas, documentation improvements, and pull requests are
-welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+Controlli principali:
 
-## License
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
+```
 
-[GPL-3.0-or-later](./LICENSE). Desk may be used, modified, and shared;
-distributed forks and derivatives must remain open source under the GPL.
+## Diaspro UI
+
+La cartella `diaspro-ui/` contiene materiale di progettazione separato dalla base applicativa:
+
+- linee guida palette;
+- componenti e card;
+- prove della lava;
+- post-it;
+- calendar strip;
+- guida visuale HTML.
+
+Questi file rappresentano il livello di esplorazione grafica del fork e non implicano che tutta la UI upstream sia già stata sostituita.
+
+## Upstream
+
+Progetto originale: `v1lling/desk.md`.
+
+La cronologia e il codice di base restano soggetti alla licenza e agli avvisi del progetto upstream.
+
+## Licenza
+
+GPL-3.0-or-later, come il progetto upstream. Vedi `LICENSE`.
