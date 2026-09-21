@@ -2,7 +2,6 @@
 import { useTabStore } from "@/stores/tabs";
 import { DocEditor } from "@/components/editors/doc-editor";
 import { TaskEditor } from "@/components/editors/task-editor";
-import { MeetingEditor } from "@/components/editors/meeting-editor";
 import { EmailViewer } from "@/components/email";
 import { cn } from "@/lib/utils";
 
@@ -42,13 +41,7 @@ export function TabContent({ children }: TabContentProps) {
               projectId={tab.projectId}
               onClose={() => closeTab(tab.id)}
             />
-          ) : tab.type === "meeting" && tab.entityId && tab.workspaceId && tab.projectId ? (
-            <MeetingEditor
-              meetingId={tab.entityId}
-              workspaceId={tab.workspaceId}
-              projectId={tab.projectId}
-              onClose={() => closeTab(tab.id)}
-            />
+          )
           ) : tab.type === "email" && tab.emailData ? (
             <EmailViewer email={tab.emailData} />
           ) : null}
