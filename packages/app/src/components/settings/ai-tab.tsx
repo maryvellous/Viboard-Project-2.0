@@ -300,7 +300,6 @@ export function AITab() {
               )}
           </SettingsField>
         </SettingsGroup>
-        )}
       </SettingsSection>
 
       <SettingsSection
