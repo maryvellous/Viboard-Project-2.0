@@ -22,7 +22,9 @@ jobs:
           cache: npm
 
       - name: Resolve dependency graph
-        run: npm install
+        run: |
+          npm install
+          npm dedupe
 
       - name: Explain remaining vulnerable packages
         shell: bash
