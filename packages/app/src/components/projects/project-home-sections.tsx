@@ -149,6 +149,7 @@ const timelineIcons = {
   "task-created": Circle,
   "task-completed": CheckCircle2,
   "task-due": Clock,
+  meeting: FileText,
   "doc-created": FileText,
   "doc-updated": FileText,
 } as const;
