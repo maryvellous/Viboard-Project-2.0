@@ -33,7 +33,7 @@ export default function DocsPage() {
   }, [currentWorkspaceId]);
 
   // Register the doc tree as the secondary sidebar slot for /docs.
-  // The slot persists across tab switches (Desk tab ↔ doc tab) — only depends on the route.
+  // The slot persists across tab switches (workspace tab ↔ doc tab) — only depends on the route.
   const pane = useMemo(
     () => (currentWorkspaceId ? (
       <DocsTreePane
@@ -64,7 +64,7 @@ export default function DocsPage() {
     );
   }
 
-  // Main pane: shown only when the Desk tab is active. Opening a doc switches to a doc tab,
+  // Main pane: shown only when the workspace tab is active. Opening a doc switches to a doc tab,
   // and `TabContent` then renders the editor here instead.
   return (
     <div className="flex flex-col h-full overflow-hidden">
