@@ -86,7 +86,7 @@ export function AuthScreen({ mode, auth, onSuccess }: AuthScreenProps) {
       <main className="flex-1 flex items-center justify-center px-8">
         <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-6">
           <div className="flex flex-col items-center text-center gap-4">
-            <img src="/icon.png" alt="Desk" width={56} height={56} className="rounded-xl" />
+            <img src="/icon.png" alt="Diaspro Viboard" width={56} height={56} className="rounded-xl" />
             <div className="flex flex-col gap-1.5">
               <h1 className="text-lg font-semibold tracking-tight">
                 {isCreate ? t("auth.create.title") : t("auth.login.title")}
