@@ -19,8 +19,6 @@ const messages: Record<string, string> = {
   "search.commandPalette.commands.createTask.aliases": "new task|add task|todo",
   "search.commandPalette.commands.createDoc.label": "Create document",
   "search.commandPalette.commands.createDoc.aliases": "new document|add document|doc|note",
-  "search.commandPalette.commands.createMeeting.label": "Create meeting",
-  "search.commandPalette.commands.createMeeting.aliases": "new meeting|add meeting|appointment",
   "search.commandPalette.commands.createProject.label": "Create project",
   "search.commandPalette.commands.createProject.aliases": "new project|add project",
   "search.commandPalette.commands.switchWorkspace.label": "Switch workspace",
@@ -33,8 +31,6 @@ const messages: Record<string, string> = {
   "search.commandPalette.commands.goTasks.aliases": "tasks|todos",
   "search.commandPalette.commands.goDocs.label": "Go to Documents",
   "search.commandPalette.commands.goDocs.aliases": "documents|docs|notes",
-  "search.commandPalette.commands.goMeetings.label": "Go to Meetings",
-  "search.commandPalette.commands.goMeetings.aliases": "meetings|appointments",
   "search.commandPalette.commands.goProjects.label": "Go to Projects",
   "search.commandPalette.commands.goProjects.aliases": "projects",
   "search.commandPalette.commands.openSettings.label": "Open Settings",
@@ -42,7 +38,6 @@ const messages: Record<string, string> = {
   "search.commandPalette.commands.viewShortcuts.label": "View keyboard shortcuts",
   "search.commandPalette.commands.viewShortcuts.aliases": "keys|hotkeys|help",
   "search.commandPalette.disabled.workspace": "Select a workspace first",
-  "search.commandPalette.disabled.meetingProject": "Create a project first",
 };
 
 const t = (key: string) => messages[key] ?? key;
@@ -55,14 +50,12 @@ describe("command palette model", () => {
       "capture-task",
       "create-task",
       "create-doc",
-      "create-meeting",
       "create-project",
       "switch-workspace",
       "go-dashboard",
       "go-planner",
       "go-tasks",
       "go-docs",
-      "go-meetings",
       "go-projects",
       "open-settings",
       "view-shortcuts",
@@ -86,30 +79,27 @@ describe("command palette model", () => {
   it("matches labels and aliases with deterministic ranking and a three-command cap", () => {
     const commands = buildPaletteCommands(t, { hasWorkspace: true, hasProjects: true });
 
-    expect(matchPaletteCommands(commands, "meet").map((command) => command.id)).toEqual([
-      "create-meeting",
-      "go-meetings",
-    ]);
+    expect(matchPaletteCommands(commands, "meet").map((command) => command.id)).toEqual([]);
     expect(matchPaletteCommands(commands, "new").map((command) => command.id)).toEqual([
       "create-task",
       "create-doc",
-      "create-meeting",
+      "create-project",
     ]);
     expect(matchPaletteCommands(commands, "RéMeMbEr").map((command) => command.id)).toEqual([
       "capture-task",
     ]);
   });
 
-  it("keeps unavailable commands searchable with a useful disabled reason", () => {
+  it("keeps workspace-scoped creation commands disabled until a workspace exists", () => {
     const withoutWorkspace = buildPaletteCommands(t, { hasWorkspace: false, hasProjects: false });
-    const meeting = withoutWorkspace.find((command) => command.id === "create-meeting");
 
-    expect(meeting).toMatchObject({ disabled: true, disabledReason: "Select a workspace first" });
-
-    const withoutProjects = buildPaletteCommands(t, { hasWorkspace: true, hasProjects: false });
-    expect(withoutProjects.find((command) => command.id === "create-meeting")).toMatchObject({
+    expect(withoutWorkspace.find((command) => command.id === "create-task")).toMatchObject({
       disabled: true,
-      disabledReason: "Create a project first",
+      disabledReason: "Select a workspace first",
+    });
+    expect(withoutWorkspace.find((command) => command.id === "create-doc")).toMatchObject({
+      disabled: true,
+      disabledReason: "Select a workspace first",
     });
   });
 
@@ -180,7 +170,7 @@ describe("command palette model", () => {
   it("toggles between a clean open palette and the reset closed state", () => {
     let state = commandPaletteReducer(createInitialCommandPaletteState(), { type: "toggle" });
     expect(state).toMatchObject({ open: true, query: "", scope: "all" });
-    state = commandPaletteReducer(state, { type: "set-query", query: "meeting" });
+    state = commandPaletteReducer(state, { type: "set-query", query: "settings" });
     state = commandPaletteReducer(state, { type: "toggle" });
     expect(state).toEqual(createInitialCommandPaletteState());
   });
