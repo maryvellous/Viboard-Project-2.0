@@ -2,7 +2,7 @@
   "ai": {
     "consent": {
       "title": "Bevor du KI-Funktionen nutzt",
-      "description": "Diaspro Viboards KI-Funktionen senden Inhalte über die API an den von dir gewählten Anbieter (Anthropic oder OpenAI). Diaspro Viboard betreibt keinen eigenen KI-Server.",
+      "description": "Die KI-Funktionen von Diaspro Viboard senden Inhalte über die API an den von dir gewählten Anbieter (Anthropic oder OpenAI). Diaspro Viboard betreibt keinen eigenen KI-Server.",
       "whatHeading": "Was gesendet wird",
       "whatItems": {
         "previews": "Kurze Vorschauen und Zusammenfassungen deiner Dateien für den Smart-Index-Katalog."
@@ -482,8 +482,8 @@
         "notConfigured": "Anbieterschlüssel nicht konfiguriert."
       },
       "browserMode": {
-        "title": "KI-Schlüssel werden in der Diaspro Viboardtop-App verwaltet",
-        "description": "Dein KI-Anbieter-Schlüssel wird von der Diaspro Viboardtop-App sicher auf deinem Gerät gespeichert und kann daher nicht im Browser gesetzt werden. Öffne Diaspro Viboard auf deinem Diaspro Viboardtop, um ihn hinzuzufügen oder zu ändern."
+        "title": "KI-Schlüssel werden in der Desktop-App verwaltet",
+        "description": "Dein KI-Anbieter-Schlüssel wird von der Desktop-App sicher auf deinem Gerät gespeichert und kann daher nicht im Browser gesetzt werden. Öffne Diaspro Viboard auf deinem Desktop, um ihn hinzuzufügen oder zu ändern."
       },
       "keychainError": {
         "title": "Schlüsselbund konnte nicht gelesen werden",
@@ -491,7 +491,7 @@
         "errorDetails": "Fehlerdetails"
       },
       "errors": {
-        "linuxKeyring": "Unter Linux bedeutet das meist, dass GNOME Keyring oder KWallet nicht läuft. Starte den Secret Service deines Diaspro Viboardtops und versuche es erneut."
+        "linuxKeyring": "Unter Linux bedeutet das meist, dass GNOME Keyring oder KWallet nicht läuft. Starte den Secret Service deines Desktops und versuche es erneut."
       },
       "usage": {
         "title": "Nutzungsstatistik",
@@ -549,7 +549,7 @@
         "toggle": "Generierte CLAUDE.md anzeigen",
         "revealInFinder": "Im Finder anzeigen",
         "refresh": "Aktualisieren",
-        "errorBrowserMode": "Vorschau ist nur in der Diaspro Viboardtop-App verfügbar.",
+        "errorBrowserMode": "Vorschau ist nur in der Desktop-App verfügbar.",
         "errorFileMissing": "Datei existiert noch nicht. Aktiviere CLAUDE.md und komm zurück."
       },
       "mcp": {
