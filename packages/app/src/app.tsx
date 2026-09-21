@@ -10,7 +10,6 @@ import { ErrorBoundary } from "@/components/error-boundary";
 const DashboardPage = lazy(() => import("./pages/dashboard"));
 const TasksPage = lazy(() => import("./pages/tasks"));
 const DocsPage = lazy(() => import("./pages/docs"));
-const MeetingsPage = lazy(() => import("./pages/meetings"));
 const SettingsPage = lazy(() => import("./pages/settings"));
 const ProjectsPage = lazy(() => import("./pages/projects"));
 const PlannerPage = lazy(() => import("./pages/planner"));
@@ -36,7 +35,6 @@ function AppTree() {
           <Route path="/planner" element={<PlannerPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/docs" element={<DocsPage />} />
-          <Route path="/meetings" element={<MeetingsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
