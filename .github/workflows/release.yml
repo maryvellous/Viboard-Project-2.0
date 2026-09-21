@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - release
 
 jobs:
   release:
@@ -62,21 +64,29 @@ jobs:
         run: |
           npm audit --audit-level=high
 
-      - name: Verify version matches tag
+      - name: Verify release version
         shell: bash
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
           TAURI_VERSION=$(jq -r '.version' packages/app/src-tauri/tauri.conf.json)
           APP_VERSION=$(jq -r '.version' packages/app/package.json)
           CORE_VERSION=$(jq -r '.version' packages/core/package.json)
           SERVER_VERSION=$(jq -r '.version' packages/server/package.json)
-          # All workspace packages are versioned in lockstep with the release tag.
-          if [ "$TAG" != "$TAURI_VERSION" ] || [ "$TAG" != "$APP_VERSION" ] || \
-             [ "$TAG" != "$CORE_VERSION" ] || [ "$TAG" != "$SERVER_VERSION" ]; then
-            echo "Version mismatch! Tag: $TAG, tauri.conf.json: $TAURI_VERSION, app: $APP_VERSION, core: $CORE_VERSION, server: $SERVER_VERSION"
+
+          if [ "$TAURI_VERSION" != "$APP_VERSION" ] || \
+             [ "$TAURI_VERSION" != "$CORE_VERSION" ] || [ "$TAURI_VERSION" != "$SERVER_VERSION" ]; then
+            echo "Version mismatch! tauri.conf.json: $TAURI_VERSION, app: $APP_VERSION, core: $CORE_VERSION, server: $SERVER_VERSION"
             exit 1
           fi
-          echo "Version $TAG matches tag across all packages."
+
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG=${GITHUB_REF#refs/tags/v}
+            if [ "$TAG" != "$TAURI_VERSION" ]; then
+              echo "Tag v$TAG does not match app version $TAURI_VERSION"
+              exit 1
+            fi
+          fi
+
+          echo "Release version $TAURI_VERSION is consistent across all packages."
 
       - name: Build & publish release
         uses: tauri-apps/tauri-action@v0
@@ -86,9 +96,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: packages/app
-          tagName: ${{ github.ref_name }}
-          releaseName: "Diaspro Viboard ${{ github.ref_name }}"
-          releaseBody: "Release ${{ github.ref_name }}"
+          tagName: "v__VERSION__"
+          releaseName: "Diaspro Viboard v__VERSION__"
+          releaseBody: "Diaspro Viboard v__VERSION__. See the attached installers and packages."
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
