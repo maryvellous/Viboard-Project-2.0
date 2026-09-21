@@ -26,7 +26,7 @@ export function SetupWizard() {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("welcome");
   const [dataPath, setDataPath] = useState("~/Viboard");
-  const [workspaceName, setWorkspaceName] = useState("Personal");
+  const [workspaceName, setWorkspaceName] = useState("Personale");
   const [isLoading, setIsLoading] = useState(false);
   const [existingWorkspaces, setExistingWorkspaces] = useState<Workspace[]>([]);
   const [hasTitleBarPadding, setHasTitleBarPadding] = useState(false);
