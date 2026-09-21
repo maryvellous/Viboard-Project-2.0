@@ -97,13 +97,13 @@ export function DataTab() {
       }
       window.location.reload();
     } catch (error) {
-      console.error("Failed to switch DeskMD data folder:", error);
+      console.error("Failed to switch Viboard data folder:", error);
       setDataPath(previousPath);
       if (isTauri()) {
         try {
           await expandHostFsScope(previousPath);
         } catch (rollbackError) {
-          console.error("Failed to restore previous DeskMD data folder:", rollbackError);
+          console.error("Failed to restore previous Viboard data folder:", rollbackError);
         }
       }
       toast.error(error instanceof Error ? error.message : String(error));
