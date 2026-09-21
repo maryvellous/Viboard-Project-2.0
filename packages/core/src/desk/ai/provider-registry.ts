@@ -49,7 +49,24 @@ export const PROVIDER_REGISTRY: Record<AIProviderType, ProviderDefinition> = {
       { id: "gpt-5-codex", label: "GPT-5 Codex", description: "Code-focused reasoning" },
     ],
     createModel: (apiKey, modelId) => createOpenAI({ apiKey })(modelId || "gpt-5-mini"),
+  },  deepseek: {
+    providerId: "deepseek",
+    label: "DeepSeek",
+    keyRef: "ai.deepseek",
+    defaultModel: "deepseek-flash",
+    models: [
+      {
+        id: "deepseek-flash",
+        label: "DeepSeek V4.1 Flash",
+        description: "Current DeepSeek V4.1 model",
+      },
+    ],
+    createModel: (apiKey, modelId) =>
+      createOpenAI({ apiKey, baseURL: "https://api.deepseek.com" })(
+        modelId || "deepseek-flash",
+      ),
   },
+
 };
 
 export function getProviderDefinition(provider: AIProviderType): ProviderDefinition {
