@@ -26,12 +26,11 @@ const GLOBAL_SCOPE = "__global__";
 interface TemplateMeta {
   type: TemplateType;
   /** i18n key fragment under settings.templates.types */
-  metaKey: "meeting" | "doc" | "task";
+  metaKey: "doc" | "task";
   hasNote?: boolean;
 }
 
 const TEMPLATE_TYPES: TemplateMeta[] = [
-  { type: "meeting", metaKey: "meeting" },
   { type: "doc", metaKey: "doc", hasNote: true },
   { type: "task", metaKey: "task" },
 ];
@@ -43,7 +42,7 @@ function TemplateCard({
   scope,
 }: {
   type: TemplateType;
-  metaKey: "meeting" | "doc" | "task";
+  metaKey: "doc" | "task";
   hasNote?: boolean;
   scope: string;
 }) {

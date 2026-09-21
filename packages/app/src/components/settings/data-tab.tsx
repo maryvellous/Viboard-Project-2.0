@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { SettingsField, SettingsGroup, SettingsSection } from "@/components/ui/settings-section";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,37 +18,17 @@ import { useBootStore } from "@/stores/boot";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useNavigationStore } from "@/stores/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { isTauri } from "@desk/core";
-import { getDeskService } from "@desk/core";
+import { isTauri, getDeskService } from "@desk/core";
 import { expandHostFsScope } from "@/lib/host-files";
-import { isRemoteMode } from "@/lib/connection";
 import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
-
-// Hosted mode only: the account/sign-out section (and better-auth) is lazy-loaded
-// behind the build flag, so the desktop bundle never includes it.
-const HostedAccountSection = import.meta.env.VITE_DESK_HOSTED
-  ? lazy(() => import("./hosted-account-section"))
-  : null;
-
-// Native hosted mode: the local/remote backend toggle. Bundled in every non-hosted
-// build (constant `!VITE_DESK_HOSTED`, so the lean web build tree-shakes it out) and
-// shown only inside a Tauri webview (isTauri(), checked at render).
-const ConnectionSection = !import.meta.env.VITE_DESK_HOSTED
-  ? lazy(() => import("./connection-section"))
-  : null;
 
 export function DataTab() {
   const { t } = useTranslation();
   const { dataPath, setDataPath, setSetupCompleted, reset: resetBoot } = useBootStore();
-  // The local data folder is meaningless when connected to a remote server. Non-reactive
-  // is fine: switching connection always reloads the app, so this component remounts.
-  const remote = isRemoteMode();
   const { reset: resetPreferences } = usePreferencesStore();
   const { setCurrentWorkspaceId, reset: resetNavigation } = useNavigationStore();
-
   const queryClient = useQueryClient();
 
-  // State for data path change dialog
   const [pendingPath, setPendingPath] = useState("");
   const [pathDialogOpen, setPathDialogOpen] = useState(false);
   const [isCheckingPath, setIsCheckingPath] = useState(false);
@@ -63,16 +43,9 @@ export function DataTab() {
     resetPreferences();
     resetNavigation();
     queryClient.invalidateQueries();
-    const root = document.documentElement;
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    root.classList.toggle("dark", systemDark);
+    document.documentElement.classList.add("dark");
     toast.success(t("toasts.settings.settingsReset"));
     window.location.reload();
-  };
-
-  const handleCheckDataPath = () => {
-    if (!pendingPath.trim()) return;
-    setPathDialogOpen(true);
   };
 
   const handleConfirmPathChange = async () => {
@@ -83,13 +56,9 @@ export function DataTab() {
         toast.error(t("editors.shared.contextTransitionBlocked"));
         return;
       }
-      if (isTauri()) {
-        await expandHostFsScope(pendingPath);
-      }
+      if (isTauri()) await expandHostFsScope(pendingPath);
       setDataPath(pendingPath);
-      const existingWorkspaces = isTauri()
-        ? await getDeskService().getWorkspaces()
-        : [];
+      const existingWorkspaces = isTauri() ? await getDeskService().getWorkspaces() : [];
       if (existingWorkspaces.length > 0) {
         setCurrentWorkspaceId(existingWorkspaces[0].id);
       } else {
@@ -114,32 +83,16 @@ export function DataTab() {
 
   return (
     <div className="space-y-8">
-      {/* Connection — local/remote backend toggle (native, non-hosted builds, Tauri only). */}
-      {ConnectionSection && isTauri() && (
-        <Suspense fallback={null}>
-          <ConnectionSection />
-        </Suspense>
-      )}
-
-      {/* Account — sign-out (hosted web build only). */}
-      {HostedAccountSection && (
-        <Suspense fallback={null}>
-          <HostedAccountSection />
-        </Suspense>
-      )}
-
-      {/* Data Storage — local mode only (a remote backend owns the data root). */}
-      {!remote && (
-        <SettingsSection
-          title={t("settings.data.storage.title")}
-          description={t("settings.data.storage.description")}
-        >
-          <SettingsGroup>
-            <SettingsField
-              label={t("settings.data.storage.pathLabel")}
-              htmlFor="data-path"
-              footer={t("settings.data.storage.helperText")}
-            >
+      <SettingsSection
+        title={t("settings.data.storage.title")}
+        description={t("settings.data.storage.description")}
+      >
+        <SettingsGroup>
+          <SettingsField
+            label={t("settings.data.storage.pathLabel")}
+            htmlFor="data-path"
+            footer={t("settings.data.storage.helperText")}
+          >
             <div className="flex gap-2">
               <Input
                 id="data-path"
@@ -150,19 +103,17 @@ export function DataTab() {
               />
               <Button
                 variant="outline"
-                onClick={handleCheckDataPath}
+                onClick={() => pendingPath.trim() && setPathDialogOpen(true)}
                 disabled={isCheckingPath || !pendingPath.trim() || pendingPath === dataPath}
               >
                 {isCheckingPath && <InlineProgress />}
                 {t("settings.data.storage.change")}
               </Button>
             </div>
-            </SettingsField>
-          </SettingsGroup>
-        </SettingsSection>
-      )}
+          </SettingsField>
+        </SettingsGroup>
+      </SettingsSection>
 
-      {/* Reset Settings */}
       <SettingsSection
         title={t("settings.data.reset.title")}
         description={t("settings.data.reset.description")}
@@ -176,7 +127,6 @@ export function DataTab() {
         </SettingsGroup>
       </SettingsSection>
 
-      {/* Reset Settings Confirmation Dialog */}
       <ConfirmDialog
         open={showResetConfirm}
         onOpenChange={setShowResetConfirm}
@@ -187,7 +137,6 @@ export function DataTab() {
         onConfirm={handleResetConfirm}
       />
 
-      {/* Data Path Change Dialog */}
       <Dialog open={pathDialogOpen} onOpenChange={setPathDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

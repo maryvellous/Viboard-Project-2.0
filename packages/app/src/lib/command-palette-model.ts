@@ -1,19 +1,17 @@
 export type PaletteScope = "all" | "workspace";
 export type PaletteView = "search" | "capture" | "workspaces";
-export type PaletteModal = "task" | "doc" | "meeting" | "project";
+export type PaletteModal = "task" | "doc" | "project";
 
 export type PaletteCommandId =
   | "capture-task"
   | "create-task"
   | "create-doc"
-  | "create-meeting"
   | "create-project"
   | "switch-workspace"
   | "go-dashboard"
   | "go-planner"
   | "go-tasks"
   | "go-docs"
-  | "go-meetings"
   | "go-projects"
   | "open-settings"
   | "view-shortcuts";
@@ -22,7 +20,6 @@ export type PaletteCommandIcon =
   | "capture"
   | "task"
   | "doc"
-  | "meeting"
   | "project"
   | "workspace"
   | "dashboard"
@@ -66,14 +63,12 @@ const COMMAND_SPECS: PaletteCommandSpec[] = [
   { id: "capture-task", icon: "capture", action: { kind: "capture" } },
   { id: "create-task", icon: "task", action: { kind: "modal", modal: "task" }, requiresWorkspace: true },
   { id: "create-doc", icon: "doc", action: { kind: "modal", modal: "doc" }, requiresWorkspace: true },
-  { id: "create-meeting", icon: "meeting", action: { kind: "modal", modal: "meeting" }, requiresWorkspace: true, requiresProject: true },
   { id: "create-project", icon: "project", action: { kind: "modal", modal: "project" }, requiresWorkspace: true },
   { id: "switch-workspace", icon: "workspace", action: { kind: "workspaces" }, requiresWorkspace: true },
   { id: "go-dashboard", icon: "dashboard", action: { kind: "navigate", path: "/" } },
   { id: "go-planner", icon: "planner", action: { kind: "navigate", path: "/planner" } },
   { id: "go-tasks", icon: "task", action: { kind: "navigate", path: "/tasks" } },
   { id: "go-docs", icon: "doc", action: { kind: "navigate", path: "/docs" } },
-  { id: "go-meetings", icon: "meeting", action: { kind: "navigate", path: "/meetings" } },
   { id: "go-projects", icon: "project", action: { kind: "navigate", path: "/projects" } },
   { id: "open-settings", icon: "settings", action: { kind: "navigate", path: "/settings" } },
   { id: "view-shortcuts", icon: "shortcuts", action: { kind: "shortcuts" } },

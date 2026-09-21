@@ -349,14 +349,16 @@ export default function DashboardPage() {
     isError: overviewError,
     refetch: refetchOverview,
   } = useDashboardOverview(today);
-  const { openTask, openDoc, openMeeting } = useOpenTab();
+  const { openTask, openDoc } = useOpenTab();
 
   const [triageModalOpen, setTriageModalOpen] = useState(false);
   const [triagedTask, setTriagedTask] = useState<Task | null>(null);
   const [triageDestination, setTriageDestination] = useState<TriageDestination | null>(null);
 
   const recentItems = useMemo<RecentWorkListItem[]>(
-    () => (overview?.recentWork ?? []).map((item) => ({
+    () => (overview?.recentWork ?? [])
+      .filter((item) => item.kind !== "meeting")
+      .map((item) => ({
       kind: item.kind,
       id: `${item.workspaceId}:${item.projectId}:${item.id}`,
       title: item.title,
@@ -365,10 +367,9 @@ export default function DashboardPage() {
       onOpen: () => {
         if (item.kind === "task") openTask(item);
         else if (item.kind === "doc") openDoc(item);
-        else openMeeting(item);
       },
     })),
-    [overview?.recentWork, openTask, openDoc, openMeeting, t],
+    [overview?.recentWork, openTask, openDoc, t],
   );
 
   const handleTriageComplete = (task: Task, destination: TriageDestination) => {

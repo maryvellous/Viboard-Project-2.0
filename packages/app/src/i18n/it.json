@@ -68,7 +68,7 @@
       "projects": "Progetti",
       "settings": "Impostazioni",
       "desk": "Diaspro Viboard",
-      "workspaceViews": "Viste dello spazio",
+      "workspaceViews": "Il tuo spazio",
       "projectsSection": "Progetti",
       "allProjects": "Tutti i progetti",
       "brandTagline": "spazio di lavoro"
@@ -87,7 +87,7 @@
       "focus": {
         "title": "Focus",
         "emptyTitle": "Nessuna attività in focus",
-        "emptyDescription": "Metti la stella sulle attività importanti per tenere qui una lista breve e voluta.",
+        "emptyDescription": "Contrassegna le attività importanti con una stella per tenerle sempre sott'occhio.",
         "openTasks": "Apri attività",
         "remove": "Rimuovi {{title}} dal focus",
         "showMore_one": "Mostra {{count}} in più",
@@ -109,7 +109,7 @@
         "title": "Lavoro recente",
         "unassigned": "Senza progetto"
       },
-      "overviewError": "La panoramica non ha potuto essere caricata. La Raccolta resta disponibile.",
+      "overviewError": "Non riesco a caricare la panoramica. Puoi comunque usare la raccolta rapida.",
       "calendar": {
         "free": "libero"
       },
@@ -118,13 +118,13 @@
         "action": "Nuova attività"
       },
       "capture": {
-        "title": "Raccolta",
+        "title": "Raccolta rapida",
         "defaultHomeName": "Personale",
         "toTriageCount_one": "{{count}} da smistare",
         "toTriageCount_other": "{{count}} da smistare",
-        "quickAddPlaceholder": "Raccolta rapida...",
+        "quickAddPlaceholder": "Aggiungi al volo…",
         "loadingLabel": "attività",
-        "emptyTitle": "Raccogli le attività al volo, smistale dopo",
+        "emptyTitle": "Aggiungi qui le attività al volo e organizzale con calma dopo.",
         "triageButton": "Smista",
         "moveToHomeTasks": "Sposta in {{home}}",
         "noWorkspacesYet": "Nessuno spazio di lavoro",
@@ -190,13 +190,13 @@
           "newFolder": "Nuova cartella",
           "newDoc": "Nuovo documento",
           "importFiles": "Importa file",
-          "openInFinder": "Mostra nel Finder"
+          "openInFinder": "Mostra nella cartella"
         },
         "newFolderDialog": {
           "title": "Nuova cartella",
           "description": "Crea una nuova cartella",
           "placeholder": "Nome cartella",
-          "creatingIn": "Creazione in: {{path}}"
+          "creatingIn": "La cartella verrà creata in: {{path}}"
         }
       },
       "selectWorkspaceTitle": "Seleziona uno spazio di lavoro",
@@ -248,7 +248,7 @@
         "loadErrorTitle": "Impossibile caricare questo progetto",
         "loadErrorDescription": "Il contesto del progetto non ha potuto essere assemblato. Riprova.",
         "createdOn": "Creato {{date}}",
-        "lastActivity": "Attivo {{date}}",
+        "lastActivity": "Ultima attività {{date}}",
         "metricTasks_one": "{{count}} attività attiva",
         "metricTasks_other": "{{count}} attività attive",
         "metricDocs_one": "{{count}} documento",
@@ -256,17 +256,17 @@
         "metricMeetings_one": "{{count}} riunione",
         "metricMeetings_other": "{{count}} riunioni",
         "renameTitle": "Clicca per rinominare",
-        "descriptionPlaceholder": "Aggiungi una breve descrizione…",
+        "descriptionPlaceholder": "Aggiungi una breve descrizione del progetto…",
         "descriptionEditTitle": "Clicca per modificare",
         "deleteProject": "Elimina progetto",
         "tasksHeading": "Attività attive",
-        "openBoard": "Apri bacheca",
-        "moreOnBoard_one": "{{count}} in più nella bacheca",
-        "moreOnBoard_other": "{{count}} in più nella bacheca",
+        "openBoard": "Vedi tutte le attività",
+        "moreOnBoard_one": "{{count}} altra attività",
+        "moreOnBoard_other": "{{count}} altre attività",
         "noActiveTasks": "Nessuna attività attiva.",
         "quickAddPlaceholder": "Aggiungi un'attività…",
-        "currentWork": "Lavoro in corso",
-        "noCurrentWork": "Al momento qui non serve la tua attenzione.",
+        "currentWork": "Attività in corso",
+        "noCurrentWork": "Non ci sono attività aperte che richiedono attenzione.",
         "timeline": {
           "schedule": "Programma",
           "history": "Cronologia",
@@ -301,7 +301,7 @@
         },
         "overview": {
           "title": "Panoramica del progetto",
-          "placeholder": "Descrivi cos'è questo progetto, cosa conta e da dove iniziare a orientarti."
+          "placeholder": "Descrivi in breve il progetto, gli obiettivi e le informazioni utili da sapere."
         }
       },
       "browse": {
@@ -311,21 +311,21 @@
         "countLabel": "progetti",
         "searchPlaceholder": "Cerca progetti…",
         "sortLabel": "Ordina",
-        "sortRecent": "Attività recente",
+        "sortRecent": "Attività più recente",
         "sortName": "Nome A–Z",
         "activeTasks_one": "{{count}} attiva",
         "activeTasks_other": "{{count}} attive",
         "nextDue": "Prossima scadenza {{date}}",
         "openProject": "Apri progetto",
         "workspaceOverview": {
-          "title": "Panoramica dello spazio",
-          "placeholder": "Descrivi questo spazio di lavoro, il suo scopo e ciò che è utile sapere per primo."
+          "title": "Panoramica dello spazio di lavoro",
+          "placeholder": "Aggiungi una breve descrizione di questo spazio di lavoro e di come lo usi."
         }
       },
       "deleteConfirmTitle": "Elimina progetto",
-      "deleteConfirmDescription": "Vuoi davvero eliminare \"{{name}}\"? Il progetto verrà rimosso definitivamente insieme a tutte le sue attività, documenti e riunioni.",
+      "deleteConfirmDescription": "Vuoi davvero eliminare \"{{name}}\"? Il progetto verrà rimosso definitivamente insieme alle sue attività e ai suoi documenti.",
       "loadErrorTitle": "Impossibile caricare i progetti",
-      "loadErrorDescription": "Le informazioni sui progetti non hanno potuto essere caricate. Controlla la connessione e riprova.",
+      "loadErrorDescription": "Non riesco a caricare i progetti. Riprova tra un momento.",
       "selectWorkspaceTitle": "Seleziona uno spazio di lavoro",
       "selectWorkspaceDescription": "Scegli uno spazio di lavoro nella barra laterale per vedere i progetti."
     },
@@ -342,7 +342,7 @@
         "moreCount": "+{{count}} in più"
       },
       "rail": {
-        "title": "Da pianificare",
+        "title": "Da organizzare",
         "empty": "Niente da pianificare",
         "overdue": "Scadute",
         "dueThisWeek": "In scadenza questa settimana",
@@ -360,24 +360,24 @@
       },
       "intentions": {
         "add": "Aggiungi intenzione",
-        "placeholder": "Di cosa parla questa settimana?"
+        "placeholder": "Su cosa vuoi concentrarti questa settimana?"
       }
     }
   },
   "settings": {
     "pageDescriptions": {
-      "general": "Scegli lingua, aspetto e preferenze di navigazione di Diaspro Viboard.",
+      "general": "Scegli la lingua e come vuoi usare la barra laterale.",
       "planner": "Imposta gli orari e i giorni mostrati nel pianificatore settimanale.",
-      "templates": "Definisci contenuti riutilizzabili per nuove riunioni, documenti e attività.",
-      "ai": "Configura provider AI, privacy, utilizzo e indicizzazione dei file.",
-      "agents": "Controlla il contesto che Diaspro Viboard fornisce agli agenti esterni, in locale o via MCP.",
-      "data": "Gestisci connessioni, account, archiviazione e impostazioni dell'applicazione.",
+      "templates": "Imposta contenuti predefiniti per nuovi documenti e attività.",
+      "ai": "Scegli il servizio AI, il modello e la chiave API da usare.",
+      "agents": "Gestisci le istruzioni e i file locali usati dagli agenti AI.",
+      "data": "Scegli dove salvare i dati e gestisci le impostazioni locali dell'app.",
       "about": "Consulta versione, aggiornamenti, link al progetto e licenza."
     },
     "general": {
       "appearance": {
-        "title": "Aspetto",
-        "description": "Personalizza l'aspetto di Diaspro Viboard"
+        "title": "Interfaccia",
+        "description": "Lingua e preferenze della barra laterale."
       },
       "theme": {
         "label": "Tema",
@@ -400,7 +400,7 @@
       },
       "compactSidebar": {
         "label": "Barra laterale compatta",
-        "description": "Mostra solo le icone nella barra laterale (oppure trascina il bordo per ridimensionarla)"
+        "description": "Riduce la barra laterale alle sole icone."
       }
     },
     "planner": {
@@ -425,14 +425,14 @@
     },
     "templates": {
       "title": "Modelli",
-      "description": "Definisci contenuti predefiniti per nuove riunioni, documenti e attività. Imposta i valori globali o personalizzali per singolo spazio di lavoro.",
-      "scopeTitle": "Ambito del modello",
-      "scopeDescription": "Modifica i valori globali oppure le personalizzazioni per uno spazio di lavoro specifico.",
+      "description": "Definisci contenuti predefiniti per nuovi documenti e attività. Puoi usare valori generali o personalizzarli per ogni spazio di lavoro.",
+      "scopeTitle": "Dove usare questi modelli",
+      "scopeDescription": "Scegli se modificare i valori generali o quelli di uno specifico spazio di lavoro.",
       "scopeLabel": "Ambito",
-      "globalDefaults": "Valori globali",
+      "globalDefaults": "Valori predefiniti",
       "cardTitle": "Modello {{label}}",
-      "usingGlobalDefault": "Stai usando il valore globale.",
-      "customizeForWorkspace": "Personalizza per questo spazio",
+      "usingGlobalDefault": "Stai usando il modello predefinito.",
+      "customizeForWorkspace": "Personalizza per questo spazio di lavoro",
       "placeholder": "Contenuto del modello (markdown)...",
       "variablesLabel": "Variabili:",
       "resetToDefault": "Ripristina predefinito",
@@ -455,22 +455,23 @@
     },
     "ai": {
       "provider": {
-        "title": "Provider",
-        "description": "Collega un provider AI. Alimenta i riassunti del catalogo dell'Indice intelligente.",
-        "label": "Provider",
-        "helperText": "Backend API dell'AI"
+        "title": "Servizio AI",
+        "description": "Scegli quale servizio usare per le funzioni AI di Diaspro Viboard.",
+        "label": "Servizio",
+        "helperText": "Il servizio a cui Diaspro Viboard invierà le richieste AI."
       },
       "providers": {
         "openai": "OpenAI",
-        "anthropic": "Anthropic"
+        "anthropic": "Anthropic",
+        "deepseek": "DeepSeek"
       },
       "credentials": {
-        "title": "Credenziali",
-        "description": "Collega in modo sicuro il provider selezionato a Diaspro Viboard."
+        "title": "Chiave API",
+        "description": "La chiave viene salvata sul tuo computer e usata soltanto per collegarsi al servizio selezionato."
       },
       "model": {
         "label": "Modello",
-        "helperText": "Modello predefinito per il provider"
+        "helperText": "Modello usato per i riassunti e le altre funzioni AI."
       },
       "apiKey": {
         "label": "Chiave API ({{provider}})",
@@ -478,8 +479,9 @@
         "placeholderAnthropic": "sk-ant-...",
         "showAriaLabel": "Mostra chiave API",
         "hideAriaLabel": "Nascondi chiave API",
-        "storedNotice": "Salvata nel portachiavi del sistema operativo (Keychain / Gestione credenziali / Secret Service).",
-        "notConfigured": "Chiave del provider non configurata."
+        "storedNotice": "La chiave viene salvata in modo sicuro nelle credenziali di Windows.",
+        "notConfigured": "Non hai ancora salvato una chiave per questo servizio.",
+        "placeholderDeepseek": "sk-..."
       },
       "browserMode": {
         "title": "Le chiavi AI si gestiscono nell'app desktop",
@@ -501,7 +503,7 @@
       },
       "usage": {
         "title": "Statistiche di utilizzo",
-        "description": "Consulta le richieste AI e i token registrati localmente.",
+        "description": "Richieste e token usati dalle funzioni AI.",
         "clear": "Cancella",
         "noUsage": "Ancora nessun utilizzo",
         "totalTokens": "Token totali",
@@ -509,11 +511,11 @@
       },
       "privacy": {
         "title": "Dati e privacy",
-        "description": "Cosa invia Diaspro Viboard al tuo provider AI e quando.",
-        "intro": "Le funzioni AI inviano contenuti al provider selezionato sopra (Anthropic o OpenAI) tramite la sua API. Diaspro Viboard non ha un server AI proprio e non viene inviato nulla finché non configuri una chiave API.",
+        "description": "Quali dati possono essere inviati al servizio AI.",
+        "intro": "Le funzioni AI inviano contenuti al servizio scelto sopra (Anthropic, OpenAI o DeepSeek) tramite la sua API. Diaspro Viboard non usa un proprio server AI e non invia nulla finché non salvi una chiave API.",
         "smartIndexLabel": "Indice dei file",
-        "smartIndexBody": ": brevi anteprime e riassunti dei tuoi file, inviati quando ricostruisci l'indice o, se Riassumi automaticamente al salvataggio è attivo, automaticamente dopo un salvataggio.",
-        "retention": "La conservazione è regolata dai termini API del tuo provider. Anthropic e OpenAI dichiarano che i dati inviati via API non vengono usati per addestrare i loro modelli, per impostazione predefinita.",
+        "smartIndexBody": ": può inviare brevi estratti dei file per generarne i riassunti.",
+        "retention": "La gestione e la conservazione dei dati dipendono dalle condizioni del servizio AI scelto.",
         "acknowledgement": {
           "title": "Presa visione della privacy",
           "given": "Hai preso visione dell'informativa privacy sull'AI.",
@@ -525,18 +527,18 @@
     "agents": {
       "title": "Agenti esterni",
       "description": "Controlla il contesto che Diaspro Viboard fornisce agli agenti esterni, in locale o tramite MCP.",
-      "notice": "Queste impostazioni valgono per gli <strong>agenti esterni</strong> che usano i file locali generati o la tua connessione MCP ospitata.",
+      "notice": "Queste impostazioni servono a preparare file di istruzioni locali per strumenti come Claude Code, Codex e Gemini.",
       "emit": {
         "title": "File generati",
-        "description": "Scegli quali file per agenti scrivere nella cartella dati. Contenuto identico, tre nomi di file.",
+        "description": "Scegli quali file di istruzioni mantenere aggiornati nella cartella di Diaspro Viboard.",
         "claude": "Per Claude Code",
         "agents": "Per Codex / OpenAI Agents",
         "gemini": "Per Gemini CLI",
-        "noneEnabled": "Nessun file per agenti viene generato. Le istruzioni qui sotto sono salvate, ma non saranno scritte su disco finché non attivi almeno un interruttore."
+        "noneEnabled": "Nessun file per agenti è attivo."
       },
       "global": {
         "title": "Istruzioni globali",
-        "description": "Valgono in tutti gli spazi di lavoro e vengono fornite tramite i file locali generati o desk_context via MCP."
+        "description": "Istruzioni generali disponibili agli agenti che lavorano sui file di Diaspro Viboard."
       },
       "instructions": {
         "globalLabel": "Istruzioni globali",
@@ -547,7 +549,7 @@
       },
       "preview": {
         "toggle": "Anteprima del CLAUDE.md generato",
-        "revealInFinder": "Mostra nel Finder",
+        "revealInFinder": "Mostra nella cartella",
         "refresh": "Aggiorna",
         "errorBrowserMode": "L'anteprima è disponibile solo nell'app desktop.",
         "errorFileMissing": "Il file non esiste ancora. Attiva CLAUDE.md e poi torna qui."
@@ -579,18 +581,18 @@
         "switchToLocal": "Passa a questo Mac"
       },
       "storage": {
-        "title": "Archiviazione dati",
-        "description": "Dove sono salvati i tuoi progetti e i tuoi file",
-        "pathLabel": "Percorso della cartella dati",
+        "title": "Cartella dati",
+        "description": "Qui Diaspro Viboard salva progetti, attività e documenti.",
+        "pathLabel": "Percorso",
         "pathPlaceholder": "~/Viboard",
-        "change": "Cambia",
-        "helperText": "Tutti i tuoi spazi di lavoro, progetti, attività e note sono salvati come file markdown in questa cartella."
+        "change": "Cambia cartella",
+        "helperText": "I dati restano sul tuo computer, in file Markdown dentro questa cartella."
       },
       "reset": {
         "title": "Ripristino",
-        "description": "Ripristina i valori predefiniti e riesegui la configurazione. I tuoi file dati vengono conservati.",
+        "description": "Ripristina le preferenze dell'app senza cancellare i tuoi file.",
         "button": "Ripristina tutte le impostazioni",
-        "helperText": "Questa operazione ripristina tutte le impostazioni e mostra di nuovo la procedura guidata. I tuoi file dati non verranno eliminati."
+        "helperText": "Diaspro Viboard tornerà alle impostazioni iniziali e mostrerà di nuovo la configurazione. I tuoi dati resteranno nella cartella scelta."
       },
       "resetDialog": {
         "title": "Ripristina tutte le impostazioni",
@@ -598,9 +600,9 @@
         "confirmLabel": "Ripristina"
       },
       "pathDialog": {
-        "confirmTitle": "Cambiare cartella dati?",
-        "confirmDescription": "Diaspro Viboard salverà gli editor aperti, passerà a {{path}} e ricaricherà.",
-        "confirmSwitch": "Cambia e ricarica",
+        "confirmTitle": "Cambiare cartella dei dati?",
+        "confirmDescription": "Diaspro Viboard salverà le modifiche aperte, userà {{path}} come nuova cartella e si riavvierà.",
+        "confirmSwitch": "Usa questa cartella",
         "existingTitle": "Dati esistenti trovati",
         "existingDescription_one": "Trovato {{count}} spazio di lavoro in questa posizione.",
         "existingDescription_other": "Trovati {{count}} spazi di lavoro in questa posizione.",
@@ -614,7 +616,7 @@
     "about": {
       "app": {
         "title": "Diaspro Viboard",
-        "description": "Gestione di progetti e attività in puro Markdown",
+        "description": "Progetti, attività e documenti in file Markdown locali.",
         "version": "Versione",
         "commit": "Commit",
         "built": "Compilata"
@@ -953,8 +955,8 @@
       "catalogCleared": "Indice dei file cancellato",
       "autoSummarizeEnabled": "Riassunto automatico attivato",
       "autoSummarizeDisabled": "Riassunto automatico disattivato",
-      "settingsReset": "Impostazioni ripristinate ai valori predefiniti",
-      "dataPathUpdated": "Percorso dati aggiornato",
+      "settingsReset": "Impostazioni ripristinate",
+      "dataPathUpdated": "Cartella dati aggiornata",
       "switchedToPath": "Passato a {{path}} con i dati esistenti",
       "dataPathUpdatedCreateWorkspace": "Percorso dati aggiornato. Crea il tuo primo spazio di lavoro.",
       "dataPathUpdatedWizard": "Percorso dati aggiornato. La procedura guidata ti accompagnerà."
@@ -1036,8 +1038,8 @@
   "errors": {
     "startup": {
       "title": "Diaspro Viboard non ha potuto avviarsi",
-      "description": "Diaspro Viboard non è riuscito a preparare la cartella dati. I tuoi file sono al sicuro. Si tratta di un problema di avvio, non di perdita di dati.",
-      "hint": "Verifica che la cartella dati esista e sia leggibile, poi riprova."
+      "description": "Diaspro Viboard non riesce ad aprire la cartella dati. I file non vengono cancellati.",
+      "hint": "Controlla che la cartella esista e che Diaspro Viboard possa leggerla e modificarla."
     },
     "connection": {
       "notAvailableRemote": "Non disponibile quando sei collegato a un server."
@@ -1070,7 +1072,7 @@
       "deleteFileFailed": "Eliminazione del file non riuscita",
       "moveFailed": "Spostamento del documento non riuscito",
       "openFailed": "Impossibile aprire il file",
-      "revealFailed": "Impossibile mostrare nel Finder",
+      "revealFailed": "Impossibile mostrare il file nella cartella",
       "copyPathFailed": "Impossibile copiare il percorso",
       "cannotRevealBrowser": "Impossibile mostrare i file in modalità browser",
       "cannotOpenBrowser": "Impossibile aprire i file in modalità browser",
@@ -1164,20 +1166,62 @@
         "meetingProject": "Crea prima un progetto"
       },
       "commands": {
-        "captureTask": { "label": "Raccogli attività nella Raccolta", "aliases": "raccogli|raccolta|ricorda|attività rapida|capture" },
-        "createTask": { "label": "Crea attività", "aliases": "nuova attività|aggiungi attività|da fare|todo" },
-        "createDoc": { "label": "Crea documento", "aliases": "nuovo documento|aggiungi documento|documento|nota" },
-        "createMeeting": { "label": "Crea riunione", "aliases": "nuova riunione|aggiungi riunione|appuntamento" },
-        "createProject": { "label": "Crea progetto", "aliases": "nuovo progetto|aggiungi progetto" },
-        "switchWorkspace": { "label": "Cambia spazio di lavoro", "aliases": "spazio|lavoro|cambia spazio|team" },
-        "goDashboard": { "label": "Vai alla dashboard", "aliases": "home|panoramica|inizio" },
-        "goPlanner": { "label": "Vai al pianificatore", "aliases": "pianifica|calendario|settimana|programma" },
-        "goTasks": { "label": "Vai alle attività", "aliases": "attività|cose da fare|todo" },
-        "goDocs": { "label": "Vai ai documenti", "aliases": "documenti|doc|note" },
-        "goMeetings": { "label": "Vai alle riunioni", "aliases": "riunioni|appuntamenti" },
-        "goProjects": { "label": "Vai ai progetti", "aliases": "progetti" },
-        "openSettings": { "label": "Apri impostazioni", "aliases": "preferenze|configurazione" },
-        "viewShortcuts": { "label": "Vedi le scorciatoie da tastiera", "aliases": "tasti|scorciatoie|aiuto" }
+        "captureTask": {
+          "label": "Raccogli attività nella Raccolta",
+          "aliases": "raccogli|raccolta|ricorda|attività rapida|capture"
+        },
+        "createTask": {
+          "label": "Crea attività",
+          "aliases": "nuova attività|aggiungi attività|da fare|todo"
+        },
+        "createDoc": {
+          "label": "Crea documento",
+          "aliases": "nuovo documento|aggiungi documento|documento|nota"
+        },
+        "createMeeting": {
+          "label": "Crea riunione",
+          "aliases": "nuova riunione|aggiungi riunione|appuntamento"
+        },
+        "createProject": {
+          "label": "Crea progetto",
+          "aliases": "nuovo progetto|aggiungi progetto"
+        },
+        "switchWorkspace": {
+          "label": "Cambia spazio di lavoro",
+          "aliases": "spazio|lavoro|cambia spazio|team"
+        },
+        "goDashboard": {
+          "label": "Vai alla dashboard",
+          "aliases": "home|panoramica|inizio"
+        },
+        "goPlanner": {
+          "label": "Vai al pianificatore",
+          "aliases": "pianifica|calendario|settimana|programma"
+        },
+        "goTasks": {
+          "label": "Vai alle attività",
+          "aliases": "attività|cose da fare|todo"
+        },
+        "goDocs": {
+          "label": "Vai ai documenti",
+          "aliases": "documenti|doc|note"
+        },
+        "goMeetings": {
+          "label": "Vai alle riunioni",
+          "aliases": "riunioni|appuntamenti"
+        },
+        "goProjects": {
+          "label": "Vai ai progetti",
+          "aliases": "progetti"
+        },
+        "openSettings": {
+          "label": "Apri impostazioni",
+          "aliases": "preferenze|configurazione"
+        },
+        "viewShortcuts": {
+          "label": "Vedi le scorciatoie da tastiera",
+          "aliases": "tasti|scorciatoie|aiuto"
+        }
       },
       "workspaces": {
         "placeholder": "Cerca spazi di lavoro...",
@@ -1215,8 +1259,8 @@
   "smartIndex": {},
   "setup": {
     "welcome": {
-      "title": "Benvenuto in Diaspro Viboard.",
-      "subtitle": "I tuoi progetti, attività, documenti e riunioni, come semplici file Markdown che sono tuoi."
+      "title": "Benvenuta in Diaspro Viboard",
+      "subtitle": "I tuoi progetti, attività e documenti salvati in semplici file Markdown, sempre tuoi."
     },
     "location": {
       "title": "Dove deve tenere Diaspro Viboard il tuo lavoro?",
@@ -1236,25 +1280,25 @@
       "httpsRequired": "Il server deve usare https. Un indirizzo http invierebbe il token di accesso in chiaro."
     },
     "dataFolder": {
-      "title": "Dove salviamo i tuoi file?",
-      "subtitle": "Scegli una cartella qualsiasi. Diaspro Viboard crea la struttura per te e puoi spostarla più avanti.",
-      "label": "Cartella dati",
-      "pickerTitle": "Seleziona cartella dati",
-      "browseTitle": "Sfoglia per la cartella"
+      "title": "Dove vuoi salvare i tuoi file?",
+      "subtitle": "Scegli una cartella sul computer. Diaspro Viboard organizzerà lì tutti i tuoi dati.",
+      "label": "Cartella di Diaspro Viboard",
+      "pickerTitle": "Scegli la cartella di Diaspro Viboard",
+      "browseTitle": "Scegli cartella"
     },
     "existingDetected": {
-      "title": "Qui hai già dei dati di Diaspro Viboard.",
-      "description_one": "Trovato {{count}} spazio di lavoro in questa cartella. Riprendi da dove eri rimasto oppure inizia da zero.",
-      "description_other": "Trovati {{count}} spazi di lavoro in questa cartella. Riprendi da dove eri rimasto oppure inizia da zero.",
-      "useExisting": "Usa dati esistenti",
+      "title": "Ho trovato dei dati di Diaspro Viboard",
+      "description_one": "In questa cartella c'è già {{count}} spazio di lavoro. Puoi continuare a usarlo oppure crearne uno nuovo.",
+      "description_other": "In questa cartella ci sono già {{count}} spazi di lavoro. Puoi continuare a usarli oppure crearne uno nuovo.",
+      "useExisting": "Continua con questi dati",
       "startFresh": "Inizia da zero"
     },
     "workspace": {
-      "title": "Dai un nome al tuo spazio di lavoro.",
-      "subtitle": "Questo è il tuo spazio principale, per note personali e per la raccolta rapida. Aggiungi altri spazi di lavoro più avanti per clienti, progetti o altre aree.",
+      "title": "Come vuoi chiamare il tuo spazio di lavoro?",
+      "subtitle": "È il contenitore principale per i tuoi progetti, documenti e attività. Potrai crearne altri quando ti servono.",
       "nameLabel": "Nome",
       "namePlaceholder": "Personale",
-      "finish": "Fine"
+      "finish": "Inizia"
     }
   },
   "auth": {
@@ -1306,7 +1350,7 @@
   },
   "menus": {
     "common": {
-      "revealInFinder": "Mostra nel Finder",
+      "revealInFinder": "Mostra nella cartella",
       "copyPath": "Copia percorso"
     },
     "taskContextMenu": {

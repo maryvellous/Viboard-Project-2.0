@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  Calendar,
   CalendarDays,
   Check,
   CheckSquare,
@@ -81,13 +80,12 @@ const OPEN_COMMAND_PALETTE_EVENT = "desk:open-command-palette";
 
 const NewTaskModal = lazy(() => import("@/components/tasks/new-task-modal").then((module) => ({ default: module.NewTaskModal })));
 const NewDocModal = lazy(() => import("@/components/docs/new-doc-modal").then((module) => ({ default: module.NewDocModal })));
-const NewMeetingModal = lazy(() => import("@/components/meetings/new-meeting-modal").then((module) => ({ default: module.NewMeetingModal })));
 const NewProjectModal = lazy(() => import("@/components/projects/new-project-modal").then((module) => ({ default: module.NewProjectModal })));
 
 const TYPE_ICONS: Record<SearchItemType, React.ReactNode> = {
   task: <CheckSquare className="size-4" />,
   doc: <FileText className="size-4" />,
-  meeting: <Calendar className="size-4" />,
+  meeting: <FileText className="size-4" />,
   project: <FolderKanban className="size-4" />,
 };
 
@@ -95,7 +93,6 @@ const COMMAND_ICONS: Record<PaletteCommandIcon, React.ReactNode> = {
   capture: <Zap className="size-4" />,
   task: <CheckSquare className="size-4" />,
   doc: <FileText className="size-4" />,
-  meeting: <Calendar className="size-4" />,
   project: <FolderKanban className="size-4" />,
   workspace: <ChevronsUpDown className="size-4" />,
   dashboard: <Home className="size-4" />,
@@ -132,7 +129,7 @@ export function CommandPalette() {
   const { data: projects = [] } = useProjects(currentWorkspaceId);
   const indexState = useSearchIndexState();
   const createCaptureTask = useCreateCaptureTask();
-  const { openTask, openDoc, openMeeting, openDesk } = useOpenTab();
+  const { openTask, openDoc, openDesk } = useOpenTab();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -159,9 +156,10 @@ export function CommandPalette() {
     // Search data lives in the module-level index; its revision is the recompute signal.
     void indexState.revision;
     if (!indexState.hasUsableIndex) return [];
-    return query
-      ? search(query, { limit: 10, workspaceId })
-      : getRecentItems(RECENT_PALETTE_LIMIT, undefined, workspaceId);
+    const items = query
+      ? search(query, { limit: 12, workspaceId })
+      : getRecentItems(RECENT_PALETTE_LIMIT + 4, undefined, workspaceId);
+    return items.filter((result) => result.item.type !== "meeting").slice(0, query ? 10 : RECENT_PALETTE_LIMIT);
   }, [indexState.hasUsableIndex, indexState.revision, query, workspaceId]);
 
   const commands = useMemo(
@@ -226,9 +224,7 @@ export function CommandPalette() {
         openDoc(item);
         break;
       case "meeting":
-        dispatch({ type: "close" });
-        openMeeting(item);
-        break;
+        return;
       case "project": {
         const opened = openSearchProject(item, {
           currentWorkspaceId,
@@ -242,7 +238,7 @@ export function CommandPalette() {
         break;
       }
     }
-  }, [currentWorkspaceId, navigate, openDesk, openDoc, openMeeting, openTask, setCurrentWorkspaceId]);
+  }, [currentWorkspaceId, navigate, openDesk, openDoc, openTask, setCurrentWorkspaceId]);
 
   const handleWorkspaceSelect = useCallback((workspaceId: string) => {
     setCurrentWorkspaceId(workspaceId);
@@ -361,7 +357,6 @@ export function CommandPalette() {
         <Suspense fallback={null}>
           {activeModal === "task" && <NewTaskModal open onClose={() => setActiveModal(null)} />}
           {activeModal === "doc" && <NewDocModal open onClose={() => setActiveModal(null)} />}
-          {activeModal === "meeting" && <NewMeetingModal open onClose={() => setActiveModal(null)} />}
           {activeModal === "project" && <NewProjectModal open onClose={() => setActiveModal(null)} />}
         </Suspense>
       )}

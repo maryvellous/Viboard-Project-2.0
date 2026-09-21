@@ -12,7 +12,7 @@ export interface AIUsage {
 // Provider Types
 // =============================================================================
 
-export type AIProviderType = 'anthropic' | 'openai';
+export type AIProviderType = 'anthropic' | 'openai' | 'deepseek';
 
 // =============================================================================
 // Usage Tracking Types

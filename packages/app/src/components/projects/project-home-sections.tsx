@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
-  Calendar,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
@@ -150,14 +149,14 @@ const timelineIcons = {
   "task-created": Circle,
   "task-completed": CheckCircle2,
   "task-due": Clock,
-  meeting: Calendar,
+  meeting: FileText,
   "doc-created": FileText,
   "doc-updated": FileText,
 } as const;
 
 function TimelineRow({ event }: { event: ProjectTimelineEvent }) {
   const { t } = useTranslation();
-  const { openTask, openDoc, openMeeting } = useOpenTab();
+  const { openTask, openDoc } = useOpenTab();
   const Icon = timelineIcons[event.kind];
   const canOpen = event.entityType && event.entityId;
   const open = () => {
@@ -170,7 +169,6 @@ function TimelineRow({ event }: { event: ProjectTimelineEvent }) {
     };
     if (event.entityType === "task") openTask(entity);
     else if (event.entityType === "doc") openDoc(entity);
-    else openMeeting(entity);
   };
 
   return (
@@ -214,9 +212,11 @@ function TimelineGroup({ title, events }: { title: string; events: ProjectTimeli
 export function ProjectTimelineRail({ timeline }: { timeline: ProjectTimeline }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const schedule = expanded ? timeline.schedule : timeline.schedule.slice(0, SCHEDULE_LIMIT);
-  const history = expanded ? timeline.history : timeline.history.slice(0, HISTORY_LIMIT);
-  const hasMore = timeline.schedule.length > SCHEDULE_LIMIT || timeline.history.length > HISTORY_LIMIT;
+  const visibleSchedule = timeline.schedule.filter((event) => event.kind !== "meeting");
+  const visibleHistory = timeline.history.filter((event) => event.kind !== "meeting");
+  const schedule = expanded ? visibleSchedule : visibleSchedule.slice(0, SCHEDULE_LIMIT);
+  const history = expanded ? visibleHistory : visibleHistory.slice(0, HISTORY_LIMIT);
+  const hasMore = visibleSchedule.length > SCHEDULE_LIMIT || visibleHistory.length > HISTORY_LIMIT;
 
   return (
     <aside className="space-y-6 lg:border-l lg:border-border/60 lg:pl-7">

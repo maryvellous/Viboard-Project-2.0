@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calendar, CheckSquare, FileText, MoreHorizontal, Trash2 } from "lucide-react";
+import { CheckSquare, FileText, MoreHorizontal, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { formatLocaleDate, formatRelativeTime } from "@/lib/i18n/format";
@@ -243,10 +243,6 @@ function ProjectMeta({ project, lastActivityAt }: { project: Project; lastActivi
         <Link to={`/docs?project=${project.id}`} className="flex items-center gap-1 hover:text-foreground">
           <FileText className="size-3.5" />
           {t("pages.projects.home.metricDocs", { count: project.docCount ?? 0 })}
-        </Link>
-        <Link to={`/meetings?project=${project.id}`} className="flex items-center gap-1 hover:text-foreground">
-          <Calendar className="size-3.5" />
-          {t("pages.projects.home.metricMeetings", { count: project.meetingCount ?? 0 })}
         </Link>
       </nav>
     </div>

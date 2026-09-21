@@ -92,7 +92,7 @@ export function classifyAIError(error: unknown, provider: AIProviderType): AIPro
   return new AIProviderError(code, provider, MESSAGES[code](provider), error);
 }
 
-const label: Record<AIProviderType, string> = { openai: "OpenAI", anthropic: "Anthropic" };
+const label: Record<AIProviderType, string> = { openai: "OpenAI", anthropic: "Anthropic", deepseek: "DeepSeek" };
 
 /** Clean, self-authored messages (safe to expose from the server; UI prefers the code mapping). */
 const MESSAGES: Record<AIErrorCode, (p: AIProviderType) => string> = {

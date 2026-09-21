@@ -8,7 +8,7 @@ import { Buffer as BufferPolyfill } from "buffer";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AppBootError, AppBootScreen } from "./app/boot-screen";
-import { applyThemePreference, readPersistedTheme } from "./lib/theme";
+import { applyThemePreference } from "./lib/theme";
 
 // gray-matter — used by every Markdown parse (parseMarkdown) — calls
 // `Buffer.from()` at runtime. The Tauri/browser WebView has no Node `Buffer`
@@ -21,7 +21,7 @@ if (typeof globalThis.Buffer === "undefined") {
 // Paint the branded boot surface before host wiring and dynamic imports begin.
 // The same component is reused by provider/auth gates, so startup reads as one
 // continuous state rather than a series of unrelated loaders.
-const stopInitialThemeSync = applyThemePreference(readPersistedTheme());
+const stopInitialThemeSync = applyThemePreference("dark");
 const root = createRoot(document.getElementById("root")!);
 root.render(
   <StrictMode>
@@ -36,17 +36,15 @@ async function bootstrap() {
   // below, since that resolves the data path through it.
   const { setDataRootResolver } = await import("@desk/core/host");
   const { useBootStore } = await import("./stores/boot");
-  setDataRootResolver(async () => useBootStore.getState().dataPath || "~/DeskMD");
+  setDataRootResolver(async () => useBootStore.getState().dataPath || "~/Viboard");
   const { isTauri } = await import("@desk/core");
-  const boot = useBootStore.getState();
-  const nativeRemote = isTauri() && boot.connectionMode === "remote" && Boolean(boot.serverUrl);
 
   // Set the Tauri FS scope BEFORE any store module is evaluated. File-backed
   // zustand stores (createRemoteSettingStorage & co.) read the filesystem during
   // hydration at module-eval time — that must happen after the scope is set,
   // otherwise the narrowed capability denies the read and the store hydrates
   // empty. expandFsScope() is a no-op in browser mode (isTauri() guard inside).
-  if (isTauri() && !nativeRemote) {
+  if (isTauri()) {
     const { expandFsScope } = await import("@desk/core/host/files");
     try {
       await expandFsScope(); // claims ownership before any local read or write
@@ -99,35 +97,10 @@ async function bootstrap() {
     // stray getStorage() throws instead of silently hitting the wrong disk.
     setStorage(new GuardStorageProvider());
     setDeskService(createRemoteDeskService(window.location.origin));
-  } else {
-    // Native remote mode: the same Tauri app can point at a remote
-    // desk.md server instead of local disk. "Native" is detected at runtime via
-    // isTauri() — true on every Tauri desktop platform (macOS/Windows/Linux) — so no
-    // build flag is needed; the DMG/MSI/AppImage is always native. This whole branch is
-    // the `else` of the constant `VITE_DESK_HOSTED`, so it's tree-shaken from the lean
-    // hosted web build. The choice is a runtime boot-store setting, so flipping it +
-    // reloading re-wires the service; requests go through the Tauri HTTP plugin (Rust
-    // reqwest, bypasses CSP/CORS) with a Keychain-backed Bearer token. Local mode (and
-    // the browser-fixture dev build, where isTauri() is false) keeps LocalDeskService.
-    if (nativeRemote) {
-      const { setDeskService, setStorage, GuardStorageProvider } = await import("@desk/core/host");
-      const { createRemoteDeskService } = await import("./lib/remote-desk-service");
-      const { nativeFetch } = await import("./lib/native-http");
-      const { loadSessionToken, getTokenHeaderSync } = await import("./lib/session-token");
-      await loadSessionToken(); // populate the in-memory mirror before any RPC
-      // Domain runs on the server: guard the local filesystem (see hosted branch above).
-      setStorage(new GuardStorageProvider());
-      setDeskService(
-        createRemoteDeskService(boot.serverUrl, {
-          fetchImpl: nativeFetch,
-          authHeader: getTokenHeaderSync,
-        })
-      );
-    }
   }
 
   // AI maintenance runs where the data lives: start the engine only when this app owns the
-  // data (local disk). In remote mode the server runs it. No-ops internally otherwise.
+  // data (local disk). Hosted builds run maintenance on the server.
   const { startAppMaintenanceEngine } = await import("./lib/maintenance");
   await startAppMaintenanceEngine();
 

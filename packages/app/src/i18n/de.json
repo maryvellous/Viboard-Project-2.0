@@ -462,7 +462,8 @@
       },
       "providers": {
         "openai": "OpenAI",
-        "anthropic": "Anthropic"
+        "anthropic": "Anthropic",
+        "deepseek": "DeepSeek"
       },
       "credentials": {
         "title": "Zugangsdaten",
@@ -479,7 +480,8 @@
         "showAriaLabel": "API-Schlüssel anzeigen",
         "hideAriaLabel": "API-Schlüssel verbergen",
         "storedNotice": "Im Schlüsselbund des Betriebssystems gespeichert (Keychain / Credential Manager / Secret Service).",
-        "notConfigured": "Anbieterschlüssel nicht konfiguriert."
+        "notConfigured": "Anbieterschlüssel nicht konfiguriert.",
+        "placeholderDeepseek": "sk-..."
       },
       "browserMode": {
         "title": "KI-Schlüssel werden in der Desktop-App verwaltet",
@@ -504,7 +506,7 @@
       "privacy": {
         "title": "Daten & Datenschutz",
         "description": "Was Diaspro Viboard an deinen KI-Anbieter sendet, und wann.",
-        "intro": "KI-Funktionen senden Inhalte an den oben ausgewählten Anbieter (Anthropic oder OpenAI) über dessen API. Diaspro Viboard hat keinen eigenen KI-Server, und es wird nichts gesendet, bevor du einen API-Schlüssel konfiguriert hast.",
+        "intro": "KI-Funktionen senden Inhalte über die API an den oben ausgewählten Anbieter (Anthropic, OpenAI oder DeepSeek). Diaspro Viboard betreibt keinen eigenen KI-Server; ohne konfigurierten API-Schlüssel wird nichts gesendet.",
         "smartIndexLabel": "Smart Index",
         "smartIndexBody": ": kurze Vorschauen und Zusammenfassungen deiner Dateien, gesendet beim Neuaufbau des Katalogs oder, wenn „Automatisch zusammenfassen beim Speichern“ aktiv ist, automatisch nach dem Speichern.",
         "retention": "Die Aufbewahrung richtet sich nach den API-Bedingungen deines Anbieters. Anthropic und OpenAI geben an, dass API-Daten standardmäßig nicht zum Training ihrer Modelle verwendet werden.",
@@ -1164,20 +1166,62 @@
         "meetingProject": "Erstelle zuerst ein Projekt"
       },
       "commands": {
-        "captureTask": { "label": "Aufgabe im Eingang erfassen", "aliases": "erfassen|eingang|merken|schnelle aufgabe" },
-        "createTask": { "label": "Aufgabe erstellen", "aliases": "neue aufgabe|aufgabe hinzufügen|todo" },
-        "createDoc": { "label": "Dokument erstellen", "aliases": "neues dokument|dokument hinzufügen|notiz" },
-        "createMeeting": { "label": "Meeting erstellen", "aliases": "neues meeting|meeting hinzufügen|termin" },
-        "createProject": { "label": "Projekt erstellen", "aliases": "neues projekt|projekt hinzufügen" },
-        "switchWorkspace": { "label": "Arbeitsbereich wechseln", "aliases": "arbeitsbereich|bereich wechseln|team|workspace" },
-        "goDashboard": { "label": "Zum Dashboard", "aliases": "start|übersicht" },
-        "goPlanner": { "label": "Zum Planer", "aliases": "planen|kalender|woche|zeitplan" },
-        "goTasks": { "label": "Zu Aufgaben", "aliases": "aufgaben|todos" },
-        "goDocs": { "label": "Zu Dokumenten", "aliases": "dokumente|docs|notizen" },
-        "goMeetings": { "label": "Zu Meetings", "aliases": "meetings|termine" },
-        "goProjects": { "label": "Zu Projekten", "aliases": "projekte" },
-        "openSettings": { "label": "Einstellungen öffnen", "aliases": "präferenzen|konfiguration" },
-        "viewShortcuts": { "label": "Tastenkürzel anzeigen", "aliases": "tasten|shortcuts|hilfe" }
+        "captureTask": {
+          "label": "Aufgabe im Eingang erfassen",
+          "aliases": "erfassen|eingang|merken|schnelle aufgabe"
+        },
+        "createTask": {
+          "label": "Aufgabe erstellen",
+          "aliases": "neue aufgabe|aufgabe hinzufügen|todo"
+        },
+        "createDoc": {
+          "label": "Dokument erstellen",
+          "aliases": "neues dokument|dokument hinzufügen|notiz"
+        },
+        "createMeeting": {
+          "label": "Meeting erstellen",
+          "aliases": "neues meeting|meeting hinzufügen|termin"
+        },
+        "createProject": {
+          "label": "Projekt erstellen",
+          "aliases": "neues projekt|projekt hinzufügen"
+        },
+        "switchWorkspace": {
+          "label": "Arbeitsbereich wechseln",
+          "aliases": "arbeitsbereich|bereich wechseln|team|workspace"
+        },
+        "goDashboard": {
+          "label": "Zum Dashboard",
+          "aliases": "start|übersicht"
+        },
+        "goPlanner": {
+          "label": "Zum Planer",
+          "aliases": "planen|kalender|woche|zeitplan"
+        },
+        "goTasks": {
+          "label": "Zu Aufgaben",
+          "aliases": "aufgaben|todos"
+        },
+        "goDocs": {
+          "label": "Zu Dokumenten",
+          "aliases": "dokumente|docs|notizen"
+        },
+        "goMeetings": {
+          "label": "Zu Meetings",
+          "aliases": "meetings|termine"
+        },
+        "goProjects": {
+          "label": "Zu Projekten",
+          "aliases": "projekte"
+        },
+        "openSettings": {
+          "label": "Einstellungen öffnen",
+          "aliases": "präferenzen|konfiguration"
+        },
+        "viewShortcuts": {
+          "label": "Tastenkürzel anzeigen",
+          "aliases": "tasten|shortcuts|hilfe"
+        }
       },
       "workspaces": {
         "placeholder": "Arbeitsbereiche durchsuchen...",

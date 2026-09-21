@@ -45,7 +45,7 @@ interface PreferencesState {
 
 const defaultPreferences = {
   theme: "system" as const,
-  language: "en" as Language,
+  language: "it" as Language,
   sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
   workDayStartHour: 9,
   workDayEndHour: 18,

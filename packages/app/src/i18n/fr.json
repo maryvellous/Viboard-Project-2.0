@@ -462,7 +462,8 @@
       },
       "providers": {
         "openai": "OpenAI",
-        "anthropic": "Anthropic"
+        "anthropic": "Anthropic",
+        "deepseek": "DeepSeek"
       },
       "credentials": {
         "title": "Identifiants",
@@ -479,7 +480,8 @@
         "showAriaLabel": "Afficher la clé API",
         "hideAriaLabel": "Masquer la clé API",
         "storedNotice": "Stockée dans le trousseau du système (Keychain / Credential Manager / Secret Service).",
-        "notConfigured": "Clé du fournisseur non configurée."
+        "notConfigured": "Clé du fournisseur non configurée.",
+        "placeholderDeepseek": "sk-..."
       },
       "browserMode": {
         "title": "Les clés d'IA sont gérées dans l'application de bureau",
@@ -504,7 +506,7 @@
       "privacy": {
         "title": "Données et confidentialité",
         "description": "Ce que Diaspro Viboard envoie à votre fournisseur d'IA, et quand.",
-        "intro": "Les fonctionnalités d'IA envoient du contenu au fournisseur sélectionné ci-dessus (Anthropic ou OpenAI) via leur API. Diaspro Viboard n'a pas de serveur d'IA propre, et rien n'est envoyé tant qu'une clé API n'est pas configurée.",
+        "intro": "Les fonctions d’IA envoient du contenu au fournisseur sélectionné ci-dessus (Anthropic, OpenAI ou DeepSeek) via son API. Diaspro Viboard ne possède pas de serveur d’IA et rien n’est envoyé tant qu’aucune clé API n’est configurée.",
         "smartIndexLabel": "Smart Index",
         "smartIndexBody": " : courts aperçus et résumés de vos fichiers, envoyés lors de la reconstruction du catalogue ou, si « Résumer automatiquement à l'enregistrement » est activé, automatiquement après un enregistrement.",
         "retention": "La conservation est régie par les conditions API de votre fournisseur. Anthropic et OpenAI indiquent que les données API ne servent pas à entraîner leurs modèles par défaut.",
@@ -1164,20 +1166,62 @@
         "meetingProject": "Créez d’abord un projet"
       },
       "commands": {
-        "captureTask": { "label": "Capturer une tâche dans la boîte de réception", "aliases": "capturer|boîte de réception|retenir|tâche rapide" },
-        "createTask": { "label": "Créer une tâche", "aliases": "nouvelle tâche|ajouter une tâche|todo" },
-        "createDoc": { "label": "Créer un document", "aliases": "nouveau document|ajouter un document|note" },
-        "createMeeting": { "label": "Créer une réunion", "aliases": "nouvelle réunion|ajouter une réunion|rendez-vous" },
-        "createProject": { "label": "Créer un projet", "aliases": "nouveau projet|ajouter un projet" },
-        "switchWorkspace": { "label": "Changer d’espace de travail", "aliases": "espace de travail|changer d’espace|équipe|workspace" },
-        "goDashboard": { "label": "Aller au tableau de bord", "aliases": "accueil|vue d’ensemble" },
-        "goPlanner": { "label": "Aller au planning", "aliases": "planifier|calendrier|semaine|programme" },
-        "goTasks": { "label": "Aller aux tâches", "aliases": "tâches|todos" },
-        "goDocs": { "label": "Aller aux documents", "aliases": "documents|docs|notes" },
-        "goMeetings": { "label": "Aller aux réunions", "aliases": "réunions|rendez-vous" },
-        "goProjects": { "label": "Aller aux projets", "aliases": "projets" },
-        "openSettings": { "label": "Ouvrir les réglages", "aliases": "préférences|configuration" },
-        "viewShortcuts": { "label": "Afficher les raccourcis clavier", "aliases": "touches|raccourcis|aide" }
+        "captureTask": {
+          "label": "Capturer une tâche dans la boîte de réception",
+          "aliases": "capturer|boîte de réception|retenir|tâche rapide"
+        },
+        "createTask": {
+          "label": "Créer une tâche",
+          "aliases": "nouvelle tâche|ajouter une tâche|todo"
+        },
+        "createDoc": {
+          "label": "Créer un document",
+          "aliases": "nouveau document|ajouter un document|note"
+        },
+        "createMeeting": {
+          "label": "Créer une réunion",
+          "aliases": "nouvelle réunion|ajouter une réunion|rendez-vous"
+        },
+        "createProject": {
+          "label": "Créer un projet",
+          "aliases": "nouveau projet|ajouter un projet"
+        },
+        "switchWorkspace": {
+          "label": "Changer d’espace de travail",
+          "aliases": "espace de travail|changer d’espace|équipe|workspace"
+        },
+        "goDashboard": {
+          "label": "Aller au tableau de bord",
+          "aliases": "accueil|vue d’ensemble"
+        },
+        "goPlanner": {
+          "label": "Aller au planning",
+          "aliases": "planifier|calendrier|semaine|programme"
+        },
+        "goTasks": {
+          "label": "Aller aux tâches",
+          "aliases": "tâches|todos"
+        },
+        "goDocs": {
+          "label": "Aller aux documents",
+          "aliases": "documents|docs|notes"
+        },
+        "goMeetings": {
+          "label": "Aller aux réunions",
+          "aliases": "réunions|rendez-vous"
+        },
+        "goProjects": {
+          "label": "Aller aux projets",
+          "aliases": "projets"
+        },
+        "openSettings": {
+          "label": "Ouvrir les réglages",
+          "aliases": "préférences|configuration"
+        },
+        "viewShortcuts": {
+          "label": "Afficher les raccourcis clavier",
+          "aliases": "touches|raccourcis|aide"
+        }
       },
       "workspaces": {
         "placeholder": "Rechercher des espaces de travail...",

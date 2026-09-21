@@ -238,12 +238,7 @@ function ContextMenuSuppressionProvider({
 }
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = usePreferencesStore((state) => state.theme);
-
-  useEffect(() => {
-    return applyThemePreference(theme);
-  }, [theme]);
-
+  useEffect(() => applyThemePreference("dark"), []);
   return <>{children}</>;
 }
 
