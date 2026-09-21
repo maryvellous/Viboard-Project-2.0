@@ -12,7 +12,7 @@ import { UpdateSection } from "./update-section";
 import { isTauri } from "@desk/core";
 import { formatLocaleDate } from "@/lib/i18n/format";
 
-const REPO_URL = "https://github.com/v1lling/desk.md";
+const REPO_URL = "https://github.com/maryvellous/Viboard-Project-2.0";
 const LICENSE_ID = "GPL-3.0-or-later";
 
 function openExternal(url: string) {
