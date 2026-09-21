@@ -55,6 +55,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate native app icons
+        run: npm run icons -w @desk/app
+
       - name: Security audit
         run: |
           npm audit --audit-level=high
