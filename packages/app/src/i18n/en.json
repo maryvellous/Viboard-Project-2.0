@@ -462,7 +462,8 @@
       },
       "providers": {
         "openai": "OpenAI",
-        "anthropic": "Anthropic"
+        "anthropic": "Anthropic",
+        "deepseek": "DeepSeek"
       },
       "credentials": {
         "title": "Credentials",
@@ -479,7 +480,8 @@
         "showAriaLabel": "Show API key",
         "hideAriaLabel": "Hide API key",
         "storedNotice": "Stored in the OS keychain (Keychain / Credential Manager / Secret Service).",
-        "notConfigured": "Provider key not configured."
+        "notConfigured": "Provider key not configured.",
+        "placeholderDeepseek": "sk-..."
       },
       "browserMode": {
         "title": "AI keys are managed in the desktop app",
@@ -510,7 +512,7 @@
       "privacy": {
         "title": "Data & Privacy",
         "description": "What Diaspro Viboard sends to your AI provider, and when.",
-        "intro": "AI features send content to the provider selected above (Anthropic or OpenAI) over their API. Diaspro Viboard has no AI server of its own, and nothing is sent until you configure an API key.",
+        "intro": "AI features send content to the provider selected above (Anthropic, OpenAI, or DeepSeek) through its API. Diaspro Viboard has no AI server of its own, and nothing is sent until you configure an API key.",
         "smartIndexLabel": "File index",
         "smartIndexBody": ": short previews and summaries of your files, sent when you rebuild the index or, if Auto-summarize on save is enabled, automatically after a save.",
         "retention": "Retention is governed by your provider's API terms. Anthropic and OpenAI state that API data is not used to train their models by default.",
@@ -1164,20 +1166,62 @@
         "meetingProject": "Create a project first"
       },
       "commands": {
-        "captureTask": { "label": "Capture task to Inbox", "aliases": "capture|inbox|remember|quick task" },
-        "createTask": { "label": "Create task", "aliases": "new task|add task|todo" },
-        "createDoc": { "label": "Create document", "aliases": "new document|add document|doc|note" },
-        "createMeeting": { "label": "Create meeting", "aliases": "new meeting|add meeting|appointment" },
-        "createProject": { "label": "Create project", "aliases": "new project|add project" },
-        "switchWorkspace": { "label": "Switch workspace", "aliases": "workspace|change workspace|team|space" },
-        "goDashboard": { "label": "Go to Dashboard", "aliases": "home|overview" },
-        "goPlanner": { "label": "Go to Planner", "aliases": "plan|calendar|week|schedule" },
-        "goTasks": { "label": "Go to Tasks", "aliases": "tasks|todos" },
-        "goDocs": { "label": "Go to Documents", "aliases": "documents|docs|notes" },
-        "goMeetings": { "label": "Go to Meetings", "aliases": "meetings|appointments" },
-        "goProjects": { "label": "Go to Projects", "aliases": "projects" },
-        "openSettings": { "label": "Open Settings", "aliases": "preferences|configuration" },
-        "viewShortcuts": { "label": "View keyboard shortcuts", "aliases": "keys|hotkeys|help" }
+        "captureTask": {
+          "label": "Capture task to Inbox",
+          "aliases": "capture|inbox|remember|quick task"
+        },
+        "createTask": {
+          "label": "Create task",
+          "aliases": "new task|add task|todo"
+        },
+        "createDoc": {
+          "label": "Create document",
+          "aliases": "new document|add document|doc|note"
+        },
+        "createMeeting": {
+          "label": "Create meeting",
+          "aliases": "new meeting|add meeting|appointment"
+        },
+        "createProject": {
+          "label": "Create project",
+          "aliases": "new project|add project"
+        },
+        "switchWorkspace": {
+          "label": "Switch workspace",
+          "aliases": "workspace|change workspace|team|space"
+        },
+        "goDashboard": {
+          "label": "Go to Dashboard",
+          "aliases": "home|overview"
+        },
+        "goPlanner": {
+          "label": "Go to Planner",
+          "aliases": "plan|calendar|week|schedule"
+        },
+        "goTasks": {
+          "label": "Go to Tasks",
+          "aliases": "tasks|todos"
+        },
+        "goDocs": {
+          "label": "Go to Documents",
+          "aliases": "documents|docs|notes"
+        },
+        "goMeetings": {
+          "label": "Go to Meetings",
+          "aliases": "meetings|appointments"
+        },
+        "goProjects": {
+          "label": "Go to Projects",
+          "aliases": "projects"
+        },
+        "openSettings": {
+          "label": "Open Settings",
+          "aliases": "preferences|configuration"
+        },
+        "viewShortcuts": {
+          "label": "View keyboard shortcuts",
+          "aliases": "keys|hotkeys|help"
+        }
       },
       "workspaces": {
         "placeholder": "Search workspaces...",
