@@ -36,28 +36,28 @@ const {
 describe("InMemoryStorageProvider", () => {
   it("implements recursive directories, binary files, metadata, moves, and deletes", async () => {
     const storage = new InMemoryStorageProvider([
-      { path: "~/DeskMD/a/one.md", content: "one" },
+      { path: "~/Viboard/a/one.md", content: "one" },
     ]);
 
-    await storage.mkdir("~/DeskMD/a/nested");
-    await storage.writeFile("~/DeskMD/a/nested/data.bin", new Uint8Array([1, 2, 3]));
+    await storage.mkdir("~/Viboard/a/nested");
+    await storage.writeFile("~/Viboard/a/nested/data.bin", new Uint8Array([1, 2, 3]));
 
-    expect(await storage.readDir("~/DeskMD/a")).toEqual([
+    expect(await storage.readDir("~/Viboard/a")).toEqual([
       { name: "nested", isDirectory: true, isFile: false },
       { name: "one.md", isDirectory: false, isFile: true },
     ]);
-    expect((await storage.fileStat("~/DeskMD/a/nested/data.bin"))?.size).toBe(3);
+    expect((await storage.fileStat("~/Viboard/a/nested/data.bin"))?.size).toBe(3);
 
-    await storage.rename("~/DeskMD/a/nested", "~/DeskMD/a/moved");
-    expect(await storage.exists("~/DeskMD/a/nested/data.bin")).toBe(false);
-    expect(await storage.exists("~/DeskMD/a/moved/data.bin")).toBe(true);
+    await storage.rename("~/Viboard/a/nested", "~/Viboard/a/moved");
+    expect(await storage.exists("~/Viboard/a/nested/data.bin")).toBe(false);
+    expect(await storage.exists("~/Viboard/a/moved/data.bin")).toBe(true);
 
     await expect(
-      storage.rename("~/DeskMD/a/one.md", "~/DeskMD/a/moved"),
+      storage.rename("~/Viboard/a/one.md", "~/Viboard/a/moved"),
     ).rejects.toThrow("Destination already exists");
 
-    await storage.removeDir("~/DeskMD/a/moved");
-    expect(await storage.exists("~/DeskMD/a/moved/data.bin")).toBe(false);
+    await storage.removeDir("~/Viboard/a/moved");
+    expect(await storage.exists("~/Viboard/a/moved/data.bin")).toBe(false);
   });
 });
 
