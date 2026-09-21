@@ -6,7 +6,9 @@ interface WindowControlsProps {
   className?: string;
 }
 
-async function withCurrentWindow(action: (window: Awaited<ReturnType<typeof import("@tauri-apps/api/window")["getCurrentWindow"]>>) => Promise<void>) {
+async function runWindowAction(
+  action: (window: import("@tauri-apps/api/window").Window) => Promise<void>,
+) {
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   await action(getCurrentWindow());
 }
@@ -20,7 +22,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-white/10 hover:text-foreground"
         aria-label="Minimizza"
-        onClick={() => void withCurrentWindow((window) => window.minimize())}
+        onClick={() => void runWindowAction((window) => window.minimize())}
       >
         <Minus className="size-4" />
       </button>
@@ -28,7 +30,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-white/10 hover:text-foreground"
         aria-label="Massimizza o ripristina"
-        onClick={() => void withCurrentWindow((window) => window.toggleMaximize())}
+        onClick={() => void runWindowAction((window) => window.toggleMaximize())}
       >
         <Square className="size-3.5" />
       </button>
@@ -36,7 +38,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-red-600 hover:text-white"
         aria-label="Chiudi"
-        onClick={() => void withCurrentWindow((window) => window.close())}
+        onClick={() => void runWindowAction((window) => window.close())}
       >
         <X className="size-4" />
       </button>
