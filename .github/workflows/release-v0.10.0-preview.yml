@@ -1,4 +1,4 @@
-name: Release v0.10.0 Preview
+name: Prepare v0.10.0 Security Fix
 
 on:
   push:
@@ -11,22 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest
-            args: "--target universal-apple-darwin"
-            rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
-          - platform: ubuntu-22.04
-            args: ""
-            rust-targets: ""
-          - platform: windows-latest
-            args: ""
-            rust-targets: ""
-
-    runs-on: ${{ matrix.platform }}
+  remediate:
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -37,73 +23,45 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.rust-targets }}
-
-      - name: Cache Rust
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: packages/app/src-tauri
-
-      - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev build-essential curl wget file \
-            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - name: Create security branch
+        run: git checkout -b security-v0.10.0
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Apply safe npm audit fixes
+        run: npm audit fix
+
       - name: Audit runtime dependencies
         run: npm audit --omit=dev --audit-level=high
 
-      - name: Verify v0.10.0 versions
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Storage integration fixture
+        run: npm run verify:storage
+
+      - name: Build desktop webview
+        run: npm run build
+
+      - name: Build hosted web app
+        run: npm run build:hosted -w @desk/app
+
+      - name: Commit dependency remediation
         shell: bash
         run: |
-          node - <<'NODE'
-          const fs = require("fs");
-          const files = [
-            "packages/app/src-tauri/tauri.conf.json",
-            "packages/app/package.json",
-            "packages/core/package.json",
-            "packages/server/package.json",
-          ];
-          for (const file of files) {
-            const version = JSON.parse(fs.readFileSync(file, "utf8")).version;
-            if (version !== "0.10.0") {
-              throw new Error(`${file} has version ${version}, expected 0.10.0`);
-            }
-          }
-          NODE
-
-      - name: Disable updater artifacts for unsigned preview
-        shell: bash
-        run: |
-          node - <<'NODE'
-          const fs = require("fs");
-          const path = "packages/app/src-tauri/tauri.conf.json";
-          const config = JSON.parse(fs.readFileSync(path, "utf8"));
-          config.bundle.createUpdaterArtifacts = false;
-          fs.writeFileSync(path, JSON.stringify(config, null, 2) + "\n");
-          NODE
-
-      - name: Build and publish preview
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: packages/app
-          tagName: v0.10.0
-          releaseName: "Diaspro Viboard v0.10.0 Preview"
-          releaseBody: |
-            Prima preview installabile di Diaspro Viboard.
-
-            Include il rebranding Diaspro Viboard, il nuovo data root ~/Viboard e il checkpoint CI completo.
-            Gli artefatti dell'auto-updater sono intenzionalmente esclusi da questa preview finché non viene configurata una chiave di firma Tauri propria.
-          releaseDraft: false
-          prerelease: true
-          args: ${{ matrix.args }}
+          if git diff --quiet -- package.json package-lock.json packages/*/package.json; then
+            echo "No dependency files changed."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json packages/*/package.json
+          git commit -m "fix: remediate runtime dependency advisories"
+          git push origin security-v0.10.0
