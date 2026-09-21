@@ -8,7 +8,7 @@ import { Buffer as BufferPolyfill } from "buffer";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AppBootError, AppBootScreen } from "./app/boot-screen";
-import { applyThemePreference, readPersistedTheme } from "./lib/theme";
+import { applyThemePreference } from "./lib/theme";
 
 // gray-matter — used by every Markdown parse (parseMarkdown) — calls
 // `Buffer.from()` at runtime. The Tauri/browser WebView has no Node `Buffer`
@@ -21,7 +21,7 @@ if (typeof globalThis.Buffer === "undefined") {
 // Paint the branded boot surface before host wiring and dynamic imports begin.
 // The same component is reused by provider/auth gates, so startup reads as one
 // continuous state rather than a series of unrelated loaders.
-const stopInitialThemeSync = applyThemePreference(readPersistedTheme());
+const stopInitialThemeSync = applyThemePreference("dark");
 const root = createRoot(document.getElementById("root")!);
 root.render(
   <StrictMode>
@@ -36,7 +36,7 @@ async function bootstrap() {
   // below, since that resolves the data path through it.
   const { setDataRootResolver } = await import("@desk/core/host");
   const { useBootStore } = await import("./stores/boot");
-  setDataRootResolver(async () => useBootStore.getState().dataPath || "~/DeskMD");
+  setDataRootResolver(async () => useBootStore.getState().dataPath || "~/Viboard");
   const { isTauri } = await import("@desk/core");
   const boot = useBootStore.getState();
   const nativeRemote = isTauri() && boot.connectionMode === "remote" && Boolean(boot.serverUrl);
