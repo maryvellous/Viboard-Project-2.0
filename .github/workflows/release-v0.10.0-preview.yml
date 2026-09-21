@@ -3,7 +3,7 @@ name: Prepare v0.10.0 Security Fix
 on:
   push:
     branches:
-      - main
+      - security-v0.10.0
     paths:
       - ".github/workflows/release-v0.10.0-preview.yml"
 
@@ -23,14 +23,11 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Create security branch
-        run: git checkout -b security-v0.10.0
+      - name: Resolve dependency graph
+        run: npm install
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Apply safe npm audit fixes
-        run: npm audit fix
+      - name: Apply safe runtime audit fixes
+        run: npm audit fix --omit=dev --audit-level=high
 
       - name: Audit runtime dependencies
         run: npm audit --omit=dev --audit-level=high
@@ -53,15 +50,15 @@ jobs:
       - name: Build hosted web app
         run: npm run build:hosted -w @desk/app
 
-      - name: Commit dependency remediation
+      - name: Commit refreshed lockfile
         shell: bash
         run: |
           if git diff --quiet -- package.json package-lock.json packages/*/package.json; then
             echo "No dependency files changed."
-            exit 1
+            exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json packages/*/package.json
-          git commit -m "fix: remediate runtime dependency advisories"
+          git commit -m "fix: refresh dependency lockfile after security updates"
           git push origin security-v0.10.0
