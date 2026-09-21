@@ -1,7 +1,7 @@
 
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { Sidebar, SecondarySidebar } from "@/components/layout";
+import { Sidebar, SecondarySidebar, WindowControls } from "@/components/layout";
 import { SetupWizard } from "@/components/setup";
 import { TabBar, TabContent } from "@/components/tabs";
 import { ResizeHandle } from "@/components/ui/resize-handle";
@@ -111,8 +111,11 @@ export function AppShell({ children }: AppShellProps) {
           <div data-tauri-drag-region className="flex-1 h-full" />
         </div>
         <div data-tauri-drag-region className="h-full" />
-        <div className="h-full min-w-0 -ml-0.5">
-          <TabBar inTitleBar />
+        <div className="h-full min-w-0 -ml-0.5 flex">
+          <div className="min-w-0 flex-1">
+            <TabBar inTitleBar />
+          </div>
+          <WindowControls />
         </div>
       </div>
       <div
