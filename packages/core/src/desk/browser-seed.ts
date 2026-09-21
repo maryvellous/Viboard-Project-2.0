@@ -10,7 +10,7 @@ import {
 import { serializeMarkdown } from "./parser";
 import type { MemorySeedFile } from "./storage/memory-provider";
 
-const DATA_ROOT = "~/DeskMD";
+const DATA_ROOT = "~/Viboard";
 
 function date(value?: string): Date | undefined {
   return value ? new Date(value) : undefined;

@@ -1,6 +1,6 @@
-# desk.md - Local-First Work Management
+# Diaspro Viboard - Local-First Work Management
 
-> Desktop app to manage workspaces, projects, tasks, docs, and meetings — all as local Markdown files you own.
+> Local-first desktop app to manage workspaces, projects, tasks, docs, and meetings — all as local Markdown files you own.\n>\n> **Migration note:** this fork is now product-branded as **Diaspro Viboard**. Upstream internal identifiers such as `@desk/*`, `DeskService`, `.desk/`, and `src/desk/` are intentionally retained until a dedicated namespace refactor. User-facing product copy should say **Diaspro Viboard**, not Desk.
 
 ## Quick Start
 

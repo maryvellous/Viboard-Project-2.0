@@ -2,7 +2,7 @@
   "ai": {
     "consent": {
       "title": "Bevor du KI-Funktionen nutzt",
-      "description": "Desks KI-Funktionen senden Inhalte über die API an den von dir gewählten Anbieter (Anthropic oder OpenAI). Desk betreibt keinen eigenen KI-Server.",
+      "description": "Die KI-Funktionen von Diaspro Viboard senden Inhalte über die API an den von dir gewählten Anbieter (Anthropic oder OpenAI). Diaspro Viboard betreibt keinen eigenen KI-Server.",
       "whatHeading": "Was gesendet wird",
       "whatItems": {
         "previews": "Kurze Vorschauen und Zusammenfassungen deiner Dateien für den Smart-Index-Katalog."
@@ -45,7 +45,7 @@
       "clear": "Leeren"
     },
     "aiBadge": "AI",
-    "bootErrorTitle": "DeskMD konnte den Datenordner nicht öffnen"
+    "bootErrorTitle": "Diaspro Viboard konnte den Datenordner nicht öffnen"
   },
   "overviews": {
     "discardTitle": "Änderungen am Überblick verwerfen?",
@@ -53,7 +53,7 @@
     "discardAction": "Änderungen verwerfen",
     "showMore": "Mehr anzeigen",
     "showLess": "Weniger anzeigen",
-    "loadFailed": "Desk konnte diesen Überblick nicht laden. Deine Datei wurde nicht verändert.",
+    "loadFailed": "Diaspro Viboard konnte diesen Überblick nicht laden. Deine Datei wurde nicht verändert.",
     "missing": "Diese Überblicksdatei ist nicht mehr vorhanden.",
     "unsavedHint": "Deine ungespeicherten Änderungen sind geschützt und können wiederhergestellt werden."
   },
@@ -67,7 +67,7 @@
       "meetings": "Meetings",
       "projects": "Projekte",
       "settings": "Einstellungen",
-      "desk": "Desk",
+      "desk": "Diaspro Viboard",
       "workspaceViews": "Arbeitsbereich-Ansichten",
       "projectsSection": "Projekte",
       "allProjects": "Alle Projekte",
@@ -155,7 +155,7 @@
     "docs": {
       "dropZone": {
         "title": "Dateien zum Importieren ablegen",
-        "hint": "Lege ein Dokument oder eine E-Mail irgendwo in diesem Fenster ab — Desk legt sie als Markdown ab."
+        "hint": "Lege ein Dokument oder eine E-Mail irgendwo in diesem Fenster ab — Diaspro Viboard legt sie als Markdown ab."
       },
       "convertDialog": {
         "title": "Office-Dateien importieren",
@@ -366,18 +366,18 @@
   },
   "settings": {
     "pageDescriptions": {
-      "general": "Sprache, Erscheinungsbild und Navigation von Desk festlegen.",
+      "general": "Sprache, Erscheinungsbild und Navigation von Diaspro Viboard festlegen.",
       "planner": "Arbeitszeiten und sichtbare Tage im Wochenplaner festlegen.",
       "templates": "Wiederverwendbare Inhalte für neue Meetings, Dokumente und Aufgaben definieren.",
       "ai": "KI-Anbieter, Datenschutz, Nutzung und Dateiindex konfigurieren.",
-      "agents": "Steuere den Kontext, den Desk externen Agenten lokal oder über MCP bereitstellt.",
+      "agents": "Steuere den Kontext, den Diaspro Viboard externen Agenten lokal oder über MCP bereitstellt.",
       "data": "Verbindungen, Konten, Speicher und Anwendungseinstellungen verwalten.",
       "about": "Versionsinformationen, Updates, Projektlinks und Lizenz anzeigen."
     },
     "general": {
       "appearance": {
         "title": "Erscheinungsbild",
-        "description": "Aussehen von Desk anpassen"
+        "description": "Aussehen von Diaspro Viboard anpassen"
       },
       "theme": {
         "label": "Design",
@@ -466,7 +466,7 @@
       },
       "credentials": {
         "title": "Zugangsdaten",
-        "description": "Verbinde den ausgewählten Anbieter sicher mit Desk."
+        "description": "Verbinde den ausgewählten Anbieter sicher mit Diaspro Viboard."
       },
       "model": {
         "label": "Modell",
@@ -483,11 +483,11 @@
       },
       "browserMode": {
         "title": "KI-Schlüssel werden in der Desktop-App verwaltet",
-        "description": "Dein KI-Anbieter-Schlüssel wird von der Desktop-App sicher auf deinem Gerät gespeichert und kann daher nicht im Browser gesetzt werden. Öffne desk.md auf deinem Desktop, um ihn hinzuzufügen oder zu ändern."
+        "description": "Dein KI-Anbieter-Schlüssel wird von der Desktop-App sicher auf deinem Gerät gespeichert und kann daher nicht im Browser gesetzt werden. Öffne Diaspro Viboard auf deinem Desktop, um ihn hinzuzufügen oder zu ändern."
       },
       "keychainError": {
         "title": "Schlüsselbund konnte nicht gelesen werden",
-        "description": "Desk konnte den gespeicherten Schlüssel nicht abrufen. Einen neuen zu speichern könnte funktionieren, bestehende Schlüssel können aber erst geladen werden, wenn das Problem behoben ist.",
+        "description": "Diaspro Viboard konnte den gespeicherten Schlüssel nicht abrufen. Einen neuen zu speichern könnte funktionieren, bestehende Schlüssel können aber erst geladen werden, wenn das Problem behoben ist.",
         "errorDetails": "Fehlerdetails"
       },
       "errors": {
@@ -503,8 +503,8 @@
       },
       "privacy": {
         "title": "Daten & Datenschutz",
-        "description": "Was Desk an deinen KI-Anbieter sendet, und wann.",
-        "intro": "KI-Funktionen senden Inhalte an den oben ausgewählten Anbieter (Anthropic oder OpenAI) über dessen API. Desk hat keinen eigenen KI-Server, und es wird nichts gesendet, bevor du einen API-Schlüssel konfiguriert hast.",
+        "description": "Was Diaspro Viboard an deinen KI-Anbieter sendet, und wann.",
+        "intro": "KI-Funktionen senden Inhalte an den oben ausgewählten Anbieter (Anthropic oder OpenAI) über dessen API. Diaspro Viboard hat keinen eigenen KI-Server, und es wird nichts gesendet, bevor du einen API-Schlüssel konfiguriert hast.",
         "smartIndexLabel": "Smart Index",
         "smartIndexBody": ": kurze Vorschauen und Zusammenfassungen deiner Dateien, gesendet beim Neuaufbau des Katalogs oder, wenn „Automatisch zusammenfassen beim Speichern“ aktiv ist, automatisch nach dem Speichern.",
         "retention": "Die Aufbewahrung richtet sich nach den API-Bedingungen deines Anbieters. Anthropic und OpenAI geben an, dass API-Daten standardmäßig nicht zum Training ihrer Modelle verwendet werden.",
@@ -517,14 +517,14 @@
       },
       "serverMode": {
         "title": "AI läuft auf deinem Server",
-        "description": "Dein Desk ist gehostet, daher wird der Smart Index auf dem Server mit Schlüsseln aus dessen Umgebung gepflegt (ANTHROPIC_API_KEY / OPENAI_API_KEY in der Deploy-.env). Einen Schlüssel dort zu setzen ist die Zustimmung des Betreibers.",
+        "description": "Dein Diaspro Viboard ist gehostet, daher wird der Smart Index auf dem Server mit Schlüsseln aus dessen Umgebung gepflegt (ANTHROPIC_API_KEY / OPENAI_API_KEY in der Deploy-.env). Einen Schlüssel dort zu setzen ist die Zustimmung des Betreibers.",
         "providerConfigured": "{{provider}}: Schlüssel auf dem Server konfiguriert.",
         "providerNotConfigured": "{{provider}}: Noch kein Schlüssel auf dem Server. In der Deploy-.env eintragen und neu starten."
       }
     },
     "agents": {
       "title": "Externe Agenten",
-      "description": "Steuere den Kontext, den Desk externen Agenten lokal oder über MCP bereitstellt.",
+      "description": "Steuere den Kontext, den Diaspro Viboard externen Agenten lokal oder über MCP bereitstellt.",
       "notice": "Diese Einstellungen gelten für <strong>externe Agenten</strong>, die lokale Dateien oder deine gehostete MCP-Verbindung verwenden.",
       "emit": {
         "title": "Dateien erzeugen",
@@ -555,7 +555,7 @@
       "mcp": {
         "title": "Model Context Protocol (MCP)",
         "description": "Auf einem Server verbinden sich externe Agenten über MCP statt über generierte Dateien.",
-        "notice": "Wenn Desk auf einem Server läuft, werden die generierten Dateien CLAUDE.md / AGENTS.md / GEMINI.md nicht geschrieben. Externe Agenten (Claude, ChatGPT) verbinden sich stattdessen über <strong>MCP</strong> mit deinem Desk.",
+        "notice": "Wenn Diaspro Viboard auf einem Server läuft, werden die generierten Dateien CLAUDE.md / AGENTS.md / GEMINI.md nicht geschrieben. Externe Agenten (Claude, ChatGPT) verbinden sich stattdessen über <strong>MCP</strong> mit deinem Diaspro Viboard.",
         "endpointLabel": "MCP-Endpunkt",
         "hint": "Füge diese URL als MCP-Server in deinem KI-Client hinzu. Die Anmeldung erfolgt über OAuth und stellt schreibgeschützte Tools für deine Workspaces bereit.",
         "copy": "Kopieren",
@@ -565,7 +565,7 @@
     "data": {
       "connection": {
         "title": "Verbindung",
-        "description": "Wo Desk deine Arbeit speichert",
+        "description": "Wo Diaspro Viboard deine Arbeit speichert",
         "localLabel": "Dieser Mac",
         "remoteLabel": "Mit Server verbunden",
         "connectToServer": "Mit einem Server verbinden",
@@ -582,7 +582,7 @@
         "title": "Datenspeicher",
         "description": "Wo deine Projekte und Dateien gespeichert sind",
         "pathLabel": "Pfad zum Datenordner",
-        "pathPlaceholder": "~/DeskMD",
+        "pathPlaceholder": "~/Viboard",
         "change": "Ändern",
         "helperText": "Alle deine Arbeitsbereiche, Projekte, Aufgaben und Notizen werden als Markdown-Dateien in diesem Ordner gespeichert."
       },
@@ -599,13 +599,13 @@
       },
       "pathDialog": {
         "confirmTitle": "Datenordner wechseln?",
-        "confirmDescription": "Desk speichert offene Editoren, wechselt zu {{path}} und lädt neu.",
+        "confirmDescription": "Diaspro Viboard speichert offene Editoren, wechselt zu {{path}} und lädt neu.",
         "confirmSwitch": "Wechseln und neu laden",
         "existingTitle": "Vorhandene Daten gefunden",
         "existingDescription_one": "{{count}} Arbeitsbereich an diesem Ort gefunden.",
         "existingDescription_other": "{{count}} Arbeitsbereiche an diesem Ort gefunden.",
         "emptyTitle": "Leerer Speicherort",
-        "emptyDescription": "Keine Desk-Daten unter diesem Pfad gefunden. Du musst deinen ersten Arbeitsbereich erstellen.",
+        "emptyDescription": "Keine Diaspro Viboard-Daten unter diesem Pfad gefunden. Du musst deinen ersten Arbeitsbereich erstellen.",
         "useExisting": "Vorhandene Daten verwenden",
         "startFresh": "Stattdessen neu beginnen",
         "continueToSetup": "Zur Einrichtung fortfahren"
@@ -613,7 +613,7 @@
     },
     "about": {
       "app": {
-        "title": "Desk",
+        "title": "Diaspro Viboard",
         "description": "Projekt- & Aufgabenverwaltung in reinem Markdown",
         "version": "Version",
         "commit": "Commit",
@@ -621,7 +621,7 @@
       },
       "updates": {
         "title": "Updates",
-        "description": "Nach neuen Desk-Versionen suchen",
+        "description": "Nach neuen Diaspro Viboard-Versionen suchen",
         "noUpdates": "Keine Updates verfügbar",
         "onLatest": "Du verwendest die aktuelle Version",
         "check": "Prüfen",
@@ -690,7 +690,7 @@
         "noProvider": "Kein KI-Anbieter konfiguriert. Der Katalog listet weiterhin jede Datei mit vollständigen Metadaten; den Dateien fehlt nur noch die KI-Zusammenfassung. Füge unter Einstellungen → KI einen Schlüssel hinzu und baue neu auf, um sie zusammenzufassen.",
         "desktopOnly": "Der Smart Index wird von dem Host gebaut, dem deine Daten gehören. Diese Browser-Vorschau hat keinen, daher ist das Bauen hier deaktiviert.",
         "incremental": "Der Neuaufbau ist inkrementell: Unveränderte Dateien verwenden ihre Zusammenfassung weiter, nur neue oder geänderte Dateien nutzen die KI.",
-        "offlineChanges": "Dateien, die außerhalb der Desk-App geändert wurden (anderes Gerät, direkte Bearbeitung), erscheinen sofort im Katalog; ihre Zusammenfassungen werden beim nächsten Neuaufbau aktualisiert.",
+        "offlineChanges": "Dateien, die außerhalb der Diaspro Viboard-App geändert wurden (anderes Gerät, direkte Bearbeitung), erscheinen sofort im Katalog; ihre Zusammenfassungen werden beim nächsten Neuaufbau aktualisiert.",
         "serverSide": "Dein Server baut und pflegt den Index mit seinem eigenen API-Schlüssel. Hintergrund-Updates laufen dort, sobald sich Einträge ändern."
       },
       "config": {
@@ -734,7 +734,7 @@
       "description": "Erstelle einen Arbeitsbereich, um einen Bereich deiner Arbeit zu trennen, z. B. einen Kunden, ein Nebenprojekt oder etwas anderes",
       "nameLabel": "Name des Arbeitsbereichs",
       "namePlaceholder": "z. B. Acme GmbH, Nebenprojekte, Studium",
-      "folderHint": "Ordner: ~/DeskMD/workspaces/{{folder}}",
+      "folderHint": "Ordner: ~/Viboard/workspaces/{{folder}}",
       "descriptionLabel": "Beschreibung",
       "descriptionPlaceholder": "Kurze Beschreibung dieses Arbeitsbereichs...",
       "overviewLabel": "Arbeitsbereichsüberblick",
@@ -869,18 +869,18 @@
       "contextTransitionBlocked": "Klär oder verwirf ungespeicherte Editor-Änderungen, bevor du den Datenkontext wechselst.",
       "loadFailed": {
         "title": "{{entity}}-Inhalt konnte nicht geladen werden",
-        "description": "Desk hat keine leere Kopie geöffnet und deine Datei nicht verändert. Prüfe die Verbindung und versuche es erneut."
+        "description": "Diaspro Viboard hat keine leere Kopie geöffnet und deine Datei nicht verändert. Prüfe die Verbindung und versuche es erneut."
       },
       "versionMismatch": {
-        "title": "Desk-Client und -Server müssen dieselbe Version verwenden",
+        "title": "Diaspro Viboard-Client und -Server müssen dieselbe Version verwenden",
         "description": "Dieser Client verwendet eine neuere Editor-API, die der Server noch nicht unterstützt. Es wurde keine Datei verändert. Aktualisiere den Server und versuche es erneut."
       },
       "review": "Prüfen",
       "conflict": {
-        "title": "Diese Datei wurde außerhalb von Desk geändert",
-        "description": "Wähle die Version aus, die erhalten bleiben soll. Desk überschreibt externe Änderungen nicht automatisch.",
+        "title": "Diese Datei wurde außerhalb von Diaspro Viboard geändert",
+        "description": "Wähle die Version aus, die erhalten bleiben soll. Diaspro Viboard überschreibt externe Änderungen nicht automatisch.",
         "useExternal": "Externe Version verwenden",
-        "keepDesk": "Desk-Version behalten"
+        "keepDiaspro Viboard": "Diaspro Viboard-Version behalten"
       }
     }
   },
@@ -1035,8 +1035,8 @@
   },
   "errors": {
     "startup": {
-      "title": "Desk konnte nicht starten",
-      "description": "Desk konnte seinen Datenordner nicht einrichten. Deine Dateien sind sicher. Dies ist ein Startproblem, kein Datenverlust.",
+      "title": "Diaspro Viboard konnte nicht starten",
+      "description": "Diaspro Viboard konnte seinen Datenordner nicht einrichten. Deine Dateien sind sicher. Dies ist ein Startproblem, kein Datenverlust.",
       "hint": "Stelle sicher, dass der Datenordner existiert und lesbar ist, und versuche es erneut."
     },
     "connection": {
@@ -1057,8 +1057,8 @@
       "catalogClearedPartial": "Index geleert, aber einige Agenten-Dateien konnten nicht entfernt werden: {{message}}"
     },
     "setup": {
-      "checkDataFolder": "Zugriff auf „{{path}}“ nicht möglich. Prüfe, ob der Ordnerpfad gültig ist und Desk dort schreiben kann, und versuche es erneut.",
-      "createDataFolder": "Die Einrichtung konnte deinen Datenordner unter „{{path}}“ nicht erstellen. Stelle sicher, dass der Ort existiert und Desk Schreibrechte hat, und versuche es erneut."
+      "checkDataFolder": "Zugriff auf „{{path}}“ nicht möglich. Prüfe, ob der Ordnerpfad gültig ist und Diaspro Viboard dort schreiben kann, und versuche es erneut.",
+      "createDataFolder": "Die Einrichtung konnte deinen Datenordner unter „{{path}}“ nicht erstellen. Stelle sicher, dass der Ort existiert und Diaspro Viboard Schreibrechte hat, und versuche es erneut."
     },
     "task": {
       "createFailed": "Aufgabe konnte nicht erstellt werden"
@@ -1110,7 +1110,7 @@
   },
   "email": {
     "dropOverlay": {
-      "title": "E-Mail in Desk öffnen, hier ablegen",
+      "title": "E-Mail in Diaspro Viboard öffnen, hier ablegen",
       "subtitle": "Apple Mail · Outlook · Thunderbird"
     },
     "viewer": {
@@ -1215,20 +1215,20 @@
   "smartIndex": {},
   "setup": {
     "welcome": {
-      "title": "Willkommen bei Desk.",
+      "title": "Willkommen bei Diaspro Viboard.",
       "subtitle": "Deine Projekte, Aufgaben, Dokumente und Meetings als reine Markdown-Dateien, die dir gehören."
     },
     "location": {
-      "title": "Wo soll Desk deine Arbeit speichern?",
+      "title": "Wo soll Diaspro Viboard deine Arbeit speichern?",
       "subtitle": "Du kannst dies jederzeit in den Einstellungen ändern.",
       "localTitle": "Dieser Mac",
       "localDescription": "Speichere deine Dateien lokal auf diesem Computer.",
-      "remoteTitle": "Ein desk.md-Server",
-      "remoteDescription": "Verbinde dich mit einem bereitgestellten desk.md-Server, etwa auf deinem NAS, um von deinem Telefon und anderen Geräten darauf zuzugreifen."
+      "remoteTitle": "Ein Diaspro Viboard-Server",
+      "remoteDescription": "Verbinde dich mit einem bereitgestellten Diaspro Viboard-Server, etwa auf deinem NAS, um von deinem Telefon und anderen Geräten darauf zuzugreifen."
     },
     "server": {
       "title": "Mit deinem Server verbinden",
-      "subtitle": "Gib die Adresse deines desk.md-Servers ein. Im nächsten Schritt meldest du dich an.",
+      "subtitle": "Gib die Adresse deines Diaspro Viboard-Servers ein. Im nächsten Schritt meldest du dich an.",
       "label": "Serveradresse",
       "hint": "Ohne Angabe wird https:// verwendet. Die Adresse muss https verwenden.",
       "connect": "Weiter",
@@ -1237,13 +1237,13 @@
     },
     "dataFolder": {
       "title": "Wo sollen wir deine Dateien speichern?",
-      "subtitle": "Wähle einen beliebigen Ordner. Desk legt die Struktur für dich an, und du kannst ihn später verschieben.",
+      "subtitle": "Wähle einen beliebigen Ordner. Diaspro Viboard legt die Struktur für dich an, und du kannst ihn später verschieben.",
       "label": "Datenordner",
       "pickerTitle": "Datenordner auswählen",
       "browseTitle": "Nach Ordner suchen"
     },
     "existingDetected": {
-      "title": "Du hast hier bereits Desk-Daten.",
+      "title": "Du hast hier bereits Diaspro Viboard-Daten.",
       "description_one": "{{count}} Arbeitsbereich in diesem Ordner gefunden. Mache dort weiter, wo du aufgehört hast, oder beginne neu.",
       "description_other": "{{count}} Arbeitsbereiche in diesem Ordner gefunden. Mache dort weiter, wo du aufgehört hast, oder beginne neu.",
       "useExisting": "Vorhandene Daten verwenden",
@@ -1260,12 +1260,12 @@
   "auth": {
     "create": {
       "title": "Konto erstellen",
-      "subtitle": "Richte das Konto ein, das diesen Desk schützt.",
+      "subtitle": "Richte das Konto ein, das diesen Diaspro Viboard schützt.",
       "submit": "Konto erstellen"
     },
     "login": {
       "title": "Willkommen zurück",
-      "subtitle": "Melde dich bei deinem Desk an.",
+      "subtitle": "Melde dich bei deinem Diaspro Viboard an.",
       "submit": "Anmelden"
     },
     "fields": {
@@ -1278,14 +1278,14 @@
     "signOut": "Abmelden",
     "account": {
       "title": "Konto",
-      "description": "Du bist bei diesem gehosteten Desk angemeldet.",
+      "description": "Du bist bei diesem gehosteten Diaspro Viboard angemeldet.",
       "signOutLabel": "Abmelden",
       "signOutDescription": "Beende deine Sitzung auf diesem Gerät."
     },
     "consent": {
       "title": "{{app}} möchte eine Verbindung herstellen",
       "unknownApp": "Eine Anwendung",
-      "subtitle": "Die Anwendung kann deine Arbeitsbereiche, Dokumente, Aufgaben und Meetings über den desk.md-Connector lesen.",
+      "subtitle": "Die Anwendung kann deine Arbeitsbereiche, Dokumente, Aufgaben und Meetings über den Diaspro Viboard-Connector lesen.",
       "scopesTitle": "Sie kann außerdem:",
       "scopes": {
         "openid": "Deine Identität bestätigen",
@@ -1339,7 +1339,7 @@
   },
   "updates": {
     "available": "Update verfügbar: v{{version}}",
-    "description": "Eine neue Desk-Version ist bereit zur Installation.",
+    "description": "Eine neue Diaspro Viboard-Version ist bereit zur Installation.",
     "updateAndRestart": "Aktualisieren & neu starten",
     "skip": "Überspringen"
   },
@@ -1441,7 +1441,7 @@
         "title": "Datei gelöscht",
         "description": "Diese Datei wurde aus dem Dateisystem gelöscht.",
         "unsavedHint": "Du hast ungespeicherte Änderungen. Wiederherstellen, um die Datei neu anzulegen.",
-        "parentMissing": "Der übergeordnete Ordner existiert nicht mehr. Desk behält deinen Entwurf, erstellt aber keinen gelöschten Arbeitsbereich oder kein gelöschtes Projekt neu.",
+        "parentMissing": "Der übergeordnete Ordner existiert nicht mehr. Diaspro Viboard behält deinen Entwurf, erstellt aber keinen gelöschten Arbeitsbereich oder kein gelöschtes Projekt neu.",
         "restoreFromEdits": "Aus Änderungen wiederherstellen",
         "closeTab": "Tab schließen"
       },
@@ -1499,7 +1499,7 @@
     }
   },
   "tabs": {
-    "desk": "Desk",
+    "desk": "Diaspro Viboard",
     "emailDefault": "E-Mail"
   }
 }

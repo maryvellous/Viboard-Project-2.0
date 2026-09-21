@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 
-const APP_DIR_NAME: &str = "Desk";
+const APP_DIR_NAME: &str = "Diaspro Viboard";
+const LEGACY_APP_DIR_NAME: &str = "Desk";
 const CONFIG_FILE_NAME: &str = "config.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -19,21 +20,30 @@ pub fn config_file_path() -> Result<PathBuf, String> {
 
 pub fn read_shared_config() -> Result<SharedConfig, String> {
     let path = config_file_path()?;
-    if !path.exists() {
-        return Ok(SharedConfig::default());
-    }
+    let read_path = if path.exists() {
+        path
+    } else {
+        // Preserve the user's configured data root when upgrading from the
+        // upstream Desk-branded fork. New writes always go to Diaspro Viboard.
+        let legacy = platform_config_dir()?.join(LEGACY_APP_DIR_NAME).join(CONFIG_FILE_NAME);
+        if legacy.exists() {
+            legacy
+        } else {
+            return Ok(SharedConfig::default());
+        }
+    };
 
-    let raw = fs::read_to_string(&path).map_err(|err| {
+    let raw = fs::read_to_string(&read_path).map_err(|err| {
         format!(
             "Failed to read shared config at {}: {}",
-            path.display(),
+            read_path.display(),
             err
         )
     })?;
     serde_json::from_str(&raw).map_err(|err| {
         format!(
             "Failed to parse shared config at {}: {}",
-            path.display(),
+            read_path.display(),
             err
         )
     })

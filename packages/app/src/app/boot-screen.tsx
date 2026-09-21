@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 /**
- * The one branded loading surface used before Desk is interactive.
+ * The one branded loading surface used before Diaspro Viboard is interactive.
  *
  * Keep the mark and its motion isolated here so the startup treatment can be
  * refined without touching bootstrap, authentication, or routing code.

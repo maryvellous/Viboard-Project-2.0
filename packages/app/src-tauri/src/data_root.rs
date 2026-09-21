@@ -1,7 +1,7 @@
-//! Data-root resolution for the desk.md Tauri shell.
+//! Data-root resolution for the Diaspro Viboard Tauri shell.
 //!
-//! Resolves and caches the user's Desk data directory (CLI override →
-//! DESK_DATA_ROOT env → shared config → ~/Desk default) so the fs-scope setup
+//! Resolves and caches the user's Viboard data directory (CLI override →
+//! DESK_DATA_ROOT env → shared config → ~/Viboard default) so the fs-scope setup
 //! can contain reads/writes to it. The former desk_* read/write commands that
 //! also lived here were retired: agent queries and content operations now use
 //! the shared TypeScript domain layer, the single read+write implementation.
@@ -45,7 +45,7 @@ pub fn resolve_data_root(cli_override: Option<PathBuf>) -> PathBuf {
 
 fn default_data_root() -> PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    Path::new(&home).join("DeskMD")
+    Path::new(&home).join("Viboard")
 }
 
 pub fn get_data_root() -> PathBuf {

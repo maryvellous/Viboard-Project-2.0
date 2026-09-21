@@ -1,5 +1,5 @@
 /**
- * desk.md server.
+ * Diaspro Viboard server.
  *
  * A Node 22 + Hono app that boots the @desk/core domain on a NodeFsProvider and exposes it
  * over HTTP behind a Better Auth session gate, plus the SPA, the OAuth-protected MCP endpoint,
@@ -102,5 +102,5 @@ const port = Number(process.env.PORT ?? 8787);
 await migrateAuth();
 
 serve({ fetch: app.fetch, port }, (info) => {
-  console.log(`desk.md server on http://localhost:${info.port}`);
+  console.log(`Diaspro Viboard server on http://localhost:${info.port}`);
 });

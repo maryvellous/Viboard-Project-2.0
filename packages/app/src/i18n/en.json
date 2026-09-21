@@ -2,7 +2,7 @@
   "ai": {
     "consent": {
       "title": "Before you use AI features",
-      "description": "Desk's AI features send content to the provider you chose (Anthropic or OpenAI) over their API. Desk runs no AI server of its own.",
+      "description": "Diaspro Viboard's AI features send content to the provider you chose (Anthropic or OpenAI) over their API. Diaspro Viboard runs no AI server of its own.",
       "whatHeading": "What gets sent",
       "whatItems": {
         "previews": "Short previews and summaries of your files, used to build the Smart Index catalog."
@@ -45,7 +45,7 @@
       "clear": "Clear"
     },
     "aiBadge": "AI",
-    "bootErrorTitle": "DeskMD could not open the data folder"
+    "bootErrorTitle": "Diaspro Viboard could not open the data folder"
   },
   "overviews": {
     "discardTitle": "Discard overview changes?",
@@ -53,7 +53,7 @@
     "discardAction": "Discard changes",
     "showMore": "Show more",
     "showLess": "Show less",
-    "loadFailed": "Desk could not load this overview. Your file was not changed.",
+    "loadFailed": "Diaspro Viboard could not load this overview. Your file was not changed.",
     "missing": "This overview file no longer exists.",
     "unsavedHint": "Your unsaved overview edits are protected and can be restored."
   },
@@ -67,7 +67,7 @@
       "meetings": "Meetings",
       "projects": "Projects",
       "settings": "Settings",
-      "desk": "Desk",
+      "desk": "Diaspro Viboard",
       "workspaceViews": "Workspace Views",
       "projectsSection": "Projects",
       "allProjects": "All projects",
@@ -155,7 +155,7 @@
     "docs": {
       "dropZone": {
         "title": "Drop files to import",
-        "hint": "Drop a document or email anywhere on this window and Desk files it as Markdown."
+        "hint": "Drop a document or email anywhere on this window and Diaspro Viboard files it as Markdown."
       },
       "convertDialog": {
         "title": "Import office files",
@@ -366,18 +366,18 @@
   },
   "settings": {
     "pageDescriptions": {
-      "general": "Choose Desk's language, appearance, and navigation preferences.",
+      "general": "Choose Diaspro Viboard's language, appearance, and navigation preferences.",
       "planner": "Set the working hours and days shown in your weekly planner.",
       "templates": "Define reusable content for new meetings, documents, and tasks.",
       "ai": "Configure AI providers, privacy, usage, and file indexing.",
-      "agents": "Control the context Desk provides to external agents, locally or through MCP.",
+      "agents": "Control the context Diaspro Viboard provides to external agents, locally or through MCP.",
       "data": "Manage connections, accounts, storage, and application settings.",
       "about": "View version information, updates, project links, and licensing."
     },
     "general": {
       "appearance": {
         "title": "Appearance",
-        "description": "Customize how Desk looks"
+        "description": "Customize how Diaspro Viboard looks"
       },
       "theme": {
         "label": "Theme",
@@ -466,7 +466,7 @@
       },
       "credentials": {
         "title": "Credentials",
-        "description": "Securely connect the selected provider to Desk."
+        "description": "Securely connect the selected provider to Diaspro Viboard."
       },
       "model": {
         "label": "Model",
@@ -483,7 +483,7 @@
       },
       "browserMode": {
         "title": "AI keys are managed in the desktop app",
-        "description": "Your AI provider key is stored securely on your device by the desktop app, so it can't be set from the browser. Open desk.md on your desktop to add or change it."
+        "description": "Your AI provider key is stored securely on your device by the desktop app, so it can't be set from the browser. Open Diaspro Viboard on your desktop to add or change it."
       },
       "serverMode": {
         "title": "AI runs on your server",
@@ -493,7 +493,7 @@
       },
       "keychainError": {
         "title": "Couldn't read the keychain",
-        "description": "Desk couldn't fetch the stored key. Saving a new one may still work, but existing keys can't be loaded until this clears.",
+        "description": "Diaspro Viboard couldn't fetch the stored key. Saving a new one may still work, but existing keys can't be loaded until this clears.",
         "errorDetails": "Error details"
       },
       "errors": {
@@ -509,8 +509,8 @@
       },
       "privacy": {
         "title": "Data & Privacy",
-        "description": "What Desk sends to your AI provider, and when.",
-        "intro": "AI features send content to the provider selected above (Anthropic or OpenAI) over their API. Desk has no AI server of its own, and nothing is sent until you configure an API key.",
+        "description": "What Diaspro Viboard sends to your AI provider, and when.",
+        "intro": "AI features send content to the provider selected above (Anthropic or OpenAI) over their API. Diaspro Viboard has no AI server of its own, and nothing is sent until you configure an API key.",
         "smartIndexLabel": "File index",
         "smartIndexBody": ": short previews and summaries of your files, sent when you rebuild the index or, if Auto-summarize on save is enabled, automatically after a save.",
         "retention": "Retention is governed by your provider's API terms. Anthropic and OpenAI state that API data is not used to train their models by default.",
@@ -524,7 +524,7 @@
     },
     "agents": {
       "title": "External Agents",
-      "description": "Control the context Desk provides to external agents, locally or through MCP.",
+      "description": "Control the context Diaspro Viboard provides to external agents, locally or through MCP.",
       "notice": "These settings apply to <strong>external agents</strong> using generated local files or your hosted MCP connection.",
       "emit": {
         "title": "Emit Files",
@@ -555,7 +555,7 @@
       "mcp": {
         "title": "Model Context Protocol (MCP)",
         "description": "On a server, external agents connect over MCP instead of generated files.",
-        "notice": "When Desk runs on a server, the generated CLAUDE.md / AGENTS.md / GEMINI.md files aren't written. External agents (Claude, ChatGPT) connect to your desk over <strong>MCP</strong> instead.",
+        "notice": "When Diaspro Viboard runs on a server, the generated CLAUDE.md / AGENTS.md / GEMINI.md files aren't written. External agents (Claude, ChatGPT) connect to Diaspro Viboard over <strong>MCP</strong> instead.",
         "endpointLabel": "MCP endpoint",
         "hint": "Add this URL as an MCP server in your AI client. It signs in with OAuth and exposes read-only tools over your workspaces.",
         "copy": "Copy",
@@ -565,7 +565,7 @@
     "data": {
       "connection": {
         "title": "Connection",
-        "description": "Where Desk keeps your work",
+        "description": "Where Diaspro Viboard keeps your work",
         "localLabel": "This Mac",
         "remoteLabel": "Connected to server",
         "connectToServer": "Connect to a server",
@@ -582,7 +582,7 @@
         "title": "Data Storage",
         "description": "Where your projects and files are stored",
         "pathLabel": "Data folder path",
-        "pathPlaceholder": "~/DeskMD",
+        "pathPlaceholder": "~/Viboard",
         "change": "Change",
         "helperText": "All your workspaces, projects, tasks, and notes are stored as markdown files in this folder."
       },
@@ -599,13 +599,13 @@
       },
       "pathDialog": {
         "confirmTitle": "Switch data folder?",
-        "confirmDescription": "Desk will save open editors, switch to {{path}}, and reload.",
+        "confirmDescription": "Diaspro Viboard will save open editors, switch to {{path}}, and reload.",
         "confirmSwitch": "Switch and Reload",
         "existingTitle": "Existing Data Found",
         "existingDescription_one": "Found {{count}} workspace at this location.",
         "existingDescription_other": "Found {{count}} workspaces at this location.",
         "emptyTitle": "Empty Location",
-        "emptyDescription": "No Desk data found at this path. You'll need to create your first workspace.",
+        "emptyDescription": "No Diaspro Viboard data found at this path. You'll need to create your first workspace.",
         "useExisting": "Use Existing Data",
         "startFresh": "Start Fresh Instead",
         "continueToSetup": "Continue to Setup"
@@ -613,7 +613,7 @@
     },
     "about": {
       "app": {
-        "title": "Desk",
+        "title": "Diaspro Viboard",
         "description": "Project & task management in plain Markdown",
         "version": "Version",
         "commit": "Commit",
@@ -621,7 +621,7 @@
       },
       "updates": {
         "title": "Updates",
-        "description": "Check for new versions of Desk",
+        "description": "Check for new versions of Diaspro Viboard",
         "noUpdates": "No updates available",
         "onLatest": "You're on the latest version",
         "check": "Check",
@@ -734,7 +734,7 @@
       "description": "Create a workspace to separate an area of your work, like a client, side project, or anything else",
       "nameLabel": "Workspace Name",
       "namePlaceholder": "e.g., Acme Corp, Side Projects, Studies",
-      "folderHint": "Folder: ~/DeskMD/workspaces/{{folder}}",
+      "folderHint": "Folder: ~/Viboard/workspaces/{{folder}}",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Brief description of this workspace...",
       "overviewLabel": "Workspace overview",
@@ -869,18 +869,18 @@
       "contextTransitionBlocked": "Resolve or discard unsaved editor changes before switching data context.",
       "loadFailed": {
         "title": "Couldn't load {{entity}} content",
-        "description": "Desk did not open an empty copy, and your file was not changed. Check the connection and retry."
+        "description": "Diaspro Viboard did not open an empty copy, and your file was not changed. Check the connection and retry."
       },
       "versionMismatch": {
-        "title": "Desk client and server need the same version",
+        "title": "Diaspro Viboard client and server need the same version",
         "description": "This client uses a newer editor API that the server does not support yet. No file was changed. Update the server, then retry."
       },
       "review": "Review",
       "conflict": {
-        "title": "This file changed outside Desk",
-        "description": "Choose which version to keep. Desk will not overwrite the external change automatically.",
+        "title": "This file changed outside Diaspro Viboard",
+        "description": "Choose which version to keep. Diaspro Viboard will not overwrite the external change automatically.",
         "useExternal": "Use External",
-        "keepDesk": "Keep Desk"
+        "keepDiaspro Viboard": "Keep Diaspro Viboard"
       }
     }
   },
@@ -1035,8 +1035,8 @@
   },
   "errors": {
     "startup": {
-      "title": "Desk couldn't start",
-      "description": "Desk failed to set up its data folder. Your files are safe. This is a startup problem, not data loss.",
+      "title": "Diaspro Viboard couldn't start",
+      "description": "Diaspro Viboard failed to set up its data folder. Your files are safe. This is a startup problem, not data loss.",
       "hint": "Make sure the data folder exists and is readable, then retry."
     },
     "connection": {
@@ -1057,8 +1057,8 @@
       "catalogClearedPartial": "Index cleared, but some agent files could not be removed: {{message}}"
     },
     "setup": {
-      "checkDataFolder": "Couldn't access \"{{path}}\". Check that the folder path is valid and that Desk can write there, then try again.",
-      "createDataFolder": "Setup couldn't create your data folder at \"{{path}}\". Make sure the location exists and Desk has permission to write there, then try again."
+      "checkDataFolder": "Couldn't access \"{{path}}\". Check that the folder path is valid and that Diaspro Viboard can write there, then try again.",
+      "createDataFolder": "Setup couldn't create your data folder at \"{{path}}\". Make sure the location exists and Diaspro Viboard has permission to write there, then try again."
     },
     "task": {
       "createFailed": "Failed to create task"
@@ -1110,7 +1110,7 @@
   },
   "email": {
     "dropOverlay": {
-      "title": "Drop email to open in Desk",
+      "title": "Drop email to open in Diaspro Viboard",
       "subtitle": "Apple Mail · Outlook · Thunderbird"
     },
     "viewer": {
@@ -1215,20 +1215,20 @@
   "smartIndex": {},
   "setup": {
     "welcome": {
-      "title": "Welcome to Desk.",
+      "title": "Welcome to Diaspro Viboard.",
       "subtitle": "Your projects, tasks, docs, and meetings, as plain Markdown files you own."
     },
     "location": {
-      "title": "Where should Desk keep your work?",
+      "title": "Where should Diaspro Viboard keep your work?",
       "subtitle": "You can change this anytime in Settings.",
       "localTitle": "This Mac",
       "localDescription": "Store your files locally on this computer.",
-      "remoteTitle": "A desk.md server",
-      "remoteDescription": "Connect to a deployed desk.md server (e.g. on your NAS) for access from your phone and other devices."
+      "remoteTitle": "A Diaspro Viboard server",
+      "remoteDescription": "Connect to a deployed Diaspro Viboard server (e.g. on your NAS) for access from your phone and other devices."
     },
     "server": {
       "title": "Connect to your server",
-      "subtitle": "Enter the address of your desk.md server. You'll sign in on the next screen.",
+      "subtitle": "Enter the address of your Diaspro Viboard server. You'll sign in on the next screen.",
       "label": "Server address",
       "hint": "Defaults to https:// if you omit it. The address must use https.",
       "connect": "Continue",
@@ -1237,13 +1237,13 @@
     },
     "dataFolder": {
       "title": "Where should we store your files?",
-      "subtitle": "Pick any folder. Desk creates the structure for you, and you can move it later.",
+      "subtitle": "Pick any folder. Diaspro Viboard creates the structure for you, and you can move it later.",
       "label": "Data folder",
       "pickerTitle": "Select Data Folder",
       "browseTitle": "Browse for folder"
     },
     "existingDetected": {
-      "title": "You already have Desk data here.",
+      "title": "You already have Diaspro Viboard data here.",
       "description_one": "Found {{count}} workspace in this folder. Continue where you left off, or start fresh.",
       "description_other": "Found {{count}} workspaces in this folder. Continue where you left off, or start fresh.",
       "useExisting": "Use existing data",
@@ -1285,7 +1285,7 @@
     "consent": {
       "title": "{{app}} wants to connect",
       "unknownApp": "An application",
-      "subtitle": "It will be able to read your workspaces, docs, tasks, and meetings through the desk.md connector.",
+      "subtitle": "It will be able to read your workspaces, docs, tasks, and meetings through the Diaspro Viboard connector.",
       "scopesTitle": "It will also:",
       "scopes": {
         "openid": "Confirm your identity",
@@ -1339,7 +1339,7 @@
   },
   "updates": {
     "available": "Update available: v{{version}}",
-    "description": "A new version of Desk is ready to install.",
+    "description": "A new version of Diaspro Viboard is ready to install.",
     "updateAndRestart": "Update & Restart",
     "skip": "Skip"
   },
@@ -1441,7 +1441,7 @@
         "title": "File Deleted",
         "description": "This file has been deleted from the file system.",
         "unsavedHint": "You have unsaved edits. Restore them to re-create the file.",
-        "parentMissing": "The containing folder no longer exists. Desk will keep your draft but will not rebuild a deleted workspace or project.",
+        "parentMissing": "The containing folder no longer exists. Diaspro Viboard will keep your draft but will not rebuild a deleted workspace or project.",
         "restoreFromEdits": "Restore from edits",
         "closeTab": "Close Tab"
       },
@@ -1499,7 +1499,7 @@
     }
   },
   "tabs": {
-    "desk": "Desk",
+    "desk": "Diaspro Viboard",
     "emailDefault": "Email"
   }
 }

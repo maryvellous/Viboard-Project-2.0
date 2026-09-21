@@ -1,33 +1,37 @@
-# Viboard Project 2.0
+# Diaspro Viboard
 
-Repository di esplorazione per una possibile seconda generazione di Viboard, basato su **desk.md**.
+Seconda generazione di Viboard basata sul progetto open source **desk.md**, adattata all'identità e al flusso di lavoro Diaspro.
 
-Questo repository è un fork di `v1lling/desk.md`: la codebase principale conserva ancora struttura, naming e architettura di Desk, mentre la cartella `diaspro-ui/` raccoglie materiale e prove visive per l'adattamento all'identità Diaspro/Viboard.
+La base resta local-first: spazi di lavoro, progetti, attività, documenti e riunioni sono salvati come normali file Markdown. Il progetto supporta sia l'app desktop locale sia la modalità self-hosted.
 
-## Base tecnica
+## Stato del progetto
 
-La base upstream è un workspace manager local-first in cui progetti, task, documenti e meeting restano file Markdown normali.
+Il fork è in fase di trasformazione attiva da Desk a Diaspro Viboard.
 
-L'architettura è un monorepo npm con:
+Sono già integrati nell'app:
 
-- `@desk/core` — dominio e accesso ai dati;
-- `@desk/app` — client React + Tauri;
-- `@desk/server` — server Node per modalità self-hosted, auth e MCP.
+- identità visiva Diaspro, palette, tipografia, logo e navigazione;
+- dashboard con calendario, focus, raccolta rapida e quick-add;
+- viste progetti con card Diaspro e task in formato post-it;
+- planner settimanale;
+- attività, documenti e riunioni;
+- localizzazione italiana completa e risorse i18n;
+- shell desktop e metadati applicativi con branding Diaspro Viboard.
 
-Il progetto supporta sia uso desktop locale sia una modalità self-hosted.
+La cartella `diaspro-ui/` resta il kit di riferimento per i pattern visivi e contiene card, lava, post-it, calendar strip e guida visuale.
 
-## Stato di questo fork
+### Naming interno
 
-Il fork non è ancora una riscrittura completa di Viboard.
+Per ridurre il rischio durante la migrazione, i namespace tecnici ereditati restano temporaneamente invariati:
 
-Al momento:
+- `@desk/core`
+- `@desk/app`
+- `@desk/server`
+- `DeskService` e la cartella dominio `src/desk/`
 
-- il codice applicativo principale è ancora quello di Desk;
-- package, namespace e documentazione tecnica interna usano ancora il naming `desk`;
-- `diaspro-ui/` contiene il lavoro di esplorazione visuale e componenti di riferimento;
-- non va quindi presentato come una release autonoma di Viboard già pronta.
+Questi identificatori sono dettagli interni e non rappresentano il nome del prodotto. Il loro eventuale rename verrà affrontato come refactor separato dopo un checkpoint CI pulito.
 
-## Stack ereditato
+## Stack
 
 - React 19
 - TypeScript
@@ -50,7 +54,7 @@ Viboard-Project-2.0/
 │   ├── core/            # Dominio condiviso
 │   ├── app/             # Applicazione React + Tauri
 │   └── server/          # Backend self-hosted e MCP
-├── diaspro-ui/          # Esperimenti e riferimenti visuali Diaspro
+├── diaspro-ui/          # Kit e riferimenti visuali Diaspro
 ├── deploy/              # Configurazione self-hosting
 ├── docs/
 ├── tests/
@@ -59,7 +63,7 @@ Viboard-Project-2.0/
 
 ## Sviluppo locale
 
-La codebase upstream richiede Node 22.
+Richiede Node 22.
 
 ```bash
 npm install
@@ -72,34 +76,29 @@ Per eseguire l'app desktop con filesystem reale:
 npm run tauri:dev
 ```
 
-Controlli principali:
+Checkpoint completo:
 
 ```bash
-npm test
 npm run lint
 npm run typecheck
+npm test
+npm run verify:storage
 npm run build
+npm run build:hosted -w @desk/app
 ```
 
-## Diaspro UI
+Le pull request eseguono questi controlli tramite GitHub Actions. Le modifiche a `packages/app/src-tauri/` attivano anche `cargo check` su macOS, Linux e Windows.
 
-La cartella `diaspro-ui/` contiene materiale di progettazione separato dalla base applicativa:
+## Release e aggiornamenti
 
-- linee guida palette;
-- componenti e card;
-- prove della lava;
-- post-it;
-- calendar strip;
-- guida visuale HTML.
-
-Questi file rappresentano il livello di esplorazione grafica del fork e non implicano che tutta la UI upstream sia già stata sostituita.
+L'app desktop usa il repository `maryvellous/Viboard-Project-2.0` come sorgente per release e aggiornamenti. Prima della prima release pubblica va configurata la chiave di firma Tauri del progetto e verificata la relativa chiave pubblica in `tauri.conf.json`.
 
 ## Upstream
 
 Progetto originale: `v1lling/desk.md`.
 
-La cronologia e il codice di base restano soggetti alla licenza e agli avvisi del progetto upstream.
+La struttura tecnica di base, parte della cronologia e gli avvisi di licenza derivano dal progetto upstream.
 
 ## Licenza
 
-GPL-3.0-or-later, come il progetto upstream. Vedi `LICENSE`.
+GPL-3.0-or-later. Vedi `LICENSE`.

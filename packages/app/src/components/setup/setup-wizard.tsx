@@ -33,7 +33,7 @@ const HOME_WORKSPACE_COLOR = "#6366f1";
 export function SetupWizard() {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("welcome");
-  const [dataPath, setDataPath] = useState("~/DeskMD");
+  const [dataPath, setDataPath] = useState("~/Viboard");
   const [workspaceName, setWorkspaceName] = useState("Personal");
   const [serverUrlInput, setServerUrlInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +96,7 @@ export function SetupWizard() {
         try {
           await expandHostFsScope(previousSettingsPath);
         } catch (rollbackError) {
-          console.error("Failed to restore previous DeskMD data folder:", rollbackError);
+          console.error("Failed to restore previous Viboard data folder:", rollbackError);
         }
         setError(t("errors.setup.checkDataFolder", { path: dataPath }));
         return;
@@ -190,7 +190,7 @@ export function SetupWizard() {
             <div className="flex flex-col items-center text-center gap-6">
               <img
                 src="/icon.png"
-                alt="Desk"
+                alt="Diaspro Viboard"
                 width={64}
                 height={64}
                 className="rounded-xl"
@@ -299,7 +299,7 @@ export function SetupWizard() {
                       setDataPath(e.target.value);
                       setError(null);
                     }}
-                    placeholder="~/DeskMD"
+                    placeholder="~/Viboard"
                     className="flex-1"
                   />
                   {isTauri() && (

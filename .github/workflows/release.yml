@@ -84,7 +84,7 @@ jobs:
         with:
           projectPath: packages/app
           tagName: ${{ github.ref_name }}
-          releaseName: "Desk ${{ github.ref_name }}"
+          releaseName: "Diaspro Viboard ${{ github.ref_name }}"
           releaseBody: "Release ${{ github.ref_name }}"
           releaseDraft: false
           prerelease: false

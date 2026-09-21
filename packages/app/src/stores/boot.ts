@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 /**
  * Where the native app runs the domain:
  *   - "local"  → in-process on the Mac filesystem (default; the only mode pre-3b-native)
- *   - "remote" → thin client of a deployed desk.md server (RemoteDeskService over HTTP)
+ *   - "remote" → thin client of a deployed Diaspro Viboard server (RemoteDeskService over HTTP)
  * This is a client-side setting, independent of `dataPath`/`setupCompleted`, so switching
  * back to local never disturbs the local setup and never traps the user behind a login.
  */
@@ -24,7 +24,7 @@ interface BootState {
 
 const getDefaultDataPath = (): string => {
   if (typeof window !== "undefined") {
-    return "~/DeskMD";
+    return "~/Viboard";
   }
   return "";
 };

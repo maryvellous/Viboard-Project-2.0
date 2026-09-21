@@ -132,13 +132,13 @@ fn expand_fs_scope(
     let p = std::path::PathBuf::from(&path);
     fs::create_dir_all(&p).map_err(|error| {
         format!(
-            "Failed to create DeskMD data folder {}: {error}",
+            "Failed to create Diaspro Viboard data folder {}: {error}",
             p.display()
         )
     })?;
     let canonical = p.canonicalize().map_err(|error| {
         format!(
-            "Failed to resolve DeskMD data folder {}: {error}",
+            "Failed to resolve Diaspro Viboard data folder {}: {error}",
             p.display()
         )
     })?;
@@ -185,20 +185,20 @@ struct DataRootOwnership {
 fn acquire_data_root_ownership(root: &Path) -> Result<DataRootOwnership, String> {
     fs::create_dir_all(root).map_err(|error| {
         format!(
-            "Failed to create DeskMD data folder {}: {error}",
+            "Failed to create Diaspro Viboard data folder {}: {error}",
             root.display()
         )
     })?;
     let canonical_root = root.canonicalize().map_err(|error| {
         format!(
-            "Failed to resolve DeskMD data folder {}: {error}",
+            "Failed to resolve Diaspro Viboard data folder {}: {error}",
             root.display()
         )
     })?;
     let lock_directory = canonical_root.join(".desk");
     fs::create_dir_all(&lock_directory).map_err(|error| {
         format!(
-            "Failed to create DeskMD lock directory {}: {error}",
+            "Failed to create Diaspro Viboard lock directory {}: {error}",
             lock_directory.display()
         )
     })?;
@@ -210,13 +210,13 @@ fn acquire_data_root_ownership(root: &Path) -> Result<DataRootOwnership, String>
         .open(&lock_path)
         .map_err(|error| {
             format!(
-                "Failed to open DeskMD writer lock {}: {error}",
+                "Failed to open Diaspro Viboard writer lock {}: {error}",
                 lock_path.display()
             )
         })?;
     file.try_lock_exclusive().map_err(|error| {
         format!(
-            "DeskMD data folder is already owned by another process or does not support locking: {}. Stop the other DeskMD instance and try again. ({error})",
+            "Diaspro Viboard data folder is already owned by another process or does not support locking: {}. Stop the other Diaspro Viboard instance and try again. ({error})",
             canonical_root.display(),
         )
     })?;
@@ -288,7 +288,7 @@ fn allow_data_path(app_handle: tauri::AppHandle, path: String) -> Result<(), Str
 
     if !target.starts_with(&root_canon) {
         return Err(format!(
-            "Path is outside the Desk data root: {}",
+            "Path is outside the Viboard data root: {}",
             requested.display()
         ));
     }
@@ -378,11 +378,11 @@ fn lock_owned_data_root(
         .lock()
         .map_err(|_| "Data-root ownership state is unavailable".to_string())?;
     let Some(active) = owner.as_ref() else {
-        return Err("DeskMD does not own the local data folder; writes are disabled".to_string());
+        return Err("Diaspro Viboard does not own the local data folder; writes are disabled".to_string());
     };
     let configured = lenient_canonicalize(&data_root::get_data_root())?;
     if active.canonical_root != configured {
-        return Err("DeskMD data-root ownership does not match the configured folder".to_string());
+        return Err("Diaspro Viboard data-root ownership does not match the configured folder".to_string());
     }
     Ok(owner)
 }
@@ -393,7 +393,7 @@ fn atomic_write_target(path: &str) -> Result<std::path::PathBuf, String> {
     let root = lenient_canonicalize(&data_root::get_data_root())?;
     if !target.starts_with(&root) {
         return Err(format!(
-            "Path is outside the Desk data root: {}",
+            "Path is outside the Viboard data root: {}",
             requested.display()
         ));
     }
@@ -515,7 +515,7 @@ pub fn run() {
                 &[
                     &Submenu::with_items(
                         app,
-                        "Desk",
+                        "Diaspro Viboard",
                         true,
                         &[
                             &PredefinedMenuItem::about(app, None, None)?,
