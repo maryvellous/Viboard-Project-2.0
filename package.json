@@ -1,5 +1,5 @@
 {
-  "name": "desk-md-monorepo",
+  "name": "viboard-project-monorepo",
   "private": true,
   "type": "module",
   "workspaces": [
