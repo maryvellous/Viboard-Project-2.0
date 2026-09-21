@@ -1,4 +1,3 @@
-
 import { useTabStore } from "@/stores/tabs";
 import { DocEditor } from "@/components/editors/doc-editor";
 import { TaskEditor } from "@/components/editors/task-editor";
@@ -21,11 +20,10 @@ export function TabContent({ children }: TabContentProps) {
           key={tab.id}
           className={cn(
             "absolute inset-0",
-            tab.id === activeTabId ? "z-10 visible" : "z-0 invisible"
+            tab.id === activeTabId ? "z-10 visible" : "z-0 invisible",
           )}
         >
           {tab.type === "desk" ? (
-            // Desk tab shows the current page content
             <div className="h-full overflow-hidden">{children}</div>
           ) : tab.type === "doc" && tab.entityId && tab.workspaceId && tab.projectId ? (
             <DocEditor
@@ -41,7 +39,6 @@ export function TabContent({ children }: TabContentProps) {
               projectId={tab.projectId}
               onClose={() => closeTab(tab.id)}
             />
-          )
           ) : tab.type === "email" && tab.emailData ? (
             <EmailViewer email={tab.emailData} />
           ) : null}
