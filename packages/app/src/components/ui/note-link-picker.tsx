@@ -9,7 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { CheckSquare, FileText, Calendar } from "lucide-react";
+import { CheckSquare, FileText } from "lucide-react";
 import {
   search,
   getRecentItems,
@@ -20,12 +20,11 @@ import {
 import { useSearchIndexState } from "@/hooks/use-search-index";
 import { searchIndexController } from "@/lib/search-index-controller";
 
-const LINKABLE_TYPES: SearchItemType[] = ["doc", "task", "meeting"];
+const LINKABLE_TYPES: SearchItemType[] = ["doc", "task"];
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   task: <CheckSquare className="h-4 w-4" />,
   doc: <FileText className="h-4 w-4" />,
-  meeting: <Calendar className="h-4 w-4" />,
 };
 
 interface NoteLinkPickerProps {
@@ -54,7 +53,6 @@ export function NoteLinkPicker({
   const typeLabels: Record<string, string> = {
     task: t("ui.noteLinkPicker.types.task"),
     doc: t("ui.noteLinkPicker.types.doc"),
-    meeting: t("ui.noteLinkPicker.types.meeting"),
   };
 
   useEffect(() => {
