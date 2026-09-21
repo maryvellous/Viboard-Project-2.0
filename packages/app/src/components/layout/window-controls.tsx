@@ -6,11 +6,19 @@ interface WindowControlsProps {
   className?: string;
 }
 
-async function runWindowAction(
-  action: (window: import("@tauri-apps/api/window").Window) => Promise<void>,
-) {
+async function minimizeWindow() {
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  await action(getCurrentWindow());
+  await getCurrentWindow().minimize();
+}
+
+async function toggleMaximizeWindow() {
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  await getCurrentWindow().toggleMaximize();
+}
+
+async function closeWindow() {
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  await getCurrentWindow().close();
 }
 
 export function WindowControls({ className }: WindowControlsProps) {
@@ -22,7 +30,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-white/10 hover:text-foreground"
         aria-label="Minimizza"
-        onClick={() => void runWindowAction((window) => window.minimize())}
+        onClick={() => void minimizeWindow()}
       >
         <Minus className="size-4" />
       </button>
@@ -30,7 +38,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-white/10 hover:text-foreground"
         aria-label="Massimizza o ripristina"
-        onClick={() => void runWindowAction((window) => window.toggleMaximize())}
+        onClick={() => void toggleMaximizeWindow()}
       >
         <Square className="size-3.5" />
       </button>
@@ -38,7 +46,7 @@ export function WindowControls({ className }: WindowControlsProps) {
         type="button"
         className="flex w-11 items-center justify-center text-foreground/70 hover:bg-red-600 hover:text-white"
         aria-label="Chiudi"
-        onClick={() => void runWindowAction((window) => window.close())}
+        onClick={() => void closeWindow()}
       >
         <X className="size-4" />
       </button>
