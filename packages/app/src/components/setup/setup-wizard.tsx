@@ -1,32 +1,24 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InlineProgress } from "@/components/ui/inline-progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DiasproLogo } from "@/components/brand";
+import { WindowControls } from "@/components/layout";
 import { useBootStore } from "@/stores/boot";
 import { useNavigationStore } from "@/stores/navigation";
 import { useCreateWorkspace } from "@/stores/workspaces";
-import { slugify, isTauri, needsTrafficLightPadding } from "@desk/core";
-import { getDeskService } from "@desk/core";
+import { slugify, isTauri, needsTrafficLightPadding, getDeskService } from "@desk/core";
 import {
   expandHostFsScope,
   initializeHostDeskDirectory,
-  releaseHostDataRootOwnership,
 } from "@/lib/host-files";
-import { FolderSearch, HardDrive, Server } from "lucide-react";
+import { FolderSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { prepareEditorContextTransition } from "@/lib/editor-session-controller";
-import { runOwnershipReleasingTransition } from "@/lib/editor-context-transition";
-import { normalizeServerUrl } from "@/lib/server-url";
 import type { Workspace } from "@desk/core/types";
 
-type Step = "welcome" | "location" | "server-url" | "data-folder" | "existing-detected" | "workspace";
-
-// Connecting to a remote server is a native-desktop capability: bundled in every
-// non-hosted build (`!VITE_DESK_HOSTED`) but only offered inside a Tauri webview
-// (isTauri()) — the browser-fixture dev build stays local-only.
-const SUPPORTS_REMOTE = !import.meta.env.VITE_DESK_HOSTED && isTauri();
+type Step = "welcome" | "data-folder" | "existing-detected" | "workspace";
 
 const HOME_WORKSPACE_COLOR = "#6366f1";
 
@@ -35,7 +27,6 @@ export function SetupWizard() {
   const [step, setStep] = useState<Step>("welcome");
   const [dataPath, setDataPath] = useState("~/Viboard");
   const [workspaceName, setWorkspaceName] = useState("Personal");
-  const [serverUrlInput, setServerUrlInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [existingWorkspaces, setExistingWorkspaces] = useState<Workspace[]>([]);
   const [hasTitleBarPadding, setHasTitleBarPadding] = useState(false);
@@ -47,7 +38,6 @@ export function SetupWizard() {
 
   const setSettingsDataPath = useBootStore((state) => state.setDataPath);
   const setSetupCompleted = useBootStore((state) => state.setSetupCompleted);
-  const setConnection = useBootStore((state) => state.setConnection);
   const setCurrentWorkspaceId = useNavigationStore((state) => state.setCurrentWorkspaceId);
   const createWorkspace = useCreateWorkspace();
 
@@ -107,41 +97,6 @@ export function SetupWizard() {
     }
   };
 
-  const handleConnectServer = async () => {
-    const normalized = normalizeServerUrl(serverUrlInput);
-    if (!normalized) {
-      setError(
-        /^http:\/\//i.test(serverUrlInput.trim())
-          ? t("setup.server.httpsRequired")
-          : t("setup.server.invalidUrl")
-      );
-      return;
-    }
-    // Switch to remote mode and reload: main.tsx wires RemoteDeskService and the
-    // native auth gate takes over for login / first-run account creation.
-    try {
-      const previousBoot = useBootStore.getState();
-      const result = await runOwnershipReleasingTransition({
-        prepare: prepareEditorContextTransition,
-        release: releaseHostDataRootOwnership,
-        commit: async () => {
-          setConnection("remote", normalized);
-          window.location.reload();
-        },
-        rollback: async () => {
-          setConnection(previousBoot.connectionMode, previousBoot.serverUrl);
-          await expandHostFsScope(previousBoot.dataPath);
-        },
-      });
-      if (result === "blocked") {
-        setError(t("editors.shared.contextTransitionBlocked"));
-        return;
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
-  };
-
   const handleUseExisting = () => {
     if (existingWorkspaces.length > 0) {
       setCurrentWorkspaceId(existingWorkspaces[0].id);
@@ -182,102 +137,22 @@ export function SetupWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="relative min-h-screen bg-background flex flex-col">
+      <WindowControls className="absolute right-0 top-0 z-50 h-10" />
       {hasTitleBarPadding && <div data-tauri-drag-region className="h-7 shrink-0" />}
-      <main className="flex-1 flex items-center justify-center px-8">
+      {!hasTitleBarPadding && <div data-tauri-drag-region className="h-10 shrink-0" />}
+      <main className="flex-1 flex items-center justify-center px-8 pb-10">
         <div className="w-full max-w-md flex flex-col items-center gap-10">
           {step === "welcome" && (
             <div className="flex flex-col items-center text-center gap-6">
-              <img
-                src="/icon.png"
-                alt="Diaspro Viboard"
-                width={64}
-                height={64}
-                className="rounded-xl"
-              />
+              <DiasproLogo size={64} />
               <div className="flex flex-col gap-2">
                 <h1 className="text-xl font-semibold tracking-tight">{t("setup.welcome.title")}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {t("setup.welcome.subtitle")}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("setup.welcome.subtitle")}</p>
               </div>
-              <Button
-                className="w-full"
-                onClick={() => setStep(SUPPORTS_REMOTE ? "location" : "data-folder")}
-              >
+              <Button className="w-full" onClick={() => setStep("data-folder")}>
                 {t("common.buttons.continue")}
               </Button>
-            </div>
-          )}
-
-          {step === "location" && (
-            <div className="w-full flex flex-col gap-6">
-              <div className="flex flex-col gap-2 text-center">
-                <h1 className="text-base font-semibold tracking-tight">{t("setup.location.title")}</h1>
-                <p className="text-sm text-muted-foreground">{t("setup.location.subtitle")}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => setStep("data-folder")}
-                  className="flex items-start gap-3 rounded-lg border border-border/60 bg-card px-4 py-3 text-left hover:border-foreground/30 hover:bg-muted/40 transition-colors"
-                >
-                  <HardDrive className="h-5 w-5 shrink-0 mt-0.5 text-muted-foreground" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{t("setup.location.localTitle")}</p>
-                    <p className="text-sm text-muted-foreground">{t("setup.location.localDescription")}</p>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep("server-url")}
-                  className="flex items-start gap-3 rounded-lg border border-border/60 bg-card px-4 py-3 text-left hover:border-foreground/30 hover:bg-muted/40 transition-colors"
-                >
-                  <Server className="h-5 w-5 shrink-0 mt-0.5 text-muted-foreground" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium">{t("setup.location.remoteTitle")}</p>
-                    <p className="text-sm text-muted-foreground">{t("setup.location.remoteDescription")}</p>
-                  </div>
-                </button>
-              </div>
-              <Button variant="outline" onClick={() => setStep("welcome")}>
-                {t("common.buttons.back")}
-              </Button>
-            </div>
-          )}
-
-          {step === "server-url" && (
-            <div className="w-full flex flex-col gap-6">
-              <div className="flex flex-col gap-2 text-center">
-                <h1 className="text-base font-semibold tracking-tight">{t("setup.server.title")}</h1>
-                <p className="text-sm text-muted-foreground">{t("setup.server.subtitle")}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="serverUrl">{t("setup.server.label")}</Label>
-                <Input
-                  id="serverUrl"
-                  value={serverUrlInput}
-                  onChange={(e) => {
-                    setServerUrlInput(e.target.value);
-                    setError(null);
-                  }}
-                  placeholder="https://nas.example"
-                />
-                <p className="text-xs text-muted-foreground">{t("setup.server.hint")}</p>
-              </div>
-              {error && (
-                <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {error}
-                </p>
-              )}
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep("location")} disabled={isLoading}>
-                  {t("common.buttons.back")}
-                </Button>
-                <Button className="flex-1" onClick={handleConnectServer} disabled={!serverUrlInput.trim()}>
-                  {t("setup.server.connect")}
-                </Button>
-              </div>
             </div>
           )}
 
@@ -285,9 +160,7 @@ export function SetupWizard() {
             <div className="w-full flex flex-col gap-6">
               <div className="flex flex-col gap-2 text-center">
                 <h1 className="text-base font-semibold tracking-tight">{t("setup.dataFolder.title")}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {t("setup.dataFolder.subtitle")}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("setup.dataFolder.subtitle")}</p>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="dataPath">{t("setup.dataFolder.label")}</Label>
@@ -321,11 +194,7 @@ export function SetupWizard() {
                 </p>
               )}
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep(SUPPORTS_REMOTE ? "location" : "welcome")}
-                  disabled={isLoading}
-                >
+                <Button variant="outline" onClick={() => setStep("welcome")} disabled={isLoading}>
                   {t("common.buttons.back")}
                 </Button>
                 <Button className="flex-1" onClick={handleCheckDataFolder} disabled={isLoading}>
@@ -373,9 +242,7 @@ export function SetupWizard() {
             <div className="w-full flex flex-col gap-6">
               <div className="flex flex-col gap-2 text-center">
                 <h1 className="text-base font-semibold tracking-tight">{t("setup.workspace.title")}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {t("setup.workspace.subtitle")}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("setup.workspace.subtitle")}</p>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="workspaceName">{t("setup.workspace.nameLabel")}</Label>
