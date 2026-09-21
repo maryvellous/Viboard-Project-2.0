@@ -370,7 +370,7 @@
       "planner": "Imposta gli orari e i giorni mostrati nel pianificatore settimanale.",
       "templates": "Imposta contenuti predefiniti per nuovi documenti e attività.",
       "ai": "Scegli il servizio AI, il modello e la chiave API da usare.",
-      "agents": "Controlla il contesto che Diaspro Viboard fornisce agli agenti esterni, in locale o via MCP.",
+      "agents": "Gestisci le istruzioni e i file locali usati dagli agenti AI.",
       "data": "Scegli dove salvare i dati e gestisci le impostazioni locali dell'app.",
       "about": "Consulta versione, aggiornamenti, link al progetto e licenza."
     },
@@ -527,18 +527,18 @@
     "agents": {
       "title": "Agenti esterni",
       "description": "Controlla il contesto che Diaspro Viboard fornisce agli agenti esterni, in locale o tramite MCP.",
-      "notice": "Queste impostazioni valgono per gli <strong>agenti esterni</strong> che usano i file locali generati o la tua connessione MCP ospitata.",
+      "notice": "Queste impostazioni servono a preparare file di istruzioni locali per strumenti come Claude Code, Codex e Gemini.",
       "emit": {
         "title": "File generati",
-        "description": "Scegli quali file per agenti scrivere nella cartella dati. Contenuto identico, tre nomi di file.",
+        "description": "Scegli quali file di istruzioni mantenere aggiornati nella cartella di Diaspro Viboard.",
         "claude": "Per Claude Code",
         "agents": "Per Codex / OpenAI Agents",
         "gemini": "Per Gemini CLI",
-        "noneEnabled": "Nessun file per agenti viene generato. Le istruzioni qui sotto sono salvate, ma non saranno scritte su disco finché non attivi almeno un interruttore."
+        "noneEnabled": "Nessun file per agenti è attivo."
       },
       "global": {
         "title": "Istruzioni globali",
-        "description": "Valgono in tutti gli spazi di lavoro e vengono fornite tramite i file locali generati o desk_context via MCP."
+        "description": "Istruzioni generali disponibili agli agenti che lavorano sui file di Diaspro Viboard."
       },
       "instructions": {
         "globalLabel": "Istruzioni globali",
