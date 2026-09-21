@@ -1,4 +1,4 @@
-import matter from "gray-matter";
+import * as matter from "@11ty/gray-matter";
 
 /**
  * Parse a markdown file with YAML frontmatter
