@@ -1,3 +1,4 @@
+import { ViboardLogo } from "@/components/brand";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -15,12 +16,7 @@ export function AppBootScreen() {
       role="status"
       aria-live="polite"
     >
-      <img
-        src="/icon.png"
-        alt=""
-        className="desk-boot-mark size-14 rounded-[14px]"
-        draggable={false}
-      />
+      <ViboardLogo size={64} className="desk-boot-mark rounded-[14px]" />
       <span className="sr-only">{t("common.buttons.loading")}</span>
     </div>
   );

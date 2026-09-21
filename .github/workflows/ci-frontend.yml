@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate native app icons
+        run: npm run icons -w @desk/app
+
       - name: Lint
         run: npm run lint
 

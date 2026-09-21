@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { InlineProgress } from "@/components/ui/inline-progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DiasproLogo } from "@/components/brand";
+import { ViboardLogo } from "@/components/brand";
 import { WindowControls } from "@/components/layout";
 import { useBootStore } from "@/stores/boot";
 import { useNavigationStore } from "@/stores/navigation";
@@ -145,7 +145,7 @@ export function SetupWizard() {
         <div className="w-full max-w-md flex flex-col items-center gap-10">
           {step === "welcome" && (
             <div className="flex flex-col items-center text-center gap-6">
-              <DiasproLogo size={64} />
+              <ViboardLogo size={80} className="rounded-[14px]" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-xl font-semibold tracking-tight">{t("setup.welcome.title")}</h1>
                 <p className="text-sm text-muted-foreground">{t("setup.welcome.subtitle")}</p>

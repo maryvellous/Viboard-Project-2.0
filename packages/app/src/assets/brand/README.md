@@ -1,8 +1,8 @@
 # Diaspro Viboard brand assets
 
-Put the final brand files here:
+- `viboard-logo.svg` — primary Viboard mark. Used in onboarding/startup and as the source for native application icons.
+- `diaspro-logo.tsx` lives in the brand component folder and remains the compact Diaspro mark used in the sidebar.
+- The web favicon remains at `packages/app/public/favicon.svg`.
 
-- `logo.svg` — primary Diaspro Viboard logo used inside the app.
-- `app-icon.png` — square source icon for the Windows executable/installer (prefer 1024×1024 PNG).
-
-The Tauri icon set in `packages/app/src-tauri/icons/` is generated from `app-icon.png`.
+Run `npm run icons -w @desk/app` to regenerate the Tauri icon set in
+`packages/app/src-tauri/icons/` from `viboard-logo.svg`.

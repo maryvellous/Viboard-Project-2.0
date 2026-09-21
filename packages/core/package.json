@@ -1,6 +1,6 @@
 {
   "name": "@desk/core",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "type": "module",
   "exports": {
@@ -34,7 +34,11 @@
     "@tauri-apps/plugin-fs": "^2.4.5"
   },
   "peerDependenciesMeta": {
-    "@tauri-apps/api": { "optional": true },
-    "@tauri-apps/plugin-fs": { "optional": true }
+    "@tauri-apps/api": {
+      "optional": true
+    },
+    "@tauri-apps/plugin-fs": {
+      "optional": true
+    }
   }
 }
