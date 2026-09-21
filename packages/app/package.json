@@ -69,7 +69,8 @@
     "tailwind-merge": "^3.4.0",
     "tiptap-markdown": "^0.9.0",
     "zustand": "^5.0.10",
-    "@tiptap/extension-paragraph": "3.31.3"
+    "@tiptap/extension-paragraph": "3.31.3",
+    "@tiptap/core": "3.31.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
