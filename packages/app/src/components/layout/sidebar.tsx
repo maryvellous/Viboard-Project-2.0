@@ -7,7 +7,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Settings,
   CheckSquare,
-  Calendar,
   CalendarDays,
   Home,
   FileText,
@@ -20,7 +19,6 @@ import { useTranslation } from "react-i18next";
 import { useCurrentWorkspace } from "@/stores/workspaces";
 import { useTasks } from "@/stores/tasks";
 import { useWorkspaceDocsShell } from "@/stores/content";
-import { useMeetings } from "@/stores/meetings";
 import { countTreeFiles } from "@/lib/tree-count";
 import { useProjectSummaries } from "@/stores/projects";
 import { useProjectSelectionStore } from "@/stores/project-selection";
@@ -57,12 +55,10 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
 
   const { data: tasks = [] } = useTasks(workspaceId);
   const { data: overviewTree = [] } = useWorkspaceDocsShell(workspaceId);
-  const { data: meetings = [] } = useMeetings(workspaceId);
   const { data: projects = [] } = useProjectSummaries(workspaceId, today);
 
   const activeTaskCount = tasks.filter((t) => isActiveStatus(t.status)).length;
   const totalFiles = useMemo(() => countTreeFiles(overviewTree), [overviewTree]);
-  const meetingCount = meetings.length;
   const projectCount = projects.length;
 
   const setActiveTab = useTabStore((s) => s.setActiveTab);
@@ -124,7 +120,6 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
           <div className="space-y-0.5">
             <SidebarNavRow to="/tasks" label={t("nav.sidebar.tasks")} icon={CheckSquare} active={pathname === "/tasks"} collapsed={collapsed} role="global" count={activeTaskCount} onClick={switchToDesk} />
             <SidebarNavRow to="/docs" label={t("nav.sidebar.docs")} icon={FileText} active={pathname === "/docs"} collapsed={collapsed} role="global" count={totalFiles} onClick={switchToDesk} />
-            <SidebarNavRow to="/meetings" label={t("nav.sidebar.meetings")} icon={Calendar} active={pathname === "/meetings"} collapsed={collapsed} role="global" count={meetingCount} onClick={switchToDesk} />
           </div>
 
           <Divider />
