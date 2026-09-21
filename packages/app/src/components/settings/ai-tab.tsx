@@ -17,11 +17,10 @@ import { useAISettingsStore } from "@/stores/ai";
 import { useAIMaintenanceSettingsStore } from "@/stores/ai-maintenance-settings";
 import { useAIMaintenanceInfo } from "@/hooks/use-ai-maintenance-info";
 import { aiMaintenanceKeys } from "@/lib/query-client";
-import { PROVIDER_MODELS, DEFAULT_MODELS, getDeskService } from "@desk/core";
+import { PROVIDER_MODELS, DEFAULT_MODELS, getDeskService, getProviderDefinition } from "@desk/core";
 import type { AIProviderType, AIUsageRecord } from "@desk/core";
 import { BrowserModeError, getSecret, setSecret } from "@/lib/ai/secrets";
 import { isTauri } from "@desk/core";
-import { isDomainRemote } from "@/lib/connection";
 import { SmartIndexSection } from "./smart-index-section";
 
 function linuxKeyringHint(message: string, t: (key: string) => string): string | null {
@@ -111,18 +110,17 @@ export function AITab() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const browserMode = !isTauri();
 
-  // Which providers have a resolvable key on the host that owns the data (this machine's
-  // Keychain locally, the server's env in hosted mode). One source of truth for both.
-  const remote = isDomainRemote();
   const { data: maintenanceInfo } = useAIMaintenanceInfo();
 
   const providerLabel = (p: AIProviderType): string =>
-    p === "openai" ? t("settings.ai.providers.openai") : t("settings.ai.providers.anthropic");
+    t(`settings.ai.providers.${p}`);
+
+  const providerKeyRef = (p: AIProviderType) => getProviderDefinition(p).keyRef;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const keyRef = safeProviderType === "openai" ? "ai.openai" : "ai.anthropic";
+      const keyRef = providerKeyRef(safeProviderType);
       try {
         const key = await getSecret(keyRef);
         if (cancelled) return;
@@ -154,7 +152,7 @@ export function AITab() {
 
     setIsSavingKey(true);
     try {
-      const keyRef = safeProviderType === "openai" ? "ai.openai" : "ai.anthropic";
+      const keyRef = providerKeyRef(safeProviderType);
       await setSecret(keyRef, trimmed);
       // The key now resolves from the Keychain; re-ask the host so every "configured?" reader updates.
       await queryClient.invalidateQueries({ queryKey: aiMaintenanceKeys.info });
@@ -197,6 +195,7 @@ export function AITab() {
               <SelectContent>
                 <SelectItem value="openai">{t("settings.ai.providers.openai")}</SelectItem>
                 <SelectItem value="anthropic">{t("settings.ai.providers.anthropic")}</SelectItem>
+                <SelectItem value="deepseek">{t("settings.ai.providers.deepseek")}</SelectItem>
               </SelectContent>
             </Select>
           </SettingsRow>
@@ -231,88 +230,76 @@ export function AITab() {
         title={t("settings.ai.credentials.title")}
         description={t("settings.ai.credentials.description")}
       >
-        {remote ? (
-          <SettingsNotice title={t("settings.ai.serverMode.title")}>
-            <p>{t("settings.ai.serverMode.description")}</p>
-            <p className="mt-2 font-medium text-foreground">
-              {maintenanceInfo?.providerConfigured[safeProviderType]
-                ? t("settings.ai.serverMode.providerConfigured", {
-                    provider: providerLabel(safeProviderType),
-                  })
-                : t("settings.ai.serverMode.providerNotConfigured", {
-                    provider: providerLabel(safeProviderType),
-                  })}
-            </p>
-          </SettingsNotice>
-        ) : (
-          <SettingsGroup>
-            <SettingsField
-              label={t("settings.ai.apiKey.label", { provider: providerLabel(safeProviderType) })}
-              htmlFor="api-key"
-              footer={t("settings.ai.apiKey.storedNotice")}
-            >
-              {browserMode && (
-                <SettingsNotice title={t("settings.ai.browserMode.title")}>
-                  {t("settings.ai.browserMode.description")}
-                </SettingsNotice>
-              )}
-              {loadError && !browserMode && (
-                <SettingsNotice tone="error" title={t("settings.ai.keychainError.title")}>
-                  <p>{t("settings.ai.keychainError.description")}</p>
-                  {linuxKeyringHint(loadError, t) && <p>{linuxKeyringHint(loadError, t)}</p>}
-                  <details>
-                    <summary className="cursor-pointer">
-                      {t("settings.ai.keychainError.errorDetails")}
-                    </summary>
-                    <p className="mt-1 break-all font-mono">{loadError}</p>
-                  </details>
-                </SettingsNotice>
-              )}
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="relative flex-1">
-                  <Input
-                    id="api-key"
-                    type={showApiKey ? "text" : "password"}
-                    value={apiKeyInput}
-                    onChange={(event) => setApiKeyInput(event.target.value)}
-                    placeholder={
-                      safeProviderType === "openai"
-                        ? t("settings.ai.apiKey.placeholderOpenai")
-                        : t("settings.ai.apiKey.placeholderAnthropic")
-                    }
-                    className="bg-background/80 pr-10 font-mono text-sm"
-                    disabled={browserMode}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    disabled={browserMode}
-                    aria-label={
-                      showApiKey
-                        ? t("settings.ai.apiKey.hideAriaLabel")
-                        : t("settings.ai.apiKey.showAriaLabel")
-                    }
-                  >
-                    {showApiKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                  </Button>
-                </div>
-                <Button onClick={handleSaveApiKey} disabled={isSavingKey || browserMode}>
-                  {t("common.buttons.save")}
+        <SettingsGroup>
+          <SettingsField
+            label={t("settings.ai.apiKey.label", { provider: providerLabel(safeProviderType) })}
+            htmlFor="api-key"
+            footer={t("settings.ai.apiKey.storedNotice")}
+          >
+            {browserMode && (
+              <SettingsNotice title={t("settings.ai.browserMode.title")}>
+                {t("settings.ai.browserMode.description")}
+              </SettingsNotice>
+            )}
+            {loadError && !browserMode && (
+              <SettingsNotice tone="error" title={t("settings.ai.keychainError.title")}>
+                <p>{t("settings.ai.keychainError.description")}</p>
+                {linuxKeyringHint(loadError, t) && <p>{linuxKeyringHint(loadError, t)}</p>}
+                <details>
+                  <summary className="cursor-pointer">
+                    {t("settings.ai.keychainError.errorDetails")}
+                  </summary>
+                  <p className="mt-1 break-all font-mono">{loadError}</p>
+                </details>
+              </SettingsNotice>
+            )}
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="relative flex-1">
+                <Input
+                  id="api-key"
+                  type={showApiKey ? "text" : "password"}
+                  value={apiKeyInput}
+                  onChange={(event) => setApiKeyInput(event.target.value)}
+                  placeholder={
+                    safeProviderType === "anthropic"
+                      ? t("settings.ai.apiKey.placeholderAnthropic")
+                      : safeProviderType === "deepseek"
+                        ? t("settings.ai.apiKey.placeholderDeepseek")
+                        : t("settings.ai.apiKey.placeholderOpenai")
+                  }
+                  className="bg-background/80 pr-10 font-mono text-sm"
+                  disabled={browserMode}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  disabled={browserMode}
+                  aria-label={
+                    showApiKey
+                      ? t("settings.ai.apiKey.hideAriaLabel")
+                      : t("settings.ai.apiKey.showAriaLabel")
+                  }
+                >
+                  {showApiKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </Button>
               </div>
-              {!browserMode &&
-                !loadError &&
-                maintenanceInfo &&
-                !maintenanceInfo.providerConfigured[safeProviderType] && (
-                  <SettingsNotice tone="warning">
-                    {t("settings.ai.apiKey.notConfigured")}
-                  </SettingsNotice>
-                )}
-            </SettingsField>
-          </SettingsGroup>
+              <Button onClick={handleSaveApiKey} disabled={isSavingKey || browserMode}>
+                {t("common.buttons.save")}
+              </Button>
+            </div>
+            {!browserMode &&
+              !loadError &&
+              maintenanceInfo &&
+              !maintenanceInfo.providerConfigured[safeProviderType] && (
+                <SettingsNotice tone="warning">
+                  {t("settings.ai.apiKey.notConfigured")}
+                </SettingsNotice>
+              )}
+          </SettingsField>
+        </SettingsGroup>
         )}
       </SettingsSection>
 
