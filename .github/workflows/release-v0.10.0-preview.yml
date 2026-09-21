@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - security-v0.10.0
-    paths:
-      - ".github/workflows/release-v0.10.0-preview.yml"
 
 permissions:
   contents: write
