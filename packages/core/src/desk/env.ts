@@ -18,15 +18,15 @@ async function getTauriPathModule() {
 }
 
 /**
- * Get the Desk data directory path.
- * Reads from the boot store, falls back to ~/DeskMD.
+ * Get the Viboard data directory path.
+ * Reads from the boot store, falls back to ~/Viboard.
  * In Tauri: resolves ~ to the actual home directory.
  * In browser: returns the configured path (data lives in memory).
  */
 export async function getDeskPath(): Promise<string> {
   // Resolved via the injectable data-root seam (app wires the boot store,
-  // server wires DESK_DATA_ROOT). Defaults to ~/DeskMD before wiring.
-  const dataPath = (await getDataRoot()) || "~/DeskMD";
+  // server wires DESK_DATA_ROOT). Defaults to ~/Viboard before wiring.
+  const dataPath = (await getDataRoot()) || "~/Viboard";
 
   if (!isTauri()) {
     // Browser mode uses the same logical path inside its in-memory provider.
@@ -115,8 +115,8 @@ export function baseName(path: string): string {
 }
 
 /**
- * Initialize the Desk directory structure.
- * Only ensures ~/DeskMD/ and ~/DeskMD/workspaces/ exist — the home workspace is
+ * Initialize the Viboard directory structure.
+ * Only ensures ~/Viboard/ and ~/Viboard/workspaces/ exist — the home workspace is
  * created during onboarding via createWorkspace({ home: true }).
  */
 export async function initDeskDirectory(): Promise<void> {
