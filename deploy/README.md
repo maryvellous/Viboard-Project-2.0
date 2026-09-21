@@ -1,8 +1,8 @@
-# Self-hosting desk.md
+# Self-hosting Diaspro Viboard
 
-Run desk.md on a server you control. One container serves it all:
+Run Diaspro Viboard on a server you control. One container serves it all:
 
-- the **hosted web app** (use desk.md from a browser on your devices),
+- the **hosted web app** (use Diaspro Viboard from a browser on your devices),
 - the **domain API** the web and native clients talk to,
 - the **OAuth 2.1 Authorization Server**, and
 - a read-only **MCP endpoint** so AI tools (Claude.ai, ChatGPT, Claude Code) can connect.
@@ -51,7 +51,7 @@ responses, so if your proxy buffers, disable buffering and raise read/send timeo
 > loopback redirect, so the authorize URL carries `redirect_uri=http://localhost:<port>/callback`.
 > Many WAF rulesets (e.g. Nginx Proxy Manager's "Block Common Exploits", OWASP CRS RFI/SSRF
 > rules) flag a `http://` URL in a parameter and return 403 — breaking sign-in before it reaches
-> desk.md. Disable that rule for this host; desk.md validates the `redirect_uri` itself.
+> Diaspro Viboard. Disable that rule for this host; Diaspro Viboard validates the `redirect_uri` itself.
 
 ## Connect AI over MCP
 
@@ -62,7 +62,7 @@ sends you through sign-in + consent, and then has **read-only** access through
 project context resources. No static API key to manage — it's the standard OAuth grant.
 
 > Don't put the server behind a separate SSO/zero-trust gate (Cloudflare Access, etc.).
-> desk.md's own OAuth is the access control; an extra login in front breaks the connector grant.
+> Diaspro Viboard's own OAuth is the access control; an extra login in front breaks the connector grant.
 
 ## Server-side AI
 
