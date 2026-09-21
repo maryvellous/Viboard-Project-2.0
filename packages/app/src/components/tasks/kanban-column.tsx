@@ -54,13 +54,18 @@ export function KanbanColumn({
     <div className={cn("flex flex-col h-full", !hideHeader && "min-w-[280px] w-[280px]")}>
       {/* Column header */}
       {!hideHeader && (
-        <div className="mb-2 flex flex-shrink-0 items-center gap-2 px-1">
-          <div className={cn("w-2 h-2 rounded-full", dotColor)} />
-          <h3 className="text-sm font-medium text-foreground/90">{label}</h3>
-          <span className="ml-auto text-xs tabular-nums text-muted-foreground">
-            {tasks.length}
-          </span>
-        </div>
+        <>
+          <div className="mb-2 flex flex-shrink-0 items-center gap-2 px-1">
+            <div className={cn("w-2 h-2 rounded-full", dotColor)} />
+            <h3 className="text-sm font-medium text-foreground/90">{label}</h3>
+            <span className="ml-auto text-xs tabular-nums text-muted-foreground">
+              {tasks.length}
+            </span>
+          </div>
+          {/* Diaspro chromatic break: one coloured rule per status, so five columns
+              don't read as one violet block. */}
+          <div className={cn("mx-1 mb-2 h-0.5 flex-shrink-0 rounded-full opacity-60", dotColor)} />
+        </>
       )}
 
       {/* Drop zone - flex-1 stretches to match siblings */}

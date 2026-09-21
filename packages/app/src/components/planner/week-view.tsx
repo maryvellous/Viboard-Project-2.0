@@ -18,7 +18,6 @@ import { useWorkspaces } from "@/stores/workspaces";
 import {
   getWeekMonday,
   getWeekDays,
-  formatDayName,
   formatDayNumber,
   computeGridRange,
   SLOT_HEIGHT,
@@ -27,6 +26,7 @@ import {
   pixelsToMinutes,
   snapToSlot,
 } from "@desk/core";
+import { formatLocaleDate } from "@/lib/i18n/format";
 import { WeekNavigator } from "./week-navigator";
 import { TimeGrid } from "./time-grid";
 import { DayColumn } from "./day-column";
@@ -343,6 +343,7 @@ export function WeekView() {
         <PageHeader
           title={t("nav.sidebar.planner")}
           icon={CalendarDays}
+          accent="lavender"
           center={(
             <WeekNavigator
               currentMonday={currentMonday}
@@ -375,18 +376,18 @@ export function WeekView() {
                   key={day}
                   className={cn(
                     "px-3 py-1.5 text-center border-r border-border/40 last:border-r-0 relative group/day-header",
-                    today && "bg-primary/5"
+                    today && "bg-[#a5c4dc]/[0.08]"
                   )}
                 >
                   <div
                     className={cn(
                       "text-xs uppercase tracking-wide",
                       today
-                        ? "text-primary font-semibold"
+                        ? "text-[#a5c4dc] font-semibold"
                         : "text-muted-foreground"
                     )}
                   >
-                    {formatDayName(day)}
+                    {formatLocaleDate(day, { weekday: "short" })}
                   </div>
                   <div
                     className={cn(

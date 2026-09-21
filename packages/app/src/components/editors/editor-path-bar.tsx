@@ -21,13 +21,15 @@ interface EditorPathBarProps {
  *       → { location: ["acme", "website", "tasks"], filename: "fix-bug.md" }
  */
 function getDisplayParts(filePath: string): { location: string[]; filename: string } {
+  // The platform separator is "\" on Windows, so normalize before splitting.
+  const normalized = filePath.replaceAll("\\", "/");
   const marker = `/${PATH_SEGMENTS.WORKSPACES}/`;
-  const idx = filePath.indexOf(marker);
+  const idx = normalized.indexOf(marker);
   const segments =
     idx === -1
-      ? [filePath.split("/").pop() || filePath]
+      ? [normalized.split("/").pop() || normalized]
       : // Filter out the "projects" directory segment — it's structural noise
-        filePath.slice(idx + marker.length).split("/").filter((s) => s !== PATH_SEGMENTS.PROJECTS);
+        normalized.slice(idx + marker.length).split("/").filter((s) => s !== PATH_SEGMENTS.PROJECTS);
 
   const filename = segments.pop() || "";
   return { location: segments, filename };

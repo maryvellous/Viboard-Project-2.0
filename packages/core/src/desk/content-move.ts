@@ -7,7 +7,7 @@ import {
   decodeDocFrontmatter,
   reportFrontmatterDiagnostics,
 } from "./frontmatter";
-import { joinPath } from "./env";
+import { joinPath, baseName } from "./env";
 import { findFileById, readMarkdownFile, moveMarkdownFile } from "./file-operations";
 import { WORKSPACE_LEVEL_PROJECT_ID } from "./constants";
 import { getDocsPath } from "./paths";
@@ -56,7 +56,7 @@ export async function moveDoc(
   const parsed = await readMarkdownFile<Record<string, unknown>>(sourceFilePath);
   if (!parsed) return null;
 
-  const sourceFilename = sourceFilePath.split("/").pop()!;
+  const sourceFilename = baseName(sourceFilePath);
   const toDir = to.folderPath ? await joinPath(toBasePath, to.folderPath) : toBasePath;
   const targetFilePath = await joinPath(toDir, sourceFilename);
 

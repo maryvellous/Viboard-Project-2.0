@@ -5,6 +5,7 @@ const LOCALE_MAP: Record<string, string> = {
   en: "en-US",
   de: "de-DE",
   fr: "fr-FR",
+  it: "it-IT",
 };
 
 function currentLocale(): string {
@@ -37,7 +38,11 @@ export function formatLocaleDate(
 
 /**
  * Format an optional ISO date with a date-fns pattern, yielding "" for a missing
- * or unparseable value. For the short inline dates in list rows ("MMM d").
+ * or unparseable value.
+ *
+ * @deprecated date-fns uses its en-US locale here, so month names stay English in
+ * every language. Use `formatLocaleDate` (Intl) instead — it follows the interface
+ * language. Kept only until the last caller is migrated.
  */
 export function safeFormat(iso: string | undefined, pattern: string): string {
   if (!iso) return "";

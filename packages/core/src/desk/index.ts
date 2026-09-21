@@ -24,7 +24,9 @@ export type {
 } from "./editor-documents";
 
 // Supported environment and path helpers. Filesystem scope/bootstrap are host-owned.
-export { isTauri, isMacOS, needsTrafficLightPadding, getDeskPath, joinPath } from "./env";
+// baseName/parentPath are separator-agnostic: absolute paths use the platform separator
+// (\ on Windows), so no caller may split them on "/".
+export { isTauri, isMacOS, needsTrafficLightPadding, getDeskPath, joinPath, baseName, parentPath } from "./env";
 export * from "./parser";
 export * from "./frontmatter";
 export * from "./constants";

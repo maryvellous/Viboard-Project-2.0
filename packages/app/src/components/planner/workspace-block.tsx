@@ -213,8 +213,8 @@ export function TimeBlock({
           className={cn(
             "absolute left-1 right-1 rounded-lg border overflow-hidden transition-shadow",
             "hover:shadow-md group/block",
-            resizePreview && "shadow-lg ring-1 ring-primary/20",
-            isDropTarget && "ring-1 ring-primary/40 shadow-md"
+            resizePreview && "shadow-lg ring-1 ring-[#e8d19e]/40",
+            isDropTarget && "ring-1 ring-[#e8d19e]/60 shadow-md"
           )}
           style={{
             top,

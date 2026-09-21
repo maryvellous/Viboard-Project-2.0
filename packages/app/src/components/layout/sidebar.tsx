@@ -30,6 +30,7 @@ import { WorkspaceSelector } from "./workspace-selector";
 import { useTabStore } from "@/stores/tabs";
 import { openCommandPalette } from "@/components/command-palette";
 import { SidebarNavRow } from "./sidebar-nav-row";
+import { DiasproLogo } from "@/components/brand";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { isMacOS } from "@desk/core";
 import { getSearchShortcutLabel } from "@/lib/search-presentation";
@@ -90,11 +91,15 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
     <aside
       data-app-chrome
       className={cn(
-        "flex flex-col h-full min-h-0 bg-sidebar",
+        "relative flex flex-col h-full min-h-0 overflow-hidden bg-sidebar",
         !isDragging && "transition-[width] duration-200"
       )}
       style={{ width: `${width}px` }}
     >
+      <div className="diaspro-lava" aria-hidden="true"><span className="diaspro-lava__bubble" /><span className="diaspro-lava__bubble" /><span className="diaspro-lava__bubble" /></div>
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+      {!collapsed && <div className="px-5 pt-5 pb-2 flex items-center gap-3"><DiasproLogo size={34} className="shrink-0" /><div className="min-w-0"><p className="font-[Outfit] text-xl font-black tracking-tight leading-none text-[#e8d19e]">Diaspro <span className="text-white">Viboard</span></p><p className="mt-1 font-mono text-[9px] uppercase tracking-[.2em] text-[#e8d19e]/70">{t("nav.sidebar.brandTagline")}</p></div></div>}
+      {collapsed && <div className="flex justify-center pt-5 pb-2"><DiasproLogo size={30} className="shrink-0" /></div>}
       <ScrollArea className="flex-1 min-h-0">
         <nav className="px-2 py-2 space-y-1">
           <SidebarNavRow
@@ -185,6 +190,7 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
       </div>
 
       <WorkspaceSelector isCollapsed={collapsed} />
+      </div>
     </aside>
   );
 }

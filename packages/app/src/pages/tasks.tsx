@@ -111,6 +111,7 @@ export default function TasksPage() {
     <FilteredListPage
       title={t("nav.sidebar.tasks")}
       icon={CheckSquare}
+      accent="blue"
       actionLabel={t("pages.tasks.newTask")}
       onAction={() => setShowNewTask(true)}
       filters={[

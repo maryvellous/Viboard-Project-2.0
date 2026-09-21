@@ -91,6 +91,30 @@ export async function joinPath(...segments: string[]): Promise<string> {
 }
 
 /**
+ * Index of the last separator in an absolute path.
+ *
+ * Tauri's `join` (and therefore `joinPath`) uses the PLATFORM separator, so on
+ * Windows every absolute domain path is backslash-separated. Any string surgery
+ * on an absolute path must go through these two helpers — `path.split("/")`
+ * silently collapses a whole Windows path into one segment.
+ */
+function lastSeparatorIndex(path: string): number {
+  return Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+}
+
+/** Parent directory of an absolute path. Separator-agnostic. */
+export function parentPath(path: string): string {
+  const index = lastSeparatorIndex(path);
+  return index <= 0 ? path : path.slice(0, index);
+}
+
+/** Final path segment (file or directory name). Separator-agnostic. */
+export function baseName(path: string): string {
+  const index = lastSeparatorIndex(path);
+  return index < 0 ? path : path.slice(index + 1);
+}
+
+/**
  * Initialize the Desk directory structure.
  * Only ensures ~/DeskMD/ and ~/DeskMD/workspaces/ exist — the home workspace is
  * created during onboarding via createWorkspace({ home: true }).

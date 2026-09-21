@@ -10,7 +10,7 @@ import {
   decodeTaskFrontmatter,
   reportFrontmatterDiagnostics,
 } from "./frontmatter";
-import { joinPath } from "./env";
+import { joinPath, baseName } from "./env";
 import { getStorage } from "./storage";
 import {
   writeMarkdownFile,
@@ -351,7 +351,7 @@ export async function moveTaskToProject(
 
   // Build target path (same filename, different directory)
   const toTasksPath = await getTasksPath(workspaceId, toProjectId);
-  const sourceFilename = sourceFilePath.split("/").pop()!;
+  const sourceFilename = baseName(sourceFilePath);
   const targetFilePath = await joinPath(toTasksPath, sourceFilename);
 
   // Move the file (handles mkdir, cache invalidation, registry notification)

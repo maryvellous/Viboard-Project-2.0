@@ -80,7 +80,8 @@ export default function MeetingsPage() {
   // Main pane: empty state. Opening a meeting switches to a meeting tab,
   // and `TabContent` renders the editor here instead.
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="diaspro-accent-strip diaspro-accent-strip--sage" aria-hidden="true" />
       <StatePanel
         variant="empty"
         display="inline"

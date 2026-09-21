@@ -5,7 +5,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { addDays, subDays, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { getWeekMonday, formatWeekRange } from "@desk/core";
+import { getWeekMonday } from "@desk/core";
+import { formatLocaleDate } from "@/lib/i18n/format";
 
 interface WeekNavigatorProps {
   currentMonday: string;
@@ -32,7 +33,11 @@ export function WeekNavigator({
     onChange(getWeekMonday(new Date()));
   };
 
-  const label = formatWeekRange(currentMonday, showWeekends);
+  // Intl-backed so the week range follows the selected interface language
+  // (core's formatWeekRange uses date-fns' en-US default).
+  const start = parseISO(currentMonday);
+  const end = addDays(start, showWeekends ? 6 : 4);
+  const label = `${formatLocaleDate(start, { day: "numeric", month: "short" })} – ${formatLocaleDate(end, { day: "numeric", month: "short", year: "numeric" })}`;
   const isCurrentWeek = currentMonday === getWeekMonday(new Date());
 
   return (

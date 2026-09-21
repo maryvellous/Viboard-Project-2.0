@@ -10,7 +10,7 @@ import {
   decodeMeetingFrontmatter,
   reportFrontmatterDiagnostics,
 } from "./frontmatter";
-import { joinPath } from "./env";
+import { joinPath, baseName } from "./env";
 import { getStorage } from "./storage";
 import {
   writeMarkdownFile,
@@ -294,7 +294,7 @@ export async function moveMeetingToProject(
   if (!parsed) return null;
 
   const toMeetingsPath = await getMeetingsPath(workspaceId, toProjectId);
-  const sourceFilename = sourceFilePath.split("/").pop()!;
+  const sourceFilename = baseName(sourceFilePath);
   const targetFilePath = await joinPath(toMeetingsPath, sourceFilename);
 
   // moveMarkdownFile handles mkdir, cache invalidation, registry notification

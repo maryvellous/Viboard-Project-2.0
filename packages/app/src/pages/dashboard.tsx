@@ -30,6 +30,7 @@ import { PageHeader, SectionLabel } from "@/components/patterns";
 import { RecentWorkList, type RecentWorkListItem } from "@/components/recent-work-list";
 import {
   CaptureWidget,
+  QuickAddTask,
   TriageDetailModal,
   type TriageDestination,
 } from "@/components/dashboard";
@@ -42,6 +43,7 @@ import {
 import { usePlannerHydrated, usePlannerStore } from "@/stores/planner";
 import { useMinuteClock } from "@/hooks/use-minute-clock";
 import { selectCurrentAndUpcomingBlocks } from "@/lib/dashboard-today";
+import { formatLocaleDate } from "@/lib/i18n/format";
 import { cn } from "@/lib/utils";
 import { pageLayoutClasses, pageWidthClasses } from "@/lib/enterprise-ui";
 
@@ -50,6 +52,47 @@ const FOCUS_COLLAPSED_LIMIT = 6;
 const TODAY_BLOCK_LIMIT = 3;
 const TODAY_DUE_LIMIT = 4;
 const NO_BLOCKS: WorkspaceBlock[] = [];
+
+function DiasproCalendarStrip({ dueTasks }: { dueTasks: DashboardTaskItem[] }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const today = new Date();
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    const task = dueTasks.find((item) => String(item.due ?? "").startsWith(key));
+    return { date, task };
+  });
+
+  return (
+    <section aria-label="Calendario della settimana" className="diaspro-calendar-strip">
+      {days.map(({ date, task }, index) => (
+        <button
+          key={date.toISOString()}
+          type="button"
+          className={cn("diaspro-calendar-day", index === 0 && "diaspro-calendar-day--today")}
+          onClick={() => navigate("/planner")}
+          title="Apri planner"
+        >
+          <span className="diaspro-calendar-day__weekday">
+            {formatLocaleDate(date, { weekday: "short" })}
+          </span>
+          <span className="diaspro-calendar-day__date">
+            {formatLocaleDate(date, { day: "numeric", month: "short" })}
+          </span>
+          {task ? (
+            <span className="diaspro-calendar-day__task">{task.title}</span>
+          ) : (
+            <span className="diaspro-calendar-day__empty">
+              {t("pages.dashboard.calendar.free")}
+            </span>
+          )}
+        </button>
+      ))}
+    </section>
+  );
+}
 
 function FocusWidget({
   tasks,
@@ -70,8 +113,13 @@ function FocusWidget({
   return (
     <DataCard className="min-w-0">
       <div className="mb-2 flex items-center gap-2">
-        <Star className="size-4 fill-brand-accent/20 text-brand-accent" />
+        <Star className="size-4 fill-[#9d85c6]/25 text-[#9d85c6]" />
         <h2 className="text-base font-medium">{t("pages.dashboard.focus.title")}</h2>
+        {tasks.length > 0 && (
+          <span className="diaspro-chip diaspro-chip--lavender ml-auto tabular-nums">
+            {tasks.length}
+          </span>
+        )}
       </div>
 
       {isLoading ? (
@@ -116,7 +164,7 @@ function FocusWidget({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="size-7 text-muted-foreground opacity-40 hover:text-brand-accent group-hover/row:opacity-100 focus-visible:opacity-100"
+                  className="size-7 text-muted-foreground opacity-40 hover:text-[#9d85c6] group-hover/row:opacity-100 focus-visible:opacity-100"
                   onClick={() => clearFocus.mutate(task)}
                   disabled={clearFocus.isPending}
                   aria-label={t("pages.dashboard.focus.remove", { title: task.title })}
@@ -178,12 +226,12 @@ function TodayWidget({
   return (
     <DataCard className="min-w-0">
       <div className="mb-2 flex items-center gap-2">
-        <CalendarDays className="size-4 text-primary" />
+        <CalendarDays className="size-4 text-[#a5c4dc]" />
         <h2 className="flex-1 text-base font-medium">{t("pages.dashboard.today.title")}</h2>
         <Button
           variant="link"
           size="sm"
-          className="h-7 px-1 text-xs text-muted-foreground"
+          className="h-7 px-1 text-xs text-[#a5c4dc]"
           onClick={() => navigate("/planner")}
         >
           {t("pages.dashboard.today.openPlanner")}
@@ -241,7 +289,7 @@ function TodayWidget({
 
           {shownDueTasks.length > 0 && (
             <div>
-              <p className="mb-1 px-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
+              <p className="mb-1 px-2 text-[11px] font-medium uppercase tracking-wide text-[#a5c4dc]/80">
                 {t("pages.dashboard.today.dueHeading")}
               </p>
               <DenseList>
@@ -337,7 +385,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <PageHeader title={t("nav.sidebar.dashboard")} icon={LayoutDashboard} width="standard" />
+      <PageHeader title={t("nav.sidebar.dashboard")} icon={LayoutDashboard} width="standard" accent="plum" />
       <ScrollArea className="flex-1">
         <main
           className={cn(
@@ -346,6 +394,8 @@ export default function DashboardPage() {
             pageLayoutClasses.contentPadding,
           )}
         >
+          <DiasproCalendarStrip dueTasks={overview?.dueTasks ?? []} />
+          <QuickAddTask />
           <CaptureWidget onTriageComplete={handleTriageComplete} />
 
           {overviewError ? (
@@ -360,7 +410,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)]">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(18rem,2fr)] [&>section]:rounded-[22px] [&>section]:border-[#9d85c6]/35 [&>section]:bg-card [&>section]:shadow-[0_16px_34px_rgba(12,6,24,.26)]">
                 <FocusWidget
                   tasks={overview?.focusTasks ?? []}
                   isLoading={overviewLoading}

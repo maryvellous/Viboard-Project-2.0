@@ -1,0 +1,1505 @@
+{
+  "ai": {
+    "consent": {
+      "title": "Prima di usare le funzioni AI",
+      "description": "Le funzioni AI di Desk inviano contenuti al provider che hai scelto (Anthropic o OpenAI) tramite la sua API. Desk non gestisce alcun server AI proprio.",
+      "whatHeading": "Cosa viene inviato",
+      "whatItems": {
+        "previews": "Brevi anteprime e riassunti dei tuoi file, usati per costruire il catalogo dell'Indice intelligente."
+      },
+      "whenHeading": "Quando",
+      "whenBody": "Solo quando usi una funzione AI. Con <strong>Riassumi automaticamente al salvataggio</strong> attivo, brevi anteprime dei file vengono inviate anche automaticamente dopo che modifichi un file.",
+      "retentionHeading": "Conservazione",
+      "retentionBody": "Gestita secondo i termini API del tuo provider. Anthropic e OpenAI dichiarano che i dati inviati via API non vengono usati per addestrare i loro modelli, per impostazione predefinita.",
+      "footer": "Non viene inviato nulla se non hai configurato una chiave API. Puoi rileggere questo avviso quando vuoi in Impostazioni → AI.",
+      "accept": "Ho capito e continuo"
+    }
+  },
+  "common": {
+    "listPane": {
+      "searchPlaceholder": "Cerca…",
+      "sortTitle": "Ordina"
+    },
+    "buttons": {
+      "save": "Salva",
+      "apply": "Applica",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "confirm": "Conferma",
+      "close": "Chiudi",
+      "back": "Indietro",
+      "continue": "Continua",
+      "retry": "Riprova",
+      "discard": "Scarta",
+      "done": "Fatto",
+      "dontSave": "Non salvare",
+      "create": "Crea",
+      "rename": "Rinomina",
+      "edit": "Modifica",
+      "saving": "Salvataggio…",
+      "add": "Aggiungi",
+      "all": "Tutti",
+      "loading": "Caricamento…",
+      "tryAgain": "Riprova",
+      "reloadPage": "Ricarica la pagina",
+      "clear": "Cancella"
+    },
+    "aiBadge": "AI",
+    "bootErrorTitle": "DeskMD non ha potuto aprire la cartella dati"
+  },
+  "overviews": {
+    "discardTitle": "Scartare le modifiche alla panoramica?",
+    "discardDescription": "Le modifiche non salvate alla panoramica andranno perse.",
+    "discardAction": "Scarta modifiche",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra meno",
+    "loadFailed": "Desk non ha potuto caricare questa panoramica. Il tuo file non è stato modificato.",
+    "missing": "Questo file di panoramica non esiste più.",
+    "unsavedHint": "Le modifiche non salvate alla panoramica sono protette e possono essere ripristinate."
+  },
+  "nav": {
+    "sidebar": {
+      "search": "Cerca",
+      "dashboard": "Dashboard",
+      "planner": "Pianificatore",
+      "tasks": "Attività",
+      "docs": "Documenti",
+      "meetings": "Riunioni",
+      "projects": "Progetti",
+      "settings": "Impostazioni",
+      "desk": "Desk",
+      "workspaceViews": "Viste dello spazio",
+      "projectsSection": "Progetti",
+      "allProjects": "Tutti i progetti",
+      "brandTagline": "spazio di lavoro"
+    },
+    "secondarySidebar": {
+      "expandPanel": "Espandi pannello"
+    },
+    "workspaceSwitcher": {
+      "createWorkspace": "Crea spazio di lavoro",
+      "selectWorkspace": "Seleziona spazio di lavoro",
+      "editWorkspace": "Modifica spazio di lavoro"
+    }
+  },
+  "pages": {
+    "dashboard": {
+      "focus": {
+        "title": "Focus",
+        "emptyTitle": "Nessuna attività in focus",
+        "emptyDescription": "Metti la stella sulle attività importanti per tenere qui una lista breve e voluta.",
+        "openTasks": "Apri attività",
+        "remove": "Rimuovi {{title}} dal focus",
+        "showMore_one": "Mostra {{count}} in più",
+        "showMore_other": "Mostra {{count}} in più",
+        "showLess": "Mostra meno"
+      },
+      "today": {
+        "title": "Oggi",
+        "openPlanner": "Apri pianificatore",
+        "emptyTitle": "Niente in programma o in scadenza",
+        "planDay": "Pianifica la giornata",
+        "taskCount_one": "{{count}} attività",
+        "taskCount_other": "{{count}} attività",
+        "dueHeading": "In scadenza e scadute",
+        "moreDue_one": "{{count}} in più nel pianificatore",
+        "moreDue_other": "{{count}} in più nel pianificatore"
+      },
+      "recent": {
+        "title": "Lavoro recente",
+        "unassigned": "Senza progetto"
+      },
+      "overviewError": "La panoramica non ha potuto essere caricata. La Raccolta resta disponibile.",
+      "calendar": {
+        "free": "libero"
+      },
+      "quickAdd": {
+        "placeholder": "Aggiungi un'attività…",
+        "action": "Nuova attività"
+      },
+      "capture": {
+        "title": "Raccolta",
+        "defaultHomeName": "Personale",
+        "toTriageCount_one": "{{count}} da smistare",
+        "toTriageCount_other": "{{count}} da smistare",
+        "quickAddPlaceholder": "Raccolta rapida...",
+        "loadingLabel": "attività",
+        "emptyTitle": "Raccogli le attività al volo, smistale dopo",
+        "triageButton": "Smista",
+        "moveToHomeTasks": "Sposta in {{home}}",
+        "noWorkspacesYet": "Nessuno spazio di lavoro",
+        "unassigned": "Senza progetto"
+      }
+    },
+    "tasks": {
+      "kanban": {
+        "noTasks": "Nessuna attività"
+      },
+      "list": {
+        "dueLabel": "Scadenza: {{date}}"
+      },
+      "visibility": {
+        "show": "Mostra {{label}}",
+        "hide": "Nascondi {{label}}"
+      },
+      "newTask": "Nuova attività",
+      "noProject": "Senza progetto",
+      "countLabel": "attività",
+      "filters": {
+        "projectLabel": "Progetto",
+        "priorityLabel": "Priorità",
+        "allProjects": "Tutti i progetti",
+        "allPriorities": "Tutte le priorità"
+      }
+    },
+    "docs": {
+      "dropZone": {
+        "title": "Trascina i file per importarli",
+        "hint": "Trascina un documento o un'email in questa finestra e Desk lo archivia come Markdown."
+      },
+      "convertDialog": {
+        "title": "Importa file Office",
+        "description_one": "{{count}} file può essere convertito in un documento Markdown. Come vuoi procedere?",
+        "description_other": "{{count}} file possono essere convertiti in documenti Markdown. Come vuoi procedere?",
+        "moreFiles_one": "e {{count}} altro",
+        "moreFiles_other": "e altri {{count}}",
+        "buttons": {
+          "convert": "Converti in documenti",
+          "keep": "Mantieni come file",
+          "both": "Fai entrambe le cose"
+        }
+      },
+      "tree": {
+        "searchPlaceholder": "Cerca documenti…",
+        "fileCount_one": "{{count}} file",
+        "fileCount_other": "{{count}} file",
+        "sections": {
+          "workspace": "Spazio di lavoro",
+          "projects": "Progetti"
+        },
+        "sort": {
+          "name": "Nome",
+          "nameAsc": "A-Z",
+          "nameDesc": "Z-A",
+          "created": "Creazione",
+          "modified": "Modifica",
+          "newest": "più recenti",
+          "oldest": "più vecchi"
+        },
+        "actions": {
+          "newFolder": "Nuova cartella",
+          "newDoc": "Nuovo documento",
+          "importFiles": "Importa file",
+          "openInFinder": "Mostra nel Finder"
+        },
+        "newFolderDialog": {
+          "title": "Nuova cartella",
+          "description": "Crea una nuova cartella",
+          "placeholder": "Nome cartella",
+          "creatingIn": "Creazione in: {{path}}"
+        }
+      },
+      "selectWorkspaceTitle": "Seleziona uno spazio di lavoro",
+      "selectWorkspaceDescription": "Scegli uno spazio di lavoro nella barra laterale per vedere i documenti.",
+      "selectDocTitle": "Seleziona un documento",
+      "selectDocDescription": "Scegli un documento dall'elenco per aprirlo.",
+      "authorAi": "Scritto dall'AI",
+      "authorFilter": {
+        "label": "Scritto da",
+        "all": "Tutti",
+        "mine": "Scritti da me",
+        "generated": "Scritti dall'AI"
+      }
+    },
+    "meetings": {
+      "latestBadge": "Più recente",
+      "groups": {
+        "noDate": "Senza data"
+      },
+      "tree": {
+        "meetingCount_one": "{{count}} riunione",
+        "meetingCount_other": "{{count}} riunioni",
+        "emptyAll": "Ancora nessuna riunione.",
+        "emptyMatching": "Nessuna riunione corrispondente.",
+        "sort": {
+          "newestFirst": "Prima le più recenti",
+          "oldestFirst": "Prima le più vecchie"
+        },
+        "actions": {
+          "newMeeting": "Nuova riunione"
+        },
+        "filter": {
+          "allProjects": "Tutti i progetti",
+          "noProject": "Senza progetto"
+        }
+      },
+      "selectWorkspaceTitle": "Seleziona uno spazio di lavoro",
+      "selectWorkspaceDescription": "Scegli uno spazio di lavoro nella barra laterale per vedere le riunioni.",
+      "noMeetingsTitle": "Ancora nessuna riunione",
+      "noMeetingsDescription": "Creane una con + Nuova riunione nel pannello.",
+      "selectMeetingTitle": "Seleziona una riunione",
+      "selectMeetingDescription": "Scegli una riunione dall'elenco per aprirla."
+    },
+    "projects": {
+      "home": {
+        "loading": "Caricamento progetto…",
+        "notFoundTitle": "Progetto non trovato",
+        "notFoundDescription": "Questo progetto potrebbe essere stato eliminato o spostato.",
+        "loadErrorTitle": "Impossibile caricare questo progetto",
+        "loadErrorDescription": "Il contesto del progetto non ha potuto essere assemblato. Riprova.",
+        "createdOn": "Creato {{date}}",
+        "lastActivity": "Attivo {{date}}",
+        "metricTasks_one": "{{count}} attività attiva",
+        "metricTasks_other": "{{count}} attività attive",
+        "metricDocs_one": "{{count}} documento",
+        "metricDocs_other": "{{count}} documenti",
+        "metricMeetings_one": "{{count}} riunione",
+        "metricMeetings_other": "{{count}} riunioni",
+        "renameTitle": "Clicca per rinominare",
+        "descriptionPlaceholder": "Aggiungi una breve descrizione…",
+        "descriptionEditTitle": "Clicca per modificare",
+        "deleteProject": "Elimina progetto",
+        "tasksHeading": "Attività attive",
+        "openBoard": "Apri bacheca",
+        "moreOnBoard_one": "{{count}} in più nella bacheca",
+        "moreOnBoard_other": "{{count}} in più nella bacheca",
+        "noActiveTasks": "Nessuna attività attiva.",
+        "quickAddPlaceholder": "Aggiungi un'attività…",
+        "currentWork": "Lavoro in corso",
+        "noCurrentWork": "Al momento qui non serve la tua attenzione.",
+        "timeline": {
+          "schedule": "Programma",
+          "history": "Cronologia",
+          "showMore": "Mostra la cronologia completa",
+          "showLess": "Mostra meno",
+          "events": {
+            "project-created": "Progetto creato",
+            "task-created": "Attività aggiunta",
+            "task-completed": "Attività completata",
+            "task-due": "Attività in scadenza",
+            "meeting": "Riunione",
+            "doc-created": "Documento aggiunto",
+            "doc-updated": "Documento aggiornato"
+          }
+        },
+        "meetingsHeading": "Riunioni",
+        "newMeeting": "Nuova riunione",
+        "allMeetings": "Tutte le riunioni",
+        "noMeetings": "Ancora nessuna riunione.",
+        "docsHeading": "Documenti",
+        "allDocs": "Tutti i documenti",
+        "noDocs": "Ancora nessun documento.",
+        "activityHeading": "Lavoro recente",
+        "noActivity": "Ancora nessun lavoro recente.",
+        "counts": {
+          "active_one": "{{count}} attiva",
+          "active_other": "{{count}} attive",
+          "done_one": "{{count}} completata",
+          "done_other": "{{count}} completate",
+          "backlog_one": "{{count}} nel backlog",
+          "backlog_other": "{{count}} nel backlog"
+        },
+        "overview": {
+          "title": "Panoramica del progetto",
+          "placeholder": "Descrivi cos'è questo progetto, cosa conta e da dove iniziare a orientarti."
+        }
+      },
+      "browse": {
+        "newProject": "Nuovo progetto",
+        "statusLabel": "Stato",
+        "allStatuses": "Tutti gli stati",
+        "countLabel": "progetti",
+        "searchPlaceholder": "Cerca progetti…",
+        "sortLabel": "Ordina",
+        "sortRecent": "Attività recente",
+        "sortName": "Nome A–Z",
+        "activeTasks_one": "{{count}} attiva",
+        "activeTasks_other": "{{count}} attive",
+        "nextDue": "Prossima scadenza {{date}}",
+        "openProject": "Apri progetto",
+        "workspaceOverview": {
+          "title": "Panoramica dello spazio",
+          "placeholder": "Descrivi questo spazio di lavoro, il suo scopo e ciò che è utile sapere per primo."
+        }
+      },
+      "deleteConfirmTitle": "Elimina progetto",
+      "deleteConfirmDescription": "Vuoi davvero eliminare \"{{name}}\"? Il progetto verrà rimosso definitivamente insieme a tutte le sue attività, documenti e riunioni.",
+      "loadErrorTitle": "Impossibile caricare i progetti",
+      "loadErrorDescription": "Le informazioni sui progetti non hanno potuto essere caricate. Controlla la connessione e riprova.",
+      "selectWorkspaceTitle": "Seleziona uno spazio di lavoro",
+      "selectWorkspaceDescription": "Scegli uno spazio di lavoro nella barra laterale per vedere i progetti."
+    },
+    "planner": {
+      "taskPicker": {
+        "placeholder": "Aggiungi attività o nota...",
+        "noAvailableTasks": "Nessuna attività disponibile",
+        "addAsNote": "Aggiungi \"{{text}}\" come nota"
+      },
+      "block": {
+        "addNote": "Aggiungi nota",
+        "removeBlock": "Rimuovi blocco",
+        "notePlaceholder": "Scrivi una nota...",
+        "moreCount": "+{{count}} in più"
+      },
+      "rail": {
+        "title": "Da pianificare",
+        "empty": "Niente da pianificare",
+        "overdue": "Scadute",
+        "dueThisWeek": "In scadenza questa settimana",
+        "later": "Più avanti",
+        "noDate": "Senza data",
+        "collapse": "Comprimi",
+        "expand": "Mostra le attività non pianificate"
+      },
+      "due": {
+        "today": "Oggi"
+      },
+      "dueStrip": {
+        "count_one": "{{count}} attività in scadenza",
+        "count_other": "{{count}} attività in scadenza"
+      },
+      "intentions": {
+        "add": "Aggiungi intenzione",
+        "placeholder": "Di cosa parla questa settimana?"
+      }
+    }
+  },
+  "settings": {
+    "pageDescriptions": {
+      "general": "Scegli lingua, aspetto e preferenze di navigazione di Desk.",
+      "planner": "Imposta gli orari e i giorni mostrati nel pianificatore settimanale.",
+      "templates": "Definisci contenuti riutilizzabili per nuove riunioni, documenti e attività.",
+      "ai": "Configura provider AI, privacy, utilizzo e indicizzazione dei file.",
+      "agents": "Controlla il contesto che Desk fornisce agli agenti esterni, in locale o via MCP.",
+      "data": "Gestisci connessioni, account, archiviazione e impostazioni dell'applicazione.",
+      "about": "Consulta versione, aggiornamenti, link al progetto e licenza."
+    },
+    "general": {
+      "appearance": {
+        "title": "Aspetto",
+        "description": "Personalizza l'aspetto di Desk"
+      },
+      "theme": {
+        "label": "Tema",
+        "description": "Scegli lo schema di colori che preferisci",
+        "options": {
+          "light": "Chiaro",
+          "dark": "Scuro",
+          "system": "Sistema"
+        }
+      },
+      "language": {
+        "label": "Lingua",
+        "description": "Lingua dell'interfaccia",
+        "options": {
+          "en": "English",
+          "de": "Deutsch",
+          "fr": "Français",
+          "it": "Italiano"
+        }
+      },
+      "compactSidebar": {
+        "label": "Barra laterale compatta",
+        "description": "Mostra solo le icone nella barra laterale (oppure trascina il bordo per ridimensionarla)"
+      }
+    },
+    "planner": {
+      "title": "Pianificatore",
+      "description": "Configura il pianificatore settimanale",
+      "schedule": {
+        "title": "Orario",
+        "description": "Scegli gli orari e i giorni mostrati nella vista settimanale."
+      },
+      "workDayStart": {
+        "label": "Inizio giornata",
+        "description": "Quando inizia la tua giornata lavorativa"
+      },
+      "workDayEnd": {
+        "label": "Fine giornata",
+        "description": "Quando finisce la tua giornata lavorativa"
+      },
+      "showWeekends": {
+        "label": "Mostra il fine settimana",
+        "description": "Includi sabato e domenica nella vista settimanale"
+      }
+    },
+    "templates": {
+      "title": "Modelli",
+      "description": "Definisci contenuti predefiniti per nuove riunioni, documenti e attività. Imposta i valori globali o personalizzali per singolo spazio di lavoro.",
+      "scopeTitle": "Ambito del modello",
+      "scopeDescription": "Modifica i valori globali oppure le personalizzazioni per uno spazio di lavoro specifico.",
+      "scopeLabel": "Ambito",
+      "globalDefaults": "Valori globali",
+      "cardTitle": "Modello {{label}}",
+      "usingGlobalDefault": "Stai usando il valore globale.",
+      "customizeForWorkspace": "Personalizza per questo spazio",
+      "placeholder": "Contenuto del modello (markdown)...",
+      "variablesLabel": "Variabili:",
+      "resetToDefault": "Ripristina predefinito",
+      "removeOverride": "Rimuovi personalizzazione",
+      "types": {
+        "meeting": {
+          "label": "Riunione",
+          "description": "Contenuto precompilato per le nuove note di riunione"
+        },
+        "doc": {
+          "label": "Documento",
+          "description": "Contenuto precompilato per i nuovi documenti",
+          "note": "Il titolo (# Titolo) viene aggiunto automaticamente."
+        },
+        "task": {
+          "label": "Attività",
+          "description": "Contenuto precompilato per le nuove attività"
+        }
+      }
+    },
+    "ai": {
+      "provider": {
+        "title": "Provider",
+        "description": "Collega un provider AI. Alimenta i riassunti del catalogo dell'Indice intelligente.",
+        "label": "Provider",
+        "helperText": "Backend API dell'AI"
+      },
+      "providers": {
+        "openai": "OpenAI",
+        "anthropic": "Anthropic"
+      },
+      "credentials": {
+        "title": "Credenziali",
+        "description": "Collega in modo sicuro il provider selezionato a Desk."
+      },
+      "model": {
+        "label": "Modello",
+        "helperText": "Modello predefinito per il provider"
+      },
+      "apiKey": {
+        "label": "Chiave API ({{provider}})",
+        "placeholderOpenai": "sk-...",
+        "placeholderAnthropic": "sk-ant-...",
+        "showAriaLabel": "Mostra chiave API",
+        "hideAriaLabel": "Nascondi chiave API",
+        "storedNotice": "Salvata nel portachiavi del sistema operativo (Keychain / Gestione credenziali / Secret Service).",
+        "notConfigured": "Chiave del provider non configurata."
+      },
+      "browserMode": {
+        "title": "Le chiavi AI si gestiscono nell'app desktop",
+        "description": "La chiave del tuo provider AI è salvata in modo sicuro sul tuo dispositivo dall'app desktop, quindi non può essere impostata dal browser. Apri desk.md sul desktop per aggiungerla o modificarla."
+      },
+      "serverMode": {
+        "title": "L'AI gira sul tuo server",
+        "description": "Il tuo desk è ospitato altrove, quindi la manutenzione dell'Indice intelligente gira sul server con le chiavi del suo ambiente (ANTHROPIC_API_KEY / OPENAI_API_KEY nel file .env del deploy). Impostare lì una chiave equivale al consenso dell'operatore.",
+        "providerConfigured": "{{provider}}: chiave configurata sul server.",
+        "providerNotConfigured": "{{provider}}: nessuna chiave sul server. Aggiungila al file .env del deploy e riavvia."
+      },
+      "keychainError": {
+        "title": "Impossibile leggere il portachiavi",
+        "description": "Desk non ha potuto recuperare la chiave salvata. Salvarne una nuova può comunque funzionare, ma le chiavi esistenti non saranno leggibili finché il problema non si risolve.",
+        "errorDetails": "Dettagli dell'errore"
+      },
+      "errors": {
+        "linuxKeyring": "Su Linux questo di solito significa che GNOME Keyring o KWallet non è in esecuzione. Avvia il servizio di segreti del desktop e riprova."
+      },
+      "usage": {
+        "title": "Statistiche di utilizzo",
+        "description": "Consulta le richieste AI e i token registrati localmente.",
+        "clear": "Cancella",
+        "noUsage": "Ancora nessun utilizzo",
+        "totalTokens": "Token totali",
+        "requests": "Richieste"
+      },
+      "privacy": {
+        "title": "Dati e privacy",
+        "description": "Cosa invia Desk al tuo provider AI e quando.",
+        "intro": "Le funzioni AI inviano contenuti al provider selezionato sopra (Anthropic o OpenAI) tramite la sua API. Desk non ha un server AI proprio e non viene inviato nulla finché non configuri una chiave API.",
+        "smartIndexLabel": "Indice dei file",
+        "smartIndexBody": ": brevi anteprime e riassunti dei tuoi file, inviati quando ricostruisci l'indice o, se Riassumi automaticamente al salvataggio è attivo, automaticamente dopo un salvataggio.",
+        "retention": "La conservazione è regolata dai termini API del tuo provider. Anthropic e OpenAI dichiarano che i dati inviati via API non vengono usati per addestrare i loro modelli, per impostazione predefinita.",
+        "acknowledgement": {
+          "title": "Presa visione della privacy",
+          "given": "Hai preso visione dell'informativa privacy sull'AI.",
+          "notGiven": "Viene mostrata una volta, prima della tua prima richiesta AI.",
+          "revoke": "Revoca"
+        }
+      }
+    },
+    "agents": {
+      "title": "Agenti esterni",
+      "description": "Controlla il contesto che Desk fornisce agli agenti esterni, in locale o tramite MCP.",
+      "notice": "Queste impostazioni valgono per gli <strong>agenti esterni</strong> che usano i file locali generati o la tua connessione MCP ospitata.",
+      "emit": {
+        "title": "File generati",
+        "description": "Scegli quali file per agenti scrivere nella cartella dati. Contenuto identico, tre nomi di file.",
+        "claude": "Per Claude Code",
+        "agents": "Per Codex / OpenAI Agents",
+        "gemini": "Per Gemini CLI",
+        "noneEnabled": "Nessun file per agenti viene generato. Le istruzioni qui sotto sono salvate, ma non saranno scritte su disco finché non attivi almeno un interruttore."
+      },
+      "global": {
+        "title": "Istruzioni globali",
+        "description": "Valgono in tutti gli spazi di lavoro e vengono fornite tramite i file locali generati o desk_context via MCP."
+      },
+      "instructions": {
+        "globalLabel": "Istruzioni globali",
+        "globalDescription": "Incluse nei file locali per agenti generati e restituite dallo strumento <code>desk_context</code> di MCP.",
+        "globalPlaceholder": "Es.: Rispondi sempre in italiano. Usa i prefissi Conventional Commit quando scrivi file.",
+        "charCount_one": "{{count}} carattere · salvataggio automatico.",
+        "charCount_other": "{{count}} caratteri · salvataggio automatico."
+      },
+      "preview": {
+        "toggle": "Anteprima del CLAUDE.md generato",
+        "revealInFinder": "Mostra nel Finder",
+        "refresh": "Aggiorna",
+        "errorBrowserMode": "L'anteprima è disponibile solo nell'app desktop.",
+        "errorFileMissing": "Il file non esiste ancora. Attiva CLAUDE.md e poi torna qui."
+      },
+      "mcp": {
+        "title": "Model Context Protocol (MCP)",
+        "description": "Su un server gli agenti esterni si collegano via MCP invece che tramite i file generati.",
+        "notice": "Quando Desk gira su un server, i file CLAUDE.md / AGENTS.md / GEMINI.md generati non vengono scritti. Gli agenti esterni (Claude, ChatGPT) si collegano al tuo desk tramite <strong>MCP</strong>.",
+        "endpointLabel": "Endpoint MCP",
+        "hint": "Aggiungi questo URL come server MCP nel tuo client AI. Effettua l'accesso con OAuth ed espone strumenti di sola lettura sui tuoi spazi di lavoro.",
+        "copy": "Copia",
+        "copied": "Endpoint MCP copiato"
+      }
+    },
+    "data": {
+      "connection": {
+        "title": "Connessione",
+        "description": "Dove Desk tiene il tuo lavoro",
+        "localLabel": "Questo Mac",
+        "remoteLabel": "Collegato al server",
+        "connectToServer": "Collega a un server",
+        "serverUrlLabel": "Indirizzo del server",
+        "connect": "Collega",
+        "connectHint": "Se lo ometti viene usato https://. L'indirizzo deve usare https.",
+        "invalidUrl": "Inserisci un indirizzo server valido.",
+        "httpsRequired": "Il server deve usare https. Un indirizzo http invierebbe il token di accesso in chiaro.",
+        "switchToLocalLabel": "Usa invece questo Mac",
+        "switchToLocalDescription": "Torna ai file locali. I tuoi dati locali non vengono toccati.",
+        "switchToLocal": "Passa a questo Mac"
+      },
+      "storage": {
+        "title": "Archiviazione dati",
+        "description": "Dove sono salvati i tuoi progetti e i tuoi file",
+        "pathLabel": "Percorso della cartella dati",
+        "pathPlaceholder": "~/DeskMD",
+        "change": "Cambia",
+        "helperText": "Tutti i tuoi spazi di lavoro, progetti, attività e note sono salvati come file markdown in questa cartella."
+      },
+      "reset": {
+        "title": "Ripristino",
+        "description": "Ripristina i valori predefiniti e riesegui la configurazione. I tuoi file dati vengono conservati.",
+        "button": "Ripristina tutte le impostazioni",
+        "helperText": "Questa operazione ripristina tutte le impostazioni e mostra di nuovo la procedura guidata. I tuoi file dati non verranno eliminati."
+      },
+      "resetDialog": {
+        "title": "Ripristina tutte le impostazioni",
+        "description": "Vuoi davvero ripristinare tutte le impostazioni predefinite? Verrà mostrata di nuovo la procedura guidata. I tuoi file dati non verranno eliminati.",
+        "confirmLabel": "Ripristina"
+      },
+      "pathDialog": {
+        "confirmTitle": "Cambiare cartella dati?",
+        "confirmDescription": "Desk salverà gli editor aperti, passerà a {{path}} e ricaricherà.",
+        "confirmSwitch": "Cambia e ricarica",
+        "existingTitle": "Dati esistenti trovati",
+        "existingDescription_one": "Trovato {{count}} spazio di lavoro in questa posizione.",
+        "existingDescription_other": "Trovati {{count}} spazi di lavoro in questa posizione.",
+        "emptyTitle": "Posizione vuota",
+        "emptyDescription": "Nessun dato di Desk trovato in questo percorso. Dovrai creare il tuo primo spazio di lavoro.",
+        "useExisting": "Usa i dati esistenti",
+        "startFresh": "Inizia da zero",
+        "continueToSetup": "Continua alla configurazione"
+      }
+    },
+    "about": {
+      "app": {
+        "title": "Desk",
+        "description": "Gestione di progetti e attività in puro Markdown",
+        "version": "Versione",
+        "commit": "Commit",
+        "built": "Compilata"
+      },
+      "updates": {
+        "title": "Aggiornamenti",
+        "description": "Controlla se ci sono nuove versioni di Desk",
+        "noUpdates": "Nessun aggiornamento disponibile",
+        "onLatest": "Hai già l'ultima versione",
+        "check": "Controlla",
+        "checking": "Controllo aggiornamenti...",
+        "versionAvailable": "Versione {{version}} disponibile",
+        "updateAndRestart": "Aggiorna e riavvia",
+        "skipThisVersion": "Salta questa versione",
+        "downloading": "Download e installazione dell'aggiornamento...",
+        "checkFailed": "Controllo aggiornamenti non riuscito"
+      },
+      "links": {
+        "title": "Link",
+        "description": "Apri le risorse del progetto nel browser",
+        "releaseNotes": "Note di rilascio della v{{version}}",
+        "allReleases": "Tutte le versioni",
+        "viewOnGithub": "Vedi su GitHub",
+        "reportIssue": "Segnala un problema"
+      },
+      "license": {
+        "title": "Licenza",
+        "description": "Open source con licenza GNU General Public",
+        "identifier": "Identificativo licenza",
+        "viewLicense": "Vedi licenza"
+      }
+    },
+    "nav": {
+      "title": "Impostazioni",
+      "general": "Generali",
+      "planner": "Pianificatore",
+      "templates": "Modelli",
+      "ai": "AI",
+      "agents": "Agenti",
+      "data": "Dati",
+      "about": "Info"
+    },
+    "smartIndex": {
+      "status": {
+        "title": "Stato dell'indice dei file",
+        "description": "Statistiche, errori e controlli di costruzione dell'indice dei file",
+        "filesIndexed": "File indicizzati",
+        "coverage": "Copertura dei riassunti",
+        "coveragePartial": "{{summarized}} di {{total}} riassunti",
+        "coverageComplete": "Tutti i {{count}} riassunti",
+        "workspaceFiles_one": "{{count}} file",
+        "workspaceFiles_other": "{{count}} file",
+        "updatedAgo": "aggiornato {{time}}"
+      },
+      "actions": {
+        "rebuild": "Ricostruisci indice",
+        "clear": "Cancella indice"
+      },
+      "progress": {
+        "summarizing": "Riassunto di {{workspace}}... {{processed}}/{{total}} file",
+        "collecting": "Raccolta dei file..."
+      },
+      "errors": {
+        "title_one": "Errori ({{count}})",
+        "title_other": "Errori ({{count}})"
+      },
+      "results": {
+        "lastRebuild": "Ultima ricostruzione {{time}}: {{summarized}} riassunti, {{reused}} riutilizzati",
+        "lastRebuildWithExcluded": "Ultima ricostruzione {{time}}: {{summarized}} riassunti, {{reused}} riutilizzati, {{excluded}} esclusi da .aiignore"
+      },
+      "info": {
+        "oneCatalog": "Quando è attivo almeno un file per agenti (Impostazioni → Agenti), l'Indice intelligente viene scritto come Markdown accanto ad esso, così gli agenti esterni (Claude Code, Codex, Gemini CLI) lo leggono senza alcuna configurazione.",
+        "noProvider": "Nessun provider AI configurato. Il catalogo elenca comunque ogni file con tutti i metadati; i file semplicemente non hanno ancora un riassunto AI. Aggiungi una chiave in Impostazioni → AI e ricostruisci per riassumerli.",
+        "desktopOnly": "L'Indice intelligente è costruito dall'host che possiede i tuoi dati. Questa anteprima nel browser non ne ha uno, quindi qui la costruzione è disattivata.",
+        "serverSide": "Il tuo server costruisce e mantiene l'indice con la propria chiave API. Gli aggiornamenti in background avvengono lì man mano che i file cambiano.",
+        "incremental": "La ricostruzione è incrementale: i file non modificati riutilizzano il loro riassunto, quindi solo i file nuovi o modificati usano l'AI.",
+        "offlineChanges": "I file modificati fuori dall'app Desk (un altro dispositivo, modifiche dirette) compaiono subito nel catalogo; i loro riassunti si aggiornano alla ricostruzione successiva."
+      },
+      "config": {
+        "title": "Impostazioni dell'indice dei file",
+        "description": "Quando si aggiornano i riassunti e quanto di ogni file viene inviato per il riassunto."
+      },
+      "autoSummarize": {
+        "label": "Riassumi automaticamente al salvataggio",
+        "description": "Mantieni i riassunti aggiornati mentre modifichi e aggiungi i nuovi file all'indice al primo salvataggio.",
+        "activeWarning": "Circa 5 secondi dopo l'ultimo salvataggio, ogni file il cui corpo è davvero cambiato viene riassunto di nuovo (una chiamata API per file). I salvataggi che toccano solo i metadati non attivano chiamate."
+      },
+      "detail": {
+        "label": "Livello di dettaglio dei riassunti",
+        "description": "Quanto di ogni file viene inviato per il riassunto. Più alto = riassunti migliori, più token.",
+        "options": {
+          "brief": "Breve (~125 tok)",
+          "standard": "Standard (~500 tok)",
+          "detailed": "Dettagliato (~1250 tok)"
+        }
+      },
+      "clearDialog": {
+        "title": "Cancella indice",
+        "description": "Questa operazione svuota l'Indice intelligente ed elimina i file CLAUDE.md, AGENTS.md, GEMINI.md e WORKSPACE_INDEX.md generati. Ricostruisci per rigenerarli. L'azione non può essere annullata.",
+        "confirmLabel": "Cancella indice"
+      },
+      "relativeTime": {
+        "never": "Mai",
+        "justNow": "Proprio ora",
+        "minutesAgo_one": "{{count}} minuto fa",
+        "minutesAgo_other": "{{count}} minuti fa",
+        "hoursAgo_one": "{{count}} ora fa",
+        "hoursAgo_other": "{{count}} ore fa",
+        "daysAgo_one": "{{count}} giorno fa",
+        "daysAgo_other": "{{count}} giorni fa"
+      }
+    }
+  },
+  "modals": {
+    "newWorkspace": {
+      "title": "Nuovo spazio di lavoro",
+      "description": "Crea uno spazio di lavoro per separare un'area del tuo lavoro, come un cliente, un progetto personale o altro",
+      "nameLabel": "Nome dello spazio",
+      "namePlaceholder": "Es.: Acme Srl, Progetti personali, Studi",
+      "folderHint": "Cartella: ~/DeskMD/workspaces/{{folder}}",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Breve descrizione di questo spazio di lavoro...",
+      "overviewLabel": "Panoramica dello spazio",
+      "overviewPlaceholder": "Scopo, contesto importante e tutto ciò che è utile leggere per primo…",
+      "colorLabel": "Colore",
+      "submit": "Crea spazio di lavoro"
+    },
+    "newProject": {
+      "title": "Nuovo progetto",
+      "description": "Crea un nuovo progetto nel tuo spazio di lavoro",
+      "nameLabel": "Nome del progetto",
+      "namePlaceholder": "Es.: Restyling del sito",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Breve descrizione mostrata negli elenchi dei progetti...",
+      "statusLabel": "Stato",
+      "submit": "Crea progetto"
+    },
+    "newTask": {
+      "title": "Nuova attività",
+      "description": "Crea una nuova attività nel tuo spazio di lavoro",
+      "submit": "Crea attività",
+      "fields": {
+        "title": "Titolo",
+        "project": "Progetto",
+        "priority": "Priorità",
+        "dueDate": "Data di scadenza"
+      },
+      "placeholders": {
+        "title": "Cosa c'è da fare?",
+        "noProject": "Senza progetto",
+        "priorityNone": "Nessuna",
+        "noDueDate": "Nessuna scadenza"
+      }
+    },
+    "newDoc": {
+      "title": "Nuovo documento",
+      "description": "Crea un nuovo documento nel tuo spazio di lavoro",
+      "submit": "Crea documento",
+      "creatingIn": "Creazione in: {{path}}",
+      "fields": {
+        "title": "Titolo",
+        "project": "Progetto"
+      },
+      "placeholders": {
+        "title": "Titolo del documento",
+        "noProject": "Senza progetto"
+      }
+    },
+    "newMeeting": {
+      "title": "Nuova riunione",
+      "description": "Crea una nuova riunione nel tuo spazio di lavoro",
+      "submit": "Crea riunione",
+      "fields": {
+        "title": "Titolo",
+        "project": "Progetto",
+        "date": "Data"
+      },
+      "placeholders": {
+        "title": "Sync settimanale, 1:1, Pianificazione sprint...",
+        "project": "Seleziona progetto"
+      }
+    },
+    "triageDetail": {
+      "title": "Attività spostata",
+      "priorityLabel": "Priorità (facoltativa)",
+      "priorityPlaceholder": "Seleziona priorità",
+      "noPriority": "Nessuna priorità",
+      "notesLabel": "Note (facoltative)",
+      "notesPlaceholder": "Aggiungi note o dettagli...",
+      "skip": "Salta",
+      "saveDetails": "Salva dettagli",
+      "homeTasks": "{{home}}"
+    },
+    "editWorkspace": {
+      "title": "Modifica spazio di lavoro",
+      "description": "Modifica le impostazioni dello spazio di lavoro",
+      "nameLabel": "Nome dello spazio",
+      "namePlaceholder": "Es.: Acme Srl, Progetti personali, Studi",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Breve descrizione di questo spazio di lavoro...",
+      "overviewLabel": "Panoramica dello spazio",
+      "overviewPlaceholder": "Scopo, contesto importante e tutto ciò che è utile leggere per primo…",
+      "colorLabel": "Colore",
+      "homeNote": "Questo è il tuo spazio di lavoro principale. Contiene la raccolta rapida e non può essere eliminato, ma puoi rinominarlo e cambiargli colore.",
+      "dangerZone": "Zona a rischio",
+      "deleteNote": "Elimina definitivamente questo spazio di lavoro e tutti i suoi progetti, attività, documenti e riunioni.",
+      "deleteButton": "Elimina spazio di lavoro",
+      "deleteConfirmTitle": "Elimina spazio di lavoro",
+      "deleteConfirmDescription": "Questa operazione eliminerà definitivamente \"{{name}}\" e tutti i suoi progetti, attività, documenti e riunioni. L'azione non può essere annullata.",
+      "discardTitle": "Scartare le modifiche allo spazio?",
+      "discardDescription": "Le modifiche non salvate allo spazio di lavoro andranno perse.",
+      "discardAction": "Scarta modifiche"
+    }
+  },
+  "editors": {
+    "doc": {
+      "titlePlaceholder": "Titolo del documento",
+      "contentPlaceholder": "Scrivi il documento in markdown...",
+      "deleteTitle": "Elimina documento",
+      "deleteDescription": "Vuoi davvero eliminare questo documento? L'azione non può essere annullata."
+    },
+    "task": {
+      "titlePlaceholder": "Titolo dell'attività",
+      "contentPlaceholder": "Aggiungi note, dettagli o punti di controllo...",
+      "deleteTitle": "Elimina attività",
+      "deleteDescription": "Vuoi davvero eliminare questa attività? L'azione non può essere annullata."
+    },
+    "meeting": {
+      "titlePlaceholder": "Titolo della riunione",
+      "contentPlaceholder": "Scrivi le note della riunione...",
+      "deleteTitle": "Elimina riunione",
+      "deleteDescription": "Vuoi davvero eliminare questa riunione? L'azione non può essere annullata."
+    },
+    "aiChat": {},
+    "shared": {
+      "untitled": "Senza titolo",
+      "saveTooltip": "Salva (⌘S)",
+      "noChangesTooltip": "Nessuna modifica da salvare",
+      "aiIncludedToggle": "Accesso agenti attivo (clicca per escludere)",
+      "aiExcludedToggle": "Accesso agenti disattivato (clicca per includere)",
+      "aiExcludedByFolder": "Escluso dalla cartella: {{path}}",
+      "revealInFinder": "Mostra nel Finder",
+      "entityName": {
+        "doc": "Documento",
+        "task": "Attività",
+        "meeting": "Riunione"
+      },
+      "entityNotFound": "{{entity}} non trovato",
+      "closeTab": "Chiudi scheda",
+      "discardFailed": "Impossibile scartare la bozza di recupero. Le tue modifiche restano aperte; riprova.",
+      "retryDiscard": "Riprova a scartare",
+      "contextTransitionBlocked": "Risolvi o scarta le modifiche non salvate nell'editor prima di cambiare contesto dati.",
+      "loadFailed": {
+        "title": "Impossibile caricare il contenuto di {{entity}}",
+        "description": "Desk non ha aperto una copia vuota e il tuo file non è stato modificato. Controlla la connessione e riprova."
+      },
+      "versionMismatch": {
+        "title": "Client Desk e server devono avere la stessa versione",
+        "description": "Questo client usa una API dell'editor più recente che il server non supporta ancora. Nessun file è stato modificato. Aggiorna il server e riprova."
+      },
+      "review": "Esamina",
+      "conflict": {
+        "title": "Questo file è cambiato fuori da Desk",
+        "description": "Scegli quale versione mantenere. Desk non sovrascriverà automaticamente la modifica esterna.",
+        "useExternal": "Usa esterna",
+        "keepDesk": "Mantieni Desk"
+      }
+    }
+  },
+  "entities": {
+    "workspace": {
+      "colors": {
+        "blue": "Blu",
+        "emerald": "Smeraldo",
+        "amber": "Ambra",
+        "red": "Rosso",
+        "violet": "Viola",
+        "pink": "Rosa",
+        "slate": "Ardesia"
+      }
+    },
+    "project": {
+      "status": {
+        "active": "Attivo",
+        "paused": "In pausa",
+        "completed": "Completato",
+        "archived": "Archiviato"
+      }
+    },
+    "task": {
+      "status": {
+        "backlog": "Backlog",
+        "todo": "Da fare",
+        "doing": "In corso",
+        "waiting": "In attesa",
+        "done": "Completata"
+      },
+      "priority": {
+        "high": "Alta",
+        "medium": "Media",
+        "low": "Bassa"
+      },
+      "pluralLowercase": "attività"
+    }
+  },
+  "emptyStates": {
+    "projects": {
+      "noMatches": "Nessun progetto corrispondente.",
+      "noProjects": "Ancora nessun progetto."
+    },
+    "tasks": {
+      "noResults": {
+        "title": "Nessuna attività trovata"
+      }
+    },
+    "meetings": {
+      "none": {
+        "title": "Ancora nessuna riunione",
+        "description": "Crea la tua prima nota di riunione per iniziare"
+      }
+    }
+  },
+  "toasts": {
+    "settings": {
+      "themeSet": "Tema impostato su {{theme}}",
+      "sidebarCollapsed": "Barra laterale compressa",
+      "sidebarExpanded": "Barra laterale espansa",
+      "apiKeySaved": "Chiave {{provider}} salvata nel portachiavi",
+      "providerSet": "Provider impostato su {{provider}}",
+      "modelSet": "Modello impostato su {{model}}",
+      "usageCleared": "Cronologia di utilizzo cancellata",
+      "privacyAcknowledgementReset": "Presa visione della privacy AI azzerata",
+      "agentFileEnabled": "{{file}} attivato",
+      "agentFileRemoved": "{{file}} rimosso",
+      "indexBuilt": "Indice costruito: {{files}} file in {{workspaces}} spazi di lavoro",
+      "catalogCleared": "Indice dei file cancellato",
+      "autoSummarizeEnabled": "Riassunto automatico attivato",
+      "autoSummarizeDisabled": "Riassunto automatico disattivato",
+      "settingsReset": "Impostazioni ripristinate ai valori predefiniti",
+      "dataPathUpdated": "Percorso dati aggiornato",
+      "switchedToPath": "Passato a {{path}} con i dati esistenti",
+      "dataPathUpdatedCreateWorkspace": "Percorso dati aggiornato. Crea il tuo primo spazio di lavoro.",
+      "dataPathUpdatedWizard": "Percorso dati aggiornato. La procedura guidata ti accompagnerà."
+    },
+    "workspace": {
+      "create": {
+        "success": "Spazio di lavoro creato",
+        "error": "Creazione dello spazio di lavoro non riuscita"
+      },
+      "update": {
+        "success": "Spazio di lavoro aggiornato",
+        "error": "Aggiornamento dello spazio di lavoro non riuscito"
+      },
+      "delete": {
+        "success": "Spazio di lavoro \"{{name}}\" eliminato",
+        "error": "Eliminazione dello spazio di lavoro non riuscita"
+      }
+    },
+    "project": {
+      "create": {
+        "success": "Progetto creato",
+        "error": "Creazione del progetto non riuscita"
+      },
+      "update": {
+        "error": "Aggiornamento del progetto non riuscito"
+      },
+      "delete": {
+        "success": "Progetto eliminato",
+        "error": "Eliminazione del progetto non riuscita"
+      }
+    },
+    "common": {
+      "renamed": "Rinominato"
+    },
+    "task": {
+      "created": "Attività creata"
+    },
+    "doc": {
+      "created": "Documento creato",
+      "pathCopied": "Percorso copiato negli appunti",
+      "createError": "Impossibile creare il file",
+      "importDocs_one": "Importato {{count}} documento",
+      "importDocs_other": "Importati {{count}} documenti",
+      "importFiles_one": "Importato {{count}} file",
+      "importFiles_other": "Importati {{count}} file",
+      "importMixed": "Importati {{docs}} documenti e {{files}} file",
+      "convertFailed_one": "Impossibile convertire {{name}}",
+      "convertFailed_other": "Impossibile convertire {{count}} file"
+    },
+    "meeting": {
+      "created": "Riunione creata",
+      "deleted": "Riunione eliminata"
+    },
+    "folder": {
+      "includedInAI": "\"{{name}}\" incluso nell'AI",
+      "excludedFromAI": "\"{{name}}\" escluso dall'AI"
+    },
+    "editor": {
+      "docDeleted": "Documento eliminato",
+      "taskDeleted": "Attività eliminata",
+      "meetingDeleted": "Riunione eliminata",
+      "moveProject": {
+        "saveFailed": "Salvataggio non riuscito. Impossibile spostare {{entity}}.",
+        "failed": "Spostamento di {{entity}} non riuscito"
+      }
+    },
+    "link": {
+      "notFound": "Nota collegata non trovata"
+    },
+    "ai": {
+      "inclusionUpdateFailed": "Aggiornamento dell'impostazione AI non riuscito"
+    },
+    "overview": {
+      "update": {
+        "error": "Impossibile salvare la panoramica"
+      }
+    }
+  },
+  "errors": {
+    "startup": {
+      "title": "Desk non ha potuto avviarsi",
+      "description": "Desk non è riuscito a preparare la cartella dati. I tuoi file sono al sicuro. Si tratta di un problema di avvio, non di perdita di dati.",
+      "hint": "Verifica che la cartella dati esista e sia leggibile, poi riprova."
+    },
+    "connection": {
+      "notAvailableRemote": "Non disponibile quando sei collegato a un server."
+    },
+    "generic": {
+      "unexpected": {
+        "title": "Qualcosa è andato storto",
+        "description": "Si è verificato un errore inatteso. Puoi riprovare o ricaricare la pagina."
+      }
+    },
+    "settings": {
+      "apiKeyEmpty": "La chiave API non può essere vuota",
+      "apiKeySaveFailed": "Salvataggio della chiave API non riuscito: {{message}}",
+      "apiKeySaveFailedWithHint": "Salvataggio della chiave API non riuscito: {{message}}\n\n{{hint}}",
+      "agentFilesUpdateFailed": "Impossibile aggiornare i file per agenti: {{message}}",
+      "indexBuildFailed": "Costruzione dell'indice non riuscita: {{message}}",
+      "catalogClearedPartial": "Indice cancellato, ma alcuni file per agenti non hanno potuto essere rimossi: {{message}}"
+    },
+    "setup": {
+      "checkDataFolder": "Impossibile accedere a \"{{path}}\". Controlla che il percorso della cartella sia valido e che Desk possa scriverci, poi riprova.",
+      "createDataFolder": "La configurazione non ha potuto creare la cartella dati in \"{{path}}\". Assicurati che la posizione esista e che Desk abbia il permesso di scriverci, poi riprova."
+    },
+    "task": {
+      "createFailed": "Creazione dell'attività non riuscita"
+    },
+    "doc": {
+      "createFailed": "Creazione del documento non riuscita",
+      "renameFailed": "Rinomina del documento non riuscita",
+      "deleteFailed": "Eliminazione del documento non riuscita",
+      "deleteFileFailed": "Eliminazione del file non riuscita",
+      "moveFailed": "Spostamento del documento non riuscito",
+      "openFailed": "Impossibile aprire il file",
+      "revealFailed": "Impossibile mostrare nel Finder",
+      "copyPathFailed": "Impossibile copiare il percorso",
+      "cannotRevealBrowser": "Impossibile mostrare i file in modalità browser",
+      "cannotOpenBrowser": "Impossibile aprire i file in modalità browser",
+      "importFailed": "Importazione dei file non riuscita",
+      "crossScopeMove": "Gli spostamenti tra ambiti diversi non sono ancora supportati. Gli spostamenti devono restare dentro lo stesso spazio di lavoro o progetto."
+    },
+    "meeting": {
+      "createFailed": "Creazione della riunione non riuscita",
+      "deleteFailed": "Eliminazione della riunione non riuscita"
+    },
+    "folder": {
+      "createFailed": "Creazione della cartella non riuscita",
+      "renameFailed": "Rinomina della cartella non riuscita",
+      "deleteFailed": "Eliminazione della cartella non riuscita",
+      "moveFailed": "Spostamento della cartella non riuscito"
+    },
+    "editor": {
+      "deleteDocFailed": "Eliminazione del documento non riuscita",
+      "deleteTaskFailed": "Eliminazione dell'attività non riuscita",
+      "deleteMeetingFailed": "Eliminazione della riunione non riuscita"
+    },
+    "email": {
+      "openFailed": "Impossibile aprire l'email"
+    },
+    "update": {
+      "checkFailed": "Controllo aggiornamenti non riuscito",
+      "installFailed": "Installazione dell'aggiornamento non riuscita"
+    },
+    "ai": {
+      "quota": "Quota superata. Controlla piano e fatturazione con il provider.",
+      "auth": "La chiave API è stata rifiutata. Verifica che sia valida.",
+      "rate-limit": "Limite di richieste raggiunto. Riprova tra poco.",
+      "network": "Impossibile raggiungere il provider AI. Controlla la connessione.",
+      "model-not-found": "Il modello selezionato non è disponibile.",
+      "unknown": "La richiesta AI non è riuscita."
+    }
+  },
+  "email": {
+    "dropOverlay": {
+      "title": "Trascina l'email per aprirla in Desk",
+      "subtitle": "Apple Mail · Outlook · Thunderbird"
+    },
+    "viewer": {
+      "noSubject": "(nessun oggetto)",
+      "showFull": "Mostra email completa",
+      "hideFull": "Nascondi email completa",
+      "toLabel": "A:",
+      "ccLabel": "CC:",
+      "viaSource": "via {{source}}",
+      "source": {
+        "appleMail": "Apple Mail",
+        "outlook": "Outlook",
+        "thunderbird": "Thunderbird",
+        "other": "Mail"
+      }
+    },
+    "replyHelper": {
+      "copyEmail": "Copia email",
+      "copied": "Copiata",
+      "extractTasks": "Estrai attività",
+      "comingSoon": "(prossimamente)",
+      "mcpHint": "Copia l'email, poi avvia il prompt \"draft-email-reply\" nel tuo connettore AI (Claude, ChatGPT) per preparare una risposta."
+    }
+  },
+  "search": {
+    "globalSearch": {
+      "placeholder": "Cerca attività, documenti, progetti...",
+      "noResults": "Nessun risultato trovato.",
+      "buildingIndex": "Costruzione dell'indice di ricerca...",
+      "unavailable": "La ricerca non è disponibile. Riprova tra un momento.",
+      "recentHeading": "Aggiornati di recente",
+      "resultsHeading": "Risultati",
+      "scope": {
+        "label": "Ambito di ricerca",
+        "all": "Ovunque",
+        "workspace": "Spazio di lavoro corrente"
+      },
+      "types": {
+        "task": "Attività",
+        "doc": "Documento",
+        "meeting": "Riunione",
+        "project": "Progetto"
+      }
+    },
+    "commandPalette": {
+      "placeholder": "Cerca nel tuo lavoro o esegui un comando...",
+      "quickActionsHeading": "Azioni rapide",
+      "actionsHeading": "Azioni",
+      "disabled": {
+        "workspace": "Seleziona prima uno spazio di lavoro",
+        "meetingProject": "Crea prima un progetto"
+      },
+      "commands": {
+        "captureTask": { "label": "Raccogli attività nella Raccolta", "aliases": "raccogli|raccolta|ricorda|attività rapida|capture" },
+        "createTask": { "label": "Crea attività", "aliases": "nuova attività|aggiungi attività|da fare|todo" },
+        "createDoc": { "label": "Crea documento", "aliases": "nuovo documento|aggiungi documento|documento|nota" },
+        "createMeeting": { "label": "Crea riunione", "aliases": "nuova riunione|aggiungi riunione|appuntamento" },
+        "createProject": { "label": "Crea progetto", "aliases": "nuovo progetto|aggiungi progetto" },
+        "switchWorkspace": { "label": "Cambia spazio di lavoro", "aliases": "spazio|lavoro|cambia spazio|team" },
+        "goDashboard": { "label": "Vai alla dashboard", "aliases": "home|panoramica|inizio" },
+        "goPlanner": { "label": "Vai al pianificatore", "aliases": "pianifica|calendario|settimana|programma" },
+        "goTasks": { "label": "Vai alle attività", "aliases": "attività|cose da fare|todo" },
+        "goDocs": { "label": "Vai ai documenti", "aliases": "documenti|doc|note" },
+        "goMeetings": { "label": "Vai alle riunioni", "aliases": "riunioni|appuntamenti" },
+        "goProjects": { "label": "Vai ai progetti", "aliases": "progetti" },
+        "openSettings": { "label": "Apri impostazioni", "aliases": "preferenze|configurazione" },
+        "viewShortcuts": { "label": "Vedi le scorciatoie da tastiera", "aliases": "tasti|scorciatoie|aiuto" }
+      },
+      "workspaces": {
+        "placeholder": "Cerca spazi di lavoro...",
+        "heading": "Spazi di lavoro",
+        "current": "Corrente",
+        "noResults": "Nessuno spazio di lavoro trovato",
+        "back": "Torna ai comandi"
+      },
+      "capture": {
+        "title": "Raccogli attività nella Raccolta",
+        "description": "Aggiungila ora e organizzala dopo.",
+        "placeholder": "Titolo dell'attività...",
+        "submit": "Raccogli",
+        "back": "Torna alla ricerca",
+        "success": "Attività raccolta nella Raccolta",
+        "error": "Impossibile raccogliere l'attività"
+      },
+      "footer": {
+        "navigate": "↑↓ Naviga",
+        "open": "↵ Apri",
+        "close": "Esc Chiudi",
+        "enterCapture": "↵ Raccogli",
+        "escapeBack": "Esc Indietro"
+      },
+      "shortcuts": {
+        "title": "Scorciatoie da tastiera",
+        "description": "Usa Comando su macOS e Control su Windows o Linux.",
+        "palette": "Apri ricerca e comandi",
+        "save": "Salva",
+        "closeTab": "Chiudi la scheda attiva",
+        "switchTabs": "Scheda precedente / successiva"
+      }
+    }
+  },
+  "smartIndex": {},
+  "setup": {
+    "welcome": {
+      "title": "Benvenuto in Desk.",
+      "subtitle": "I tuoi progetti, attività, documenti e riunioni, come semplici file Markdown che sono tuoi."
+    },
+    "location": {
+      "title": "Dove deve tenere Desk il tuo lavoro?",
+      "subtitle": "Puoi cambiarlo quando vuoi nelle Impostazioni.",
+      "localTitle": "Questo Mac",
+      "localDescription": "Salva i tuoi file in locale, su questo computer.",
+      "remoteTitle": "Un server desk.md",
+      "remoteDescription": "Collegati a un server desk.md attivo (ad esempio sul tuo NAS) per accedere dal telefono e da altri dispositivi."
+    },
+    "server": {
+      "title": "Collegati al tuo server",
+      "subtitle": "Inserisci l'indirizzo del tuo server desk.md. Accederai nella schermata successiva.",
+      "label": "Indirizzo del server",
+      "hint": "Se lo ometti viene usato https://. L'indirizzo deve usare https.",
+      "connect": "Continua",
+      "invalidUrl": "Inserisci un indirizzo server valido.",
+      "httpsRequired": "Il server deve usare https. Un indirizzo http invierebbe il token di accesso in chiaro."
+    },
+    "dataFolder": {
+      "title": "Dove salviamo i tuoi file?",
+      "subtitle": "Scegli una cartella qualsiasi. Desk crea la struttura per te e puoi spostarla più avanti.",
+      "label": "Cartella dati",
+      "pickerTitle": "Seleziona cartella dati",
+      "browseTitle": "Sfoglia per la cartella"
+    },
+    "existingDetected": {
+      "title": "Qui hai già dei dati di Desk.",
+      "description_one": "Trovato {{count}} spazio di lavoro in questa cartella. Riprendi da dove eri rimasto oppure inizia da zero.",
+      "description_other": "Trovati {{count}} spazi di lavoro in questa cartella. Riprendi da dove eri rimasto oppure inizia da zero.",
+      "useExisting": "Usa dati esistenti",
+      "startFresh": "Inizia da zero"
+    },
+    "workspace": {
+      "title": "Dai un nome al tuo spazio di lavoro.",
+      "subtitle": "Questo è il tuo spazio principale, per note personali e per la raccolta rapida. Aggiungi altri spazi di lavoro più avanti per clienti, progetti o altre aree.",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Personale",
+      "finish": "Fine"
+    }
+  },
+  "auth": {
+    "create": {
+      "title": "Crea il tuo account",
+      "subtitle": "Configura l'account che protegge questo desk.",
+      "submit": "Crea account"
+    },
+    "login": {
+      "title": "Bentornato",
+      "subtitle": "Accedi al tuo desk.",
+      "submit": "Accedi"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "errors": {
+      "generic": "Qualcosa è andato storto. Riprova."
+    },
+    "signOut": "Esci",
+    "account": {
+      "title": "Account",
+      "description": "Hai effettuato l'accesso a questo desk ospitato.",
+      "signOutLabel": "Esci",
+      "signOutDescription": "Termina la sessione su questo dispositivo."
+    },
+    "consent": {
+      "title": "{{app}} vuole collegarsi",
+      "unknownApp": "Un'applicazione",
+      "subtitle": "Potrà leggere i tuoi spazi di lavoro, documenti, attività e riunioni tramite il connettore desk.md.",
+      "scopesTitle": "Potrà anche:",
+      "scopes": {
+        "openid": "Confermare la tua identità",
+        "profile": "Vedere il tuo profilo di base",
+        "email": "Vedere il tuo indirizzo email",
+        "offline_access": "Restare collegata senza un nuovo accesso"
+      },
+      "allow": "Consenti",
+      "deny": "Nega",
+      "error": "Impossibile completare la richiesta. Riprova."
+    }
+  },
+  "tooltips": {
+    "priorityIcon": "Priorità {{label}}",
+    "appShell": {
+      "search": "Cerca (⌘K)"
+    }
+  },
+  "menus": {
+    "common": {
+      "revealInFinder": "Mostra nel Finder",
+      "copyPath": "Copia percorso"
+    },
+    "taskContextMenu": {
+      "highlightForFocus": "Evidenzia per il focus",
+      "removeHighlight": "Rimuovi evidenziazione"
+    },
+    "docContextMenu": {
+      "moveTo": "Sposta in...",
+      "workspaceLevel": "Documenti dello spazio"
+    },
+    "folderContextMenu": {
+      "newDoc": "Nuovo documento",
+      "newSubfolder": "Nuova sottocartella",
+      "includeInAI": "Includi nell'AI",
+      "excludeFromAI": "Escludi dall'AI"
+    },
+    "assetContextMenu": {
+      "openInDefaultApp": "Apri con l'app predefinita"
+    },
+    "workspaceSwitcher": {
+      "newWorkspace": "Nuovo spazio di lavoro"
+    },
+    "tabContextMenu": {
+      "close": "Chiudi",
+      "closeOthers": "Chiudi le altre",
+      "moreTabs_one": "{{count}} altra scheda",
+      "moreTabs_other": "{{count}} altre schede",
+      "unsavedTabDescription": "\"{{title}}\" ha modifiche non salvate. Vuoi salvare prima di chiudere?"
+    }
+  },
+  "updates": {
+    "available": "Aggiornamento disponibile: v{{version}}",
+    "description": "Una nuova versione di Desk è pronta per l'installazione.",
+    "updateAndRestart": "Aggiorna e riavvia",
+    "skip": "Salta"
+  },
+  "unsavedChanges": {
+    "title": "Modifiche non salvate",
+    "description": "Hai modifiche non salvate in: {{tabs}}{{more}}. Vuoi salvare prima di uscire?",
+    "more_one": " e {{count}} altra",
+    "more_other": " e altre {{count}}"
+  },
+  "ui": {
+    "colorPicker": {
+      "customColor": "Colore personalizzato"
+    },
+    "dateField": {
+      "placeholder": "Seleziona data",
+      "clearAriaLabel": "Cancella data"
+    },
+    "formField": {
+      "optional": "(facoltativo)"
+    },
+    "loadingState": {
+      "defaultLabel": "contenuto",
+      "title": "Caricamento {{label}}…"
+    },
+    "saveChanges": {
+      "title": "Modifiche non salvate",
+      "description": "Vuoi salvare le modifiche che hai fatto?"
+    },
+    "saveStatus": {
+      "failed": "Salvataggio non riuscito"
+    },
+    "viewMode": {
+      "list": "Vista elenco",
+      "kanban": "Bacheca kanban"
+    },
+    "metadataToolbar": {
+      "none": "Nessuna",
+      "noProject": "Senza progetto",
+      "workspaceLevel": "Spazio di lavoro",
+      "addDueDate": "Aggiungi scadenza",
+      "addDate": "Aggiungi data"
+    },
+    "richTextEditor": {
+      "placeholder": "Scrivi qualcosa…",
+      "bold": "Grassetto",
+      "italic": "Corsivo",
+      "strike": "Barrato",
+      "inlineCode": "Codice in linea",
+      "link": "Aggiungi o modifica link",
+      "unlink": "Rimuovi link",
+      "linkUrl": "URL del link",
+      "linkPlaceholder": "https://esempio.com",
+      "table": {
+        "more": "Altre azioni tabella",
+        "addRowBefore": "Aggiungi riga sopra",
+        "addRowAfter": "Aggiungi riga sotto",
+        "addColumnBefore": "Aggiungi colonna a sinistra",
+        "addColumnAfter": "Aggiungi colonna a destra",
+        "deleteRow": "Elimina riga",
+        "deleteColumn": "Elimina colonna",
+        "deleteTable": "Elimina tabella",
+        "mergeCells": "Unisci celle",
+        "splitCell": "Dividi cella",
+        "toggleHeaderRow": "Attiva/disattiva riga di intestazione"
+      },
+      "code": {
+        "language": "Linguaggio del codice",
+        "plainText": "Testo semplice",
+        "copy": "Copia codice",
+        "copied": "Codice copiato",
+        "copyFailed": "Impossibile copiare il codice"
+      }
+    },
+    "noteLinkPicker": {
+      "placeholder": "Cerca note da collegare…",
+      "noNotesFound": "Nessuna nota trovata.",
+      "buildingIndex": "Costruzione dell'indice di ricerca…",
+      "searchUnavailable": "La ricerca non è disponibile. Riprova tra un momento.",
+      "results": "Risultati",
+      "recent": "Recenti",
+      "types": {
+        "task": "Attività",
+        "doc": "Documento",
+        "meeting": "Riunione"
+      }
+    },
+    "command": {
+      "searchTitle": "Ricerca e comandi",
+      "searchDescription": "Cerca nel tuo lavoro o esegui un comando"
+    },
+    "editorBanners": {
+      "fileMoved": {
+        "title": "File spostato",
+        "description": "Questo file è stato spostato o rinominato dall'esterno.",
+        "newLocation": "Nuova posizione:",
+        "continueEditing": "Continua a modificare"
+      },
+      "fileDeleted": {
+        "title": "File eliminato",
+        "description": "Questo file è stato eliminato dal file system.",
+        "unsavedHint": "Hai modifiche non salvate. Ripristinale per ricreare il file.",
+        "parentMissing": "La cartella che lo conteneva non esiste più. Desk conserverà la bozza ma non ricreerà uno spazio di lavoro o un progetto eliminato.",
+        "restoreFromEdits": "Ripristina dalle modifiche",
+        "closeTab": "Chiudi scheda"
+      },
+      "externalChange": "Rilevate modifiche esterne"
+    },
+    "slashCommands": {
+      "empty": "Nessun comando corrispondente",
+      "heading1": {
+        "title": "Titolo 1",
+        "description": "Titolo di sezione grande"
+      },
+      "heading2": {
+        "title": "Titolo 2",
+        "description": "Titolo di sezione medio"
+      },
+      "heading3": {
+        "title": "Titolo 3",
+        "description": "Titolo di sezione piccolo"
+      },
+      "bulletList": {
+        "title": "Elenco puntato",
+        "description": "Elenco non ordinato"
+      },
+      "numberedList": {
+        "title": "Elenco numerato",
+        "description": "Elenco ordinato"
+      },
+      "taskList": {
+        "title": "Elenco attività",
+        "description": "Elenco di attività con caselle di spunta"
+      },
+      "table": {
+        "title": "Tabella",
+        "description": "Inserisci una tabella",
+        "pickerTitle": "Dimensione tabella",
+        "pickerLabel": "Scegli la dimensione della tabella",
+        "dimensions": "{{rows}} × {{cols}}"
+      },
+      "codeBlock": {
+        "title": "Blocco di codice",
+        "description": "Blocco di codice"
+      },
+      "blockquote": {
+        "title": "Citazione",
+        "description": "Blocco di citazione"
+      },
+      "divider": {
+        "title": "Separatore",
+        "description": "Linea orizzontale"
+      },
+      "link": {
+        "title": "Link",
+        "description": "Inserisci un link a una nota"
+      }
+    }
+  },
+  "tabs": {
+    "desk": "Desk",
+    "emailDefault": "Email"
+  }
+}

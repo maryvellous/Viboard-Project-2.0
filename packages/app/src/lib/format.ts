@@ -1,19 +1,22 @@
-import { format, parseISO } from "date-fns";
 import { todayISO } from "@desk/core";
+import { formatLocaleDate } from "./i18n/format";
 
 /**
- * Format an ISO date string for display (e.g., "20 Jan 2024")
+ * Format an ISO date string for display (e.g., "20 gen 2024", "Jan 20, 2024").
+ *
+ * Goes through `formatLocaleDate` (Intl) rather than date-fns, which would
+ * silently use its en-US default and print English month names in every language.
  */
 export function formatDate(iso: string): string {
-  return format(parseISO(iso), "d MMM yyyy");
+  return formatLocaleDate(iso, { day: "numeric", month: "short", year: "numeric" });
 }
 
 /**
- * Year-less date for tight spots (e.g., "20 Jan") — planner rows are ~20px tall and the
- * rail is 256px wide, where the full "20 Jan 2024" does not fit.
+ * Year-less date for tight spots (e.g., "20 gen") — planner rows are ~20px tall and the
+ * rail is 256px wide, where the full "20 gen 2024" does not fit.
  */
 export function formatDateShort(iso: string): string {
-  return format(parseISO(iso), "d MMM");
+  return formatLocaleDate(iso, { day: "numeric", month: "short" });
 }
 
 /** Whether a `YYYY-MM-DD` date is the local today. String compare, same reasoning as isOverdue. */

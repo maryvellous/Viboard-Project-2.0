@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "overlayscrollbars/overlayscrollbars.css";
@@ -160,6 +161,225 @@
   --sidebar-border: oklch(0.265 0.008 260);
   --sidebar-ring: oklch(0.55 0.15 250);
 }
+
+/* Diaspro keeps a coherent night canvas in either system preference. */
+:root, .dark {
+  --font-geist-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-geist-mono: "JetBrains Mono", ui-monospace, monospace;
+  --background: #1e1333;
+  --foreground: #f8f4ed;
+  --card: #2b1c47;
+  --card-foreground: #f8f4ed;
+  --popover: #2b1c47;
+  --popover-foreground: #f8f4ed;
+  --primary: #e8d19e;
+  --primary-foreground: #1e1333;
+  --brand-accent: #bc957d;
+  --brand-accent-foreground: #1e1333;
+  --secondary: #6b5887;
+  --secondary-foreground: #ffffff;
+  --muted: #382657;
+  --muted-foreground: #c7b7dc;
+  --accent: #493566;
+  --accent-foreground: #ffffff;
+  --destructive: #c87575;
+  --border: color-mix(in srgb, #9d85c6 42%, transparent);
+  --input: #382657;
+  --ring: #e8d19e;
+  --sidebar: #6b5887;
+  --sidebar-foreground: #f8f4ed;
+  --sidebar-primary: #e8d19e;
+  --sidebar-primary-foreground: #1e1333;
+  --sidebar-accent: rgba(30, 19, 51, 0.32);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(232, 209, 158, 0.22);
+  --sidebar-ring: #e8d19e;
+}
+
+@layer base {
+  body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; }
+  h1, h2, h3, h4, h5, h6 { font-family: "Outfit", ui-sans-serif, system-ui, sans-serif; }
+}
+
+/* ============================================================================
+   Diaspro material vocabulary — inherited by ordinary Desk components.
+   Values are lifted from `diaspro-ui/` (palette-guidelines.md, cards/tokens.css,
+   cards/cards.css, postit/postit.css). `diaspro-ui` is a design reference kept
+   outside the workspace packages, so the tokens are inlined here rather than
+   imported across the monorepo boundary; treat those files as the source of truth
+   when changing a value.
+   ========================================================================== */
+.diaspro-tokens {
+  --diaspro-canvas: #1e1333;
+  --diaspro-card: #2b1c47;
+  --diaspro-sidebar: #6b5887;
+  --diaspro-lavender: #9d85c6;
+  --diaspro-plum: #7a3f67;
+  --diaspro-terracotta: #8f5a5a;
+  --diaspro-warm-sand: #bc957d;
+  --diaspro-sand: #e8d19e;
+  --diaspro-blue: #a5c4dc;
+  --diaspro-sage: #98a78a;
+  --diaspro-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Lava (sidebar atmosphere — NOT a per-page decoration) ─────────────────── */
+.diaspro-lava { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.diaspro-lava__bubble { position: absolute; bottom: -22%; border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; filter: blur(4px); opacity: .68; animation: diaspro-lava-rise linear infinite; }
+.diaspro-lava__bubble:nth-child(1) { left: 8%; width: 94px; height: 112px; background: #bc957d; animation-duration: 18s; }
+.diaspro-lava__bubble:nth-child(2) { left: 42%; width: 68px; height: 84px; background: #9d85c6; animation-duration: 24s; animation-delay: -8s; }
+.diaspro-lava__bubble:nth-child(3) { right: -8%; width: 128px; height: 112px; background: #7a3f67; animation-duration: 20s; animation-delay: -14s; }
+@keyframes diaspro-lava-rise { 0% { transform: translateY(0) scale(1); opacity: 0; } 12% { opacity: .64; } 54% { border-radius: 35% 65% 48% 52% / 58% 38% 62% 42%; transform: translateY(-52vh) scale(.92); } 100% { transform: translateY(-112vh) scale(1.12); opacity: 0; } }
+
+/* ── Calendar strip (dashboard, approved — do not restyle) ─────────────────── */
+.diaspro-calendar-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; border: 1px solid rgba(157,133,198,.38); border-radius: 24px; padding: 12px; background: #2b1c47; box-shadow: 0 20px 40px rgba(10,5,22,.3); }
+.diaspro-calendar-day { min-width: 0; min-height: 92px; padding: 10px; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; background: #1e1333; color: #f8f4ed; text-align: left; transition: transform .2s cubic-bezier(.34,1.56,.64,1), border-color .2s, background .2s; }
+.diaspro-calendar-day:hover { transform: translateY(-3px); border-color: #e8d19e; background: #382657; }
+.diaspro-calendar-day--today { border-color: rgba(232,209,158,.72); background: rgba(122,63,103,.68); }
+.diaspro-calendar-day__weekday { display:block; font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 700; letter-spacing:.08em; color: #e8d19e; text-transform: uppercase; }
+.diaspro-calendar-day__date { display:block; margin-top:2px; font-family: "Outfit", sans-serif; font-weight:800; font-size: 15px; }
+.diaspro-calendar-day__task { display:block; margin-top:12px; overflow:hidden; color:#a5c4dc; font-size:10px; font-weight:600; text-overflow:ellipsis; white-space:nowrap; }
+.diaspro-calendar-day__empty { display:block; margin-top:12px; color:rgba(255,255,255,.33); font-family:"JetBrains Mono", monospace; font-size:9px; }
+@media (max-width: 900px) { .diaspro-calendar-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } .diaspro-calendar-day:nth-child(n+5) { display:none; } }
+
+/* ── Cards (diaspro-ui/cards) ───────────────────────────────────────────────
+   Colour is a stable property of the card, set by a `--` modifier class.
+   Hover NEVER changes the colour scheme: it only lifts and deepens the shadow. */
+.diaspro-card {
+  --diaspro-card-fg: #1e1333;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 28px;
+  box-shadow: 0 16px 40px -10px rgba(0,0,0,.5);
+  transition: transform .25s var(--diaspro-ease-bounce, cubic-bezier(.34,1.56,.64,1)), box-shadow .25s ease;
+}
+.diaspro-card:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -10px rgba(0,0,0,.7); }
+.diaspro-card--blue       { background: #a5c4dc; color: #1e1333; --diaspro-card-fg: #1e1333; }
+.diaspro-card--sage       { background: #98a78a; color: #1e1333; --diaspro-card-fg: #1e1333; }
+.diaspro-card--sand       { background: #e8d19e; color: #1e1333; --diaspro-card-fg: #1e1333; }
+.diaspro-card--lavender   { background: #9d85c6; color: #ffffff; --diaspro-card-fg: #ffffff; }
+.diaspro-card--plum       { background: #7a3f67; color: #ffffff; --diaspro-card-fg: #ffffff; }
+.diaspro-card--terracotta { background: #8f5a5a; color: #ffffff; --diaspro-card-fg: #ffffff; }
+.diaspro-card--default    { background: #2b1c47; color: #ffffff; --diaspro-card-fg: #ffffff; border: 1px solid rgba(255,255,255,.12); }
+
+/* Project cards — the stable-colour grid on /projects. */
+.diaspro-project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px; align-items:start; }
+.diaspro-project-card {
+  display:flex; flex-direction:column; gap:2px;
+  margin:0; padding:18px 20px 16px; min-height:132px;
+  border:1px solid rgba(255,255,255,.12); border-radius:24px;
+  background:#2b1c47; color:#ffffff;
+  box-shadow:0 14px 28px rgba(10,5,22,.24);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+}
+.diaspro-project-card:hover { transform: translateY(-3px); box-shadow: 0 22px 40px rgba(8,4,18,.42); }
+.diaspro-project-card .text-muted-foreground { color: inherit; opacity:.72; }
+
+/* ── Post-it (diaspro-ui/postit) ────────────────────────────────────────────
+   One meaning only: a SMALL task note. Never a page section, form or container. */
+.diaspro-postit-task {
+  --diaspro-postit-paper: #efdebd;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px 11px;
+  border: 1px solid rgba(120,80,118,.55);
+  border-radius: 12px;
+  background: var(--diaspro-postit-paper);
+  color: #1e1333;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(0,0,0,.28);
+  transform: rotate(var(--diaspro-postit-tilt, 0deg));
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+}
+/* Tape strip, as in the canonical component. */
+.diaspro-postit-task::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 44px;
+  height: 13px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(4px);
+}
+.diaspro-postit-task:hover { transform: rotate(var(--diaspro-postit-tilt, 0deg)) translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,.36); }
+.diaspro-postit-task:active { transform: rotate(var(--diaspro-postit-tilt, 0deg)) translateY(-1px) scale(.99); }
+.diaspro-postit-task__title { font-size: 12px; font-weight: 700; line-height: 1.35; color: #1e1333; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.diaspro-postit-task__meta { display: flex; align-items: center; gap: 6px; font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: rgba(30,19,51,.62); }
+.diaspro-postit-task__dot { width: 7px; height: 7px; border-radius: 9999px; flex-shrink: 0; }
+/* Ink variants keep the paper light but let status read at a glance. */
+.diaspro-postit-task--todo    { --diaspro-postit-paper: #efdebd; }
+.diaspro-postit-task--doing   { --diaspro-postit-paper: #d9cdf0; }
+.diaspro-postit-task--waiting { --diaspro-postit-paper: #c9dcec; }
+.diaspro-postit-task--done    { --diaspro-postit-paper: #d5ddc9; opacity: .82; }
+.diaspro-postit-task--done .diaspro-postit-task__title { text-decoration: line-through; text-decoration-color: rgba(30,19,51,.35); }
+
+/* ── Pills, chips and playful buttons (diaspro-ui/cards actions) ───────────── */
+.diaspro-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 32px; padding: 7px 17px;
+  border: 0; border-radius: 9999px;
+  font-family: "Outfit", sans-serif; font-size: 12px; font-weight: 800; letter-spacing: .2px; line-height: 1;
+  cursor: pointer; white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, filter .18s ease;
+}
+.diaspro-pill:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.38); }
+.diaspro-pill:active { transform: translateY(0) scale(.97); box-shadow: 0 3px 8px rgba(0,0,0,.3); }
+.diaspro-pill:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.diaspro-pill--sand       { background: #e8d19e; color: #1e1333; }
+.diaspro-pill--plum       { background: #7a3f67; color: #ffffff; }
+.diaspro-pill--lavender   { background: #9d85c6; color: #1e1333; }
+.diaspro-pill--sage       { background: #98a78a; color: #1e1333; }
+.diaspro-pill--blue       { background: #a5c4dc; color: #1e1333; }
+.diaspro-pill--terracotta { background: #8f5a5a; color: #ffffff; }
+.diaspro-pill--quiet      { background: rgba(255,255,255,.11); color: #ffffff; border: 1px solid rgba(255,255,255,.2); }
+
+.diaspro-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 9999px;
+  font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+}
+.diaspro-chip--sand       { background: rgba(232,209,158,.18); color: #e8d19e; }
+.diaspro-chip--blue       { background: rgba(165,196,220,.18); color: #a5c4dc; }
+.diaspro-chip--sage       { background: rgba(152,167,138,.2);  color: #b4c2a4; }
+.diaspro-chip--lavender   { background: rgba(157,133,198,.2);  color: #c3b1e0; }
+.diaspro-chip--terracotta { background: rgba(143,90,90,.26);   color: #e5a5a5; }
+.diaspro-chip--plum       { background: rgba(122,63,103,.3);   color: #e0a9cf; }
+
+/* ── Quick-add bar (dashboard) ────────────────────────────────────────────── */
+.diaspro-quickadd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border: 1px solid rgba(232,209,158,.34);
+  border-radius: 9999px;
+  background: #2b1c47;
+  box-shadow: 0 10px 22px rgba(12,6,24,.26);
+}
+.diaspro-quickadd:focus-within { border-color: rgba(232,209,158,.7); }
+
+/* ── Triage strip (compact — renders only when the inbox has items) ───────── */
+.diaspro-triage { border: 1px solid rgba(165,196,220,.32); border-radius: 18px; background: #2b1c47; box-shadow: 0 12px 26px rgba(12,6,24,.22); overflow: hidden; }
+
+/* ── Chromatic breaks: thin accents that keep pages off a single violet ─────
+   The accent strip is a 2px signature line — a page's colour, not decoration. */
+.diaspro-accent-strip { height: 2px; background: linear-gradient(90deg, #a5c4dc 0%, #98a78a 34%, #e8d19e 68%, #8f5a5a 100%); opacity: .55; }
+.diaspro-accent-strip--blue       { background: #a5c4dc; opacity: .7; }
+.diaspro-accent-strip--sage       { background: #98a78a; opacity: .7; }
+.diaspro-accent-strip--sand       { background: #e8d19e; opacity: .7; }
+.diaspro-accent-strip--lavender   { background: #9d85c6; opacity: .7; }
+.diaspro-accent-strip--plum       { background: #7a3f67; opacity: .85; }
+.diaspro-accent-strip--terracotta { background: #8f5a5a; opacity: .7; }
+/* "Paper" surface for docs — sand/cream, used sparingly, never as a full page bg. */
+.diaspro-paper { background: #f5ecd8; color: #1e1333; border: 1px solid rgba(122,63,103,.28); border-radius: 18px; }
+
 
 @layer base {
   * {

@@ -70,7 +70,8 @@
       "desk": "Desk",
       "workspaceViews": "Workspace Views",
       "projectsSection": "Projects",
-      "allProjects": "All projects"
+      "allProjects": "All projects",
+      "brandTagline": "spazio di lavoro"
     },
     "secondarySidebar": {
       "expandPanel": "Expand panel"
@@ -109,6 +110,13 @@
         "unassigned": "Unassigned"
       },
       "overviewError": "The dashboard overview could not be loaded. Capture is still available.",
+      "calendar": {
+        "free": "free"
+      },
+      "quickAdd": {
+        "placeholder": "Add a task…",
+        "action": "New task"
+      },
       "capture": {
         "title": "Capture",
         "defaultHomeName": "Home",
@@ -146,7 +154,8 @@
     },
     "docs": {
       "dropZone": {
-        "title": "Drop files to import"
+        "title": "Drop files to import",
+        "hint": "Drop a document or email anywhere on this window and Desk files it as Markdown."
       },
       "convertDialog": {
         "title": "Import office files",
@@ -306,6 +315,8 @@
         "sortName": "Name A–Z",
         "activeTasks_one": "{{count}} active",
         "activeTasks_other": "{{count}} active",
+        "nextDue": "Next due {{date}}",
+        "openProject": "Open project",
         "workspaceOverview": {
           "title": "Workspace overview",
           "placeholder": "Describe this workspace, its purpose, and anything people should know first."
@@ -383,7 +394,8 @@
         "options": {
           "en": "English",
           "de": "Deutsch",
-          "fr": "Français"
+          "fr": "Français",
+          "it": "Italiano"
         }
       },
       "compactSidebar": {

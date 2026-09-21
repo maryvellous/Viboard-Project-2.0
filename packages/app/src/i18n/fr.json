@@ -70,7 +70,8 @@
       "desk": "Desk",
       "workspaceViews": "Vues de l'espace",
       "projectsSection": "Projets",
-      "allProjects": "Tous les projets"
+      "allProjects": "Tous les projets",
+      "brandTagline": "espace de travail"
     },
     "secondarySidebar": {
       "expandPanel": "Déployer le panneau"
@@ -109,6 +110,13 @@
         "unassigned": "Non assigné"
       },
       "overviewError": "L’aperçu du tableau de bord n’a pas pu être chargé. La capture reste disponible.",
+      "calendar": {
+        "free": "libre"
+      },
+      "quickAdd": {
+        "placeholder": "Ajouter une tâche…",
+        "action": "Nouvelle tâche"
+      },
       "capture": {
         "title": "Capture",
         "defaultHomeName": "Personnel",
@@ -146,7 +154,8 @@
     },
     "docs": {
       "dropZone": {
-        "title": "Déposez des fichiers pour les importer"
+        "title": "Déposez des fichiers pour les importer",
+        "hint": "Déposez un document ou un e-mail n’importe où dans cette fenêtre : Desk l’enregistre en Markdown."
       },
       "convertDialog": {
         "title": "Importer des fichiers Office",
@@ -306,6 +315,8 @@
         "sortName": "Nom A–Z",
         "activeTasks_one": "{{count}} active",
         "activeTasks_other": "{{count}} actives",
+        "nextDue": "Prochaine échéance {{date}}",
+        "openProject": "Ouvrir le projet",
         "workspaceOverview": {
           "title": "Présentation de l’espace",
           "placeholder": "Décrivez l’objectif, le contexte important et ce qu’il faut lire en premier."
@@ -383,7 +394,8 @@
         "options": {
           "en": "English",
           "de": "Deutsch",
-          "fr": "Français"
+          "fr": "Français",
+          "it": "Italiano"
         }
       },
       "compactSidebar": {

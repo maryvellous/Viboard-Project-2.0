@@ -36,12 +36,12 @@ export function SidebarNavRow({
   className,
 }: SidebarNavRowProps) {
   const baseClass = cn(
-    "flex items-center gap-2 rounded-md font-medium transition-colors",
+    "flex items-center gap-2 rounded-xl font-medium transition-all duration-200",
     roleClasses[role],
     collapsed && "justify-center px-0",
     active
-      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-      : "text-sidebar-foreground/80 hover:bg-sidebar-accent/55 hover:text-sidebar-foreground",
+      ? "bg-[#e8d19e] text-[#1e1333] shadow-[0_5px_16px_rgba(20,10,35,.2)]"
+      : "text-sidebar-foreground/90 hover:translate-x-0.5 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground",
     interactionClasses.keyboardFocus,
     className
   );

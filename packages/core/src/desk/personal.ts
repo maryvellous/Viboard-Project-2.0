@@ -27,7 +27,7 @@ import {
   decodeTaskFrontmatter,
   reportFrontmatterDiagnostics,
 } from "./frontmatter";
-import { joinPath } from "./env";
+import { joinPath, baseName } from "./env";
 import { getStorage } from "./storage";
 import {
   writeMarkdownFile,
@@ -205,7 +205,7 @@ export async function moveCaptureToPersonal(taskId: string): Promise<Task | null
   if (!task) return null;
 
   const unassignedTasksPath = await getTasksPath(await getHomeWorkspaceId(), SPECIAL_DIRS.UNASSIGNED);
-  const filename = task.filePath.split("/").pop()!;
+  const filename = baseName(task.filePath);
   const newFilePath = await joinPath(unassignedTasksPath, filename);
 
   const moved = await moveMarkdownFile(task.filePath, newFilePath);
@@ -231,7 +231,7 @@ export async function moveCaptureToWorkspace(
   if (!task) return null;
 
   const targetTasksPath = await getTasksPath(workspaceId, projectId);
-  const filename = task.filePath.split("/").pop()!;
+  const filename = baseName(task.filePath);
   const newFilePath = await joinPath(targetTasksPath, filename);
 
   const moved = await moveMarkdownFile(task.filePath, newFilePath);

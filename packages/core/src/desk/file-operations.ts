@@ -9,7 +9,7 @@
  * - Notify open editors about delete/move lifecycle changes
  */
 
-import { joinPath } from "./env";
+import { joinPath, parentPath, baseName } from "./env";
 import { getStorage } from "./storage";
 import { parseMarkdown, filenameToId } from "./parser";
 import { publishPathChange, publishDeleted } from "./editor-event-bus";
@@ -103,7 +103,7 @@ export async function readMarkdownFile<T>(
   try {
     const content = await getStorage().readTextFile(filePath);
     const { data, content: body } = parseMarkdown<T>(content);
-    const filename = filePath.split("/").pop() || "";
+    const filename = baseName(filePath);
 
     return {
       id: filenameToId(filename),
@@ -147,9 +147,10 @@ export async function writeMarkdownFile<T extends Record<string, unknown>>(
   content: string,
   options: WriteFileOptions = {}
 ): Promise<void> {
-  const parts = filePath.split("/");
-  parts.pop();
-  await getStorage().mkdir(parts.join("/"));
+  // `parentPath`, not `split("/")`: on Windows the path is backslash-separated
+  // and splitting on "/" would pass an empty string to mkdir, which the Tauri fs
+  // scope rejects ("forbidden path") — every create through this funnel failed there.
+  await getStorage().mkdir(parentPath(filePath));
 
   const result = await createMarkdownRecord(filePath, frontmatter, content, {
     stampUpdated: true,
@@ -277,10 +278,7 @@ export async function moveMarkdownFile(
     throw new FileCollisionError(targetPath);
   }
 
-  const parts = targetPath.split("/");
-  parts.pop();
-  await getStorage().mkdir(parts.join("/"));
-
+  await getStorage().mkdir(parentPath(targetPath));
   await getStorage().rename(sourcePath, targetPath);
 
   getContentCache().invalidate(sourcePath);

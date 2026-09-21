@@ -15,7 +15,7 @@ import { ListPane, ListRow, SectionLabel, type ListPaneSortOption } from "@/comp
 import { cn } from "@/lib/utils";
 import { AIBadge } from "@/components/ui/ai-badge";
 import { matchesSearch } from "@/lib/tree-count";
-import { safeFormat } from "@/lib/i18n/format";
+import { formatLocaleDate } from "@/lib/i18n/format";
 import type { Meeting } from "@desk/core/types";
 import {
   useMeetings,
@@ -60,7 +60,8 @@ function groupByMonth(meetings: Meeting[], dir: "asc" | "desc", noDateLabel: str
   }
   const result = Array.from(groups.entries()).map(([key, ms]) => ({
     key,
-    label: safeFormat(ms[0].date, "MMMM yyyy"),
+    // `date` is non-null here: undated meetings are bucketed separately (see `key` above).
+    label: formatLocaleDate(ms[0].date!, { month: "long", year: "numeric" }),
     meetings: ms,
   }));
   if (undated.length > 0) {
@@ -243,7 +244,7 @@ export function MeetingsTreePane({ workspaceId, initialProjectFilter }: Meetings
                         className={cn(
                           "size-3.5 shrink-0",
                           showSecondLine && "mt-0.5",
-                          isLatest ? "text-brand-accent" : "text-muted-foreground",
+                          isLatest ? "text-[#a5c4dc]" : "text-[#98a78a]/70",
                         )}
                       />
                     }
@@ -253,7 +254,7 @@ export function MeetingsTreePane({ workspaceId, initialProjectFilter }: Meetings
                         {meeting.author === "ai" && <AIBadge />}
                       </span>
                     }
-                    meta={safeFormat(meeting.date, "MMM d")}
+                    meta={meeting.date ? formatLocaleDate(meeting.date, { day: "numeric", month: "short" }) : undefined}
                     secondLine={showSecondLine ? projectName : undefined}
                     menuItems={
                       <DropdownMenuItem

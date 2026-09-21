@@ -34,9 +34,11 @@ interface NewTaskModalProps {
   open: boolean;
   onClose: () => void;
   defaultProjectId?: string;
+  /** Prefill for the title — the dashboard quick-add opens the modal already typed. */
+  defaultTitle?: string;
 }
 
-export function NewTaskModal({ open, onClose, defaultProjectId }: NewTaskModalProps) {
+export function NewTaskModal({ open, onClose, defaultProjectId, defaultTitle }: NewTaskModalProps) {
   const { t } = useTranslation();
   const currentWorkspace = useCurrentWorkspace();
   const createTask = useCreateTask();
@@ -55,12 +57,12 @@ export function NewTaskModal({ open, onClose, defaultProjectId }: NewTaskModalPr
   // no project.md). Reset the whole form on open; it is the single reset.
   useEffect(() => {
     if (open) {
-      setTitle("");
+      setTitle(defaultTitle ?? "");
       setPriority("none");
       setDue("");
       setProjectId(defaultProjectId || SPECIAL_DIRS.UNASSIGNED);
     }
-  }, [open, defaultProjectId]);
+  }, [open, defaultProjectId, defaultTitle]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

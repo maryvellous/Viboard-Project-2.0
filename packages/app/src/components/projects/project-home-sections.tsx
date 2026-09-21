@@ -9,7 +9,6 @@ import {
   Circle,
   Clock,
   FileText,
-  Loader2,
   Plus,
   Star,
 } from "lucide-react";
@@ -22,22 +21,30 @@ import type {
 import { getScopedEntityKey } from "@desk/core";
 import { cn } from "@/lib/utils";
 import { formatLocaleDate } from "@/lib/i18n/format";
+import { isOverdue } from "@/lib/format";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DueLabel } from "@/components/ui/due-label";
-import { PriorityIcon } from "@/components/ui/priority-icon";
 import { SectionLabel } from "@/components/patterns";
+import { MiniTaskPostit } from "@/components/projects/mini-task-postit";
 import { useCreateTask, useHighlightedTasks, useOpenTab } from "@/stores";
 
 const CURRENT_TASK_LIMIT = 6;
 const SCHEDULE_LIMIT = 5;
 const HISTORY_LIMIT = 8;
 
-const statusIcons = {
-  todo: Circle,
-  doing: Loader2,
-  waiting: Clock,
-} as const;
+/**
+ * The mini post-it's metadata line: status on the left (the dot carries it), then
+ * priority/due only when they exist. Kept to one short line so the note stays small.
+ */
+function postitMeta(
+  t: (key: string) => string,
+  task: ProjectCurrentTask
+): string {
+  const parts: string[] = [t(`entities.task.status.${task.status}`)];
+  if (task.due) parts.push(formatLocaleDate(task.due, { day: "numeric", month: "short" }));
+  if (task.priority) parts.push(t(`entities.task.priority.${task.priority}`));
+  return parts.join(" · ");
+}
 
 export function CurrentWorkSection({
   workspaceId,
@@ -88,35 +95,32 @@ export function CurrentWorkSection({
           {t("pages.projects.home.noCurrentWork")}
         </p>
       ) : (
-        <div className="-mx-2 divide-y divide-border/40">
-          {shown.map((task) => {
-            const Icon = statusIcons[task.status as keyof typeof statusIcons];
-            return (
-              <div key={`${task.workspaceId}:${task.projectId}:${task.id}`} className="group flex items-center gap-2 px-2 py-2">
-                <button
-                  type="button"
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                  onClick={() => openTask(task)}
-                >
-                  <Icon className={cn("size-3.5 shrink-0 text-muted-foreground", task.status === "doing" && "text-primary")} />
-                  <span className="min-w-0 flex-1 truncate text-sm">{task.title}</span>
-                  {task.priority && <PriorityIcon priority={task.priority} className="shrink-0" />}
-                  <DueLabel due={task.due} status={task.status} showUpcoming />
-                </button>
-                <button
-                  type="button"
-                  className={cn(
-                    "rounded p-1 text-muted-foreground/50 transition-colors hover:bg-muted hover:text-brand-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
-                    task.highlighted && "text-brand-accent",
-                  )}
-                  onClick={() => toggleHighlight(getScopedEntityKey(task))}
-                  aria-label={t(task.highlighted ? "menus.taskContextMenu.removeHighlight" : "menus.taskContextMenu.highlightForFocus")}
-                >
-                  <Star className={cn("size-3.5", task.highlighted && "fill-current")} />
-                </button>
-              </div>
-            );
-          })}
+        // Tasks in a project read as small post-its (Diaspro: a post-it means a small
+        // task note). Slight per-task tilt, clickable, nothing decorative.
+        <div className="grid grid-cols-1 gap-2.5 pt-1 sm:grid-cols-2 xl:grid-cols-3">
+          {shown.map((task) => (
+            <div key={`${task.workspaceId}:${task.projectId}:${task.id}`} className="relative">
+              <MiniTaskPostit
+                id={task.id}
+                title={task.title}
+                status={task.status}
+                meta={postitMeta(t, task)}
+                metaTone={task.due && isOverdue(task.due) && task.status !== "done" ? "terracotta" : "default"}
+                onClick={() => openTask(task)}
+              />
+              <button
+                type="button"
+                className={cn(
+                  "absolute right-1.5 top-1.5 rounded p-1 text-[#1e1333]/35 transition-colors hover:bg-black/10 hover:text-[#1e1333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1e1333]/40",
+                  task.highlighted && "text-[#7a3f67]",
+                )}
+                onClick={() => toggleHighlight(getScopedEntityKey(task))}
+                aria-label={t(task.highlighted ? "menus.taskContextMenu.removeHighlight" : "menus.taskContextMenu.highlightForFocus")}
+              >
+                <Star className={cn("size-3.5", task.highlighted && "fill-current")} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 

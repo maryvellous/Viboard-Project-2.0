@@ -7,6 +7,7 @@
 
 import { AlertTriangle, FileX, FolderInput } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { baseName } from "@desk/core";
 import { Button } from "./button";
 
 interface FileMovedBannerProps {
@@ -22,8 +23,9 @@ interface FileMovedBannerProps {
  */
 export function FileMovedBanner({ newPath, onAcknowledge }: FileMovedBannerProps) {
   const { t } = useTranslation();
-  // Extract just the filename from the path for display
-  const fileName = newPath.split("/").pop() || newPath;
+  // Extract just the filename from the path for display. `baseName`, not split("/"):
+  // absolute paths are backslash-separated on Windows.
+  const fileName = baseName(newPath);
 
   return (
     <div className="h-full flex items-center justify-center bg-background">

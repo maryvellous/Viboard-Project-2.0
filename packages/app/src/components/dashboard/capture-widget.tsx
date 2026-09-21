@@ -1,13 +1,26 @@
-
+/**
+ * Capture triage — a COMPACT strip, not a post-it and not a page block.
+ *
+ * Semantics: a post-it in Diaspro means "a small task note", so the triage inbox
+ * must not be dressed as one. This renders nothing at all when the inbox is empty
+ * (no giant empty container) and a single slim bar when it holds items, expanding
+ * in place into the compact triage list.
+ *
+ * Creation lives in QuickAddTask (NewTaskModal → useCreateTask); this file only
+ * moves and deletes already-captured items.
+ */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Zap, Plus, MoreHorizontal, User, FolderKanban, Trash2 } from "lucide-react";
-import { EmptyState } from "@/components/ui/empty-state";
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { InlineProgress } from "@/components/ui/inline-progress";
+import {
+  ChevronDown,
+  ChevronUp,
+  Inbox,
+  MoreHorizontal,
+  User,
+  FolderKanban,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +33,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   useCaptureTasks,
-  useCreateCaptureTask,
   useMoveCaptureToPersonal,
   useMoveCaptureToWorkspace,
   useDeleteCaptureTask,
@@ -28,7 +40,6 @@ import {
   useProjects,
 } from "@/stores";
 import type { Task, Workspace } from "@desk/core/types";
-import { cn } from "@/lib/utils";
 import { SPECIAL_DIRS } from "@desk/core";
 
 interface CaptureWidgetProps {
@@ -45,26 +56,17 @@ export interface TriageDestination {
 
 export function CaptureWidget({ onTriageComplete }: CaptureWidgetProps) {
   const { t } = useTranslation();
-  const { data: tasks = [], isLoading } = useCaptureTasks();
+  const { data: tasks = [] } = useCaptureTasks();
   const { data: workspaces = [] } = useWorkspaces();
-  const createTask = useCreateCaptureTask();
   const moveToPersonal = useMoveCaptureToPersonal();
   const moveToWorkspace = useMoveCaptureToWorkspace();
   const deleteTask = useDeleteCaptureTask();
 
-  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
   const homeWorkspace = workspaces.find((w) => w.isHome);
   const homeName = homeWorkspace?.name ?? t("pages.dashboard.capture.defaultHomeName");
   const otherWorkspaces = workspaces.filter((w) => !w.isHome);
-
-  const handleQuickAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTaskTitle.trim()) return;
-
-    await createTask.mutateAsync({ title: newTaskTitle.trim() });
-    setNewTaskTitle("");
-  };
 
   const handleMoveToPersonal = async (task: Task) => {
     await moveToPersonal.mutateAsync(task.id);
@@ -95,82 +97,50 @@ export function CaptureWidget({ onTriageComplete }: CaptureWidgetProps) {
     });
   };
 
-  const handleDelete = async (taskId: string) => {
-    await deleteTask.mutateAsync(taskId);
-  };
-
-  const hasTasks = tasks.length > 0;
+  // Empty inbox → no container at all. The strip is an affordance, not a section.
+  if (tasks.length === 0) return null;
 
   return (
-    <div
-      className={cn(
-        "bg-card border rounded-lg p-4 transition-colors",
-        hasTasks
-          ? "border-brand-accent/50 bg-brand-accent/[0.03]"
-          : "border-border"
-      )}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <Zap className={cn("size-4", hasTasks ? "text-brand-accent" : "text-primary")} />
-        <h2 className="font-medium">{t("pages.dashboard.capture.title")}</h2>
-        {hasTasks && (
-          <span className="text-xs font-medium text-brand-accent">
-            {t("pages.dashboard.capture.toTriageCount", { count: tasks.length })}
-          </span>
+    <section className="diaspro-triage" aria-label={t("pages.dashboard.capture.title")}>
+      <button
+        type="button"
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left"
+        onClick={() => setExpanded((value) => !value)}
+        aria-expanded={expanded}
+      >
+        <Inbox className="size-4 shrink-0 text-[#a5c4dc]" />
+        <span className="text-sm font-semibold text-foreground">
+          {t("pages.dashboard.capture.title")}
+        </span>
+        <span className="diaspro-chip diaspro-chip--terracotta">
+          {t("pages.dashboard.capture.toTriageCount", { count: tasks.length })}
+        </span>
+        <span className="flex-1" />
+        {expanded ? (
+          <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         )}
-      </div>
+      </button>
 
-      {/* Quick Add */}
-      <form onSubmit={handleQuickAdd} className="mb-3">
-        <div className="relative">
-          <Input
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            placeholder={t("pages.dashboard.capture.quickAddPlaceholder")}
-            className="pr-9 h-9 text-sm"
-          />
-          <Button
-            type="submit"
-            variant="ghost"
-            size="icon"
-            disabled={!newTaskTitle.trim() || createTask.isPending}
-            aria-label={t("common.buttons.add")}
-            className="absolute right-0 top-0 h-9 w-9"
-          >
-            {createTask.isPending ? (
-              <InlineProgress />
-            ) : (
-              <Plus className="size-4" />
-            )}
-          </Button>
+      {expanded && (
+        <div className="space-y-1.5 px-3 pb-3">
+          {tasks.map((task) => (
+            <CaptureItem
+              key={task.id}
+              task={task}
+              workspaces={otherWorkspaces}
+              homeName={homeName}
+              onMoveToPersonal={() => void handleMoveToPersonal(task)}
+              onMoveToWorkspace={(ws, pid, pname) =>
+                void handleMoveToWorkspace(task, ws, pid, pname)
+              }
+              onDelete={() => void deleteTask.mutateAsync(task.id)}
+            />
+          ))}
         </div>
-      </form>
-
-      {/* Task List */}
-      {isLoading ? (
-        <LoadingSkeleton variant="list" rows={3} className="py-1" />
-      ) : !hasTasks ? (
-        <EmptyState title={t("pages.dashboard.capture.emptyTitle")} display="inline" className="py-6" />
-      ) : (
-        <ScrollArea className="max-h-[280px]">
-          <div className="space-y-1.5">
-            {tasks.map((task) => (
-              <CaptureItem
-                key={task.id}
-                task={task}
-                workspaces={otherWorkspaces}
-                homeName={homeName}
-                onMoveToPersonal={() => handleMoveToPersonal(task)}
-                onMoveToWorkspace={(ws, pid, pname) =>
-                  handleMoveToWorkspace(task, ws, pid, pname)
-                }
-                onDelete={() => handleDelete(task.id)}
-              />
-            ))}
-          </div>
-        </ScrollArea>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -193,16 +163,12 @@ function CaptureItem({
 }: CaptureItemProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-md border-l-2 border-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 transition-colors group">
-      <span className="flex-1 text-sm font-medium truncate">{task.title}</span>
+    <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/35 px-3 py-1.5">
+      <span className="flex-1 truncate text-sm font-medium">{task.title}</span>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 opacity-60 group-hover:opacity-100 transition-opacity text-xs font-medium"
-          >
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs font-semibold">
             {t("pages.dashboard.capture.triageButton")}
             <MoreHorizontal className="size-3.5 ml-1" />
           </Button>

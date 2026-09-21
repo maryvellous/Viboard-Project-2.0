@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { densityClasses, type Density } from "@/lib/enterprise-ui";
-import { PageHeader } from "./page-header";
+import { PageHeader, type PageAccent } from "./page-header";
 
 interface FilteredListPageProps {
   title: string;
@@ -23,6 +23,8 @@ interface FilteredListPageProps {
   density?: Density;
   isLoading?: boolean;
   filterLeading?: React.ReactNode;
+  /** Page colour, forwarded to `PageHeader`. */
+  accent?: PageAccent;
 }
 
 export function FilteredListPage({
@@ -40,6 +42,7 @@ export function FilteredListPage({
   density = "regular",
   isLoading = false,
   filterLeading,
+  accent,
 }: FilteredListPageProps) {
   const isKanban = viewMode === "kanban";
   const contentPadding = isKanban ? "px-4 pt-2 pb-4" : densityClasses[density].content;
@@ -64,6 +67,7 @@ export function FilteredListPage({
       <PageHeader
         title={title}
         icon={icon}
+        accent={accent}
         actions={headerAction}
         secondary={(
           <FilterBar

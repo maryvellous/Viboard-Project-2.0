@@ -70,7 +70,8 @@
       "desk": "Desk",
       "workspaceViews": "Arbeitsbereich-Ansichten",
       "projectsSection": "Projekte",
-      "allProjects": "Alle Projekte"
+      "allProjects": "Alle Projekte",
+      "brandTagline": "Arbeitsbereich"
     },
     "secondarySidebar": {
       "expandPanel": "Panel ausklappen"
@@ -109,6 +110,13 @@
         "unassigned": "Nicht zugewiesen"
       },
       "overviewError": "Die Dashboard-Übersicht konnte nicht geladen werden. Erfassen ist weiterhin verfügbar.",
+      "calendar": {
+        "free": "frei"
+      },
+      "quickAdd": {
+        "placeholder": "Aufgabe hinzufügen…",
+        "action": "Neue Aufgabe"
+      },
       "capture": {
         "title": "Eingang",
         "defaultHomeName": "Persönlich",
@@ -146,7 +154,8 @@
     },
     "docs": {
       "dropZone": {
-        "title": "Dateien zum Importieren ablegen"
+        "title": "Dateien zum Importieren ablegen",
+        "hint": "Lege ein Dokument oder eine E-Mail irgendwo in diesem Fenster ab — Desk legt sie als Markdown ab."
       },
       "convertDialog": {
         "title": "Office-Dateien importieren",
@@ -306,6 +315,8 @@
         "sortName": "Name A–Z",
         "activeTasks_one": "{{count}} aktiv",
         "activeTasks_other": "{{count}} aktiv",
+        "nextDue": "Nächste Fälligkeit {{date}}",
+        "openProject": "Projekt öffnen",
         "workspaceOverview": {
           "title": "Arbeitsbereichsüberblick",
           "placeholder": "Beschreibe Zweck, Hintergrund und was man zuerst wissen sollte."
@@ -383,7 +394,8 @@
         "options": {
           "en": "English",
           "de": "Deutsch",
-          "fr": "Français"
+          "fr": "Français",
+          "it": "Italiano"
         }
       },
       "compactSidebar": {

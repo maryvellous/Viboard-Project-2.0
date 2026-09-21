@@ -1,6 +1,6 @@
 import type { ProjectStatus, TaskPriority, TaskStatus } from "../types";
 import { FILE_NAMES, WORKSPACE_LEVEL_PROJECT_ID } from "./constants";
-import { getDeskPath, joinPath } from "./env";
+import { getDeskPath, joinPath, baseName } from "./env";
 import {
   decodeDocFrontmatter,
   decodeMeetingFrontmatter,
@@ -329,7 +329,7 @@ async function toEditorSnapshot(
   ref: EditorDocumentRef,
   record: MarkdownRecordSnapshot<Record<string, unknown>>,
 ): Promise<EditorDocumentSnapshot> {
-  const filename = record.filePath.split("/").pop() ?? "";
+  const filename = baseName(record.filePath);
   const common = {
     filePath: record.filePath,
     revision: record.revision,

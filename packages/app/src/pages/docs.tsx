@@ -67,15 +67,22 @@ export default function DocsPage() {
   // Main pane: shown only when the Desk tab is active. Opening a doc switches to a doc tab,
   // and `TabContent` then renders the editor here instead.
   return (
-    <div className="flex flex-col h-full">
-      <StatePanel
-        variant="empty"
-        display="inline"
-        icon={FileText}
-        title={t("pages.docs.selectDocTitle")}
-        description={t("pages.docs.selectDocDescription")}
-        className="h-full"
-      />
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="diaspro-accent-strip diaspro-accent-strip--sand" aria-hidden="true" />
+      <div className="relative flex-1 min-h-0">
+        <StatePanel
+          variant="empty"
+          display="inline"
+          icon={FileText}
+          title={t("pages.docs.selectDocTitle")}
+          description={t("pages.docs.selectDocDescription")}
+          className="h-full"
+        />
+        {/* Docs read as paper: one small cream note, not a cream page. */}
+        <p className="diaspro-paper absolute bottom-5 left-1/2 max-w-sm -translate-x-1/2 px-3.5 py-2 text-center text-[11px] leading-relaxed shadow-[0_10px_22px_rgba(12,6,24,.28)]">
+          {t("pages.docs.dropZone.hint")}
+        </p>
+      </div>
     </div>
   );
 }

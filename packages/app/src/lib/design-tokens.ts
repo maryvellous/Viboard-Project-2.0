@@ -34,7 +34,7 @@ export const priorityMeta: Record<
   high: {
     get label() { return i18next.t("entities.task.priority.high"); },
     icon: SignalHigh,
-    color: "text-rose-500 dark:text-rose-400",
+    color: "text-[#8f5a5a] dark:text-[#cf9494]",
   },
   medium: {
     get label() { return i18next.t("entities.task.priority.medium"); },
@@ -44,7 +44,7 @@ export const priorityMeta: Record<
   low: {
     get label() { return i18next.t("entities.task.priority.low"); },
     icon: SignalLow,
-    color: "text-emerald-500 dark:text-emerald-400",
+    color: "text-[#98a78a] dark:text-[#b4c2a4]",
   },
 };
 
@@ -57,12 +57,17 @@ export const priorityOrder: Priority[] = ["high", "medium", "low"];
 
 export type ProjectStatus = "active" | "paused" | "completed" | "archived";
 
-/** Solid dot colors for project status — `statusColors` are badge bundles, not plain dots. */
+/**
+ * Solid dot colors for project status — `statusColors` are badge bundles, not plain dots.
+ *
+ * Diaspro palette only: sage = healthy/active, sand = on hold, blue = wound up,
+ * lavender = put away. No traffic-light hues outside the brand set.
+ */
 export const projectStatusDotColors: Record<ProjectStatus, string> = {
-  active: "bg-emerald-500",
-  paused: "bg-amber-500",
-  completed: "bg-blue-500",
-  archived: "bg-slate-400",
+  active: "bg-[#98a78a]",
+  paused: "bg-[#e8d19e]",
+  completed: "bg-[#a5c4dc]",
+  archived: "bg-[#9d85c6]",
 };
 
 /** Ordered list of project statuses — the one source for status pickers and filters. */
@@ -97,12 +102,19 @@ export const workspaceColorOptions: readonly { value: string; readonly label: st
 // Used for kanban column headers and status indicators
 // =============================================================================
 
+/**
+ * Kanban column headers and status indicators.
+ *
+ * Diaspro palette: lavender = parked, warm-sand = queued, blue = in flight,
+ * terracotta = blocked/waiting, sage = landed. Deliberate chromatic breaks in a
+ * board that would otherwise be five identical violet columns.
+ */
 export const taskStatusColors = {
-  backlog: "bg-slate-500",
-  todo: "bg-muted-foreground",
-  doing: "bg-blue-500",
-  waiting: "bg-amber-500/80",
-  done: "bg-emerald-500",
+  backlog: "bg-[#9d85c6]",
+  todo: "bg-[#bc957d]",
+  doing: "bg-[#a5c4dc]",
+  waiting: "bg-[#8f5a5a]",
+  done: "bg-[#98a78a]",
 } as const;
 
 export type TaskStatus = keyof typeof taskStatusColors;
@@ -113,21 +125,20 @@ export type TaskStatus = keyof typeof taskStatusColors;
 // =============================================================================
 
 export const taskStatusTextColors = {
-  backlog: "text-slate-600 dark:text-slate-400",
-  todo: "text-muted-foreground",
-  doing: "text-blue-600 dark:text-blue-400",
-  waiting: "text-amber-600 dark:text-amber-500",
-  done: "text-emerald-600 dark:text-emerald-400",
+  backlog: "text-[#9d85c6]",
+  todo: "text-[#bc957d]",
+  doing: "text-[#a5c4dc]",
+  waiting: "text-[#8f5a5a] dark:text-[#cf9494]",
+  done: "text-[#98a78a] dark:text-[#b4c2a4]",
 } as const;
 
 /**
- * How a due date reads at a glance. Amber is the same hue `waiting` uses ("needs
- * attention, not yet a problem"), reused deliberately to keep the palette closed —
- * but a separate constant, because the meaning is different.
+ * How a due date reads at a glance. Terracotta is the same hue `waiting` uses
+ * ("needs attention, not yet a problem"), sand marks today — both in-palette.
  */
 export const dueAccent = {
-  overdue: "text-destructive",
-  today: "text-amber-600 dark:text-amber-500",
+  overdue: "text-[#8f5a5a] dark:text-[#cf9494] font-semibold",
+  today: "text-[#e8d19e] font-semibold",
   upcoming: "text-muted-foreground/60",
 } as const;
 

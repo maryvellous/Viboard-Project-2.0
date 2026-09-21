@@ -166,7 +166,8 @@ export function DayColumn({
       ref={columnRef}
       className={cn(
         "relative border-r border-border/40 last:border-r-0 min-w-0",
-        today && "bg-primary/[0.03]"
+        // Today reads blue — the Diaspro hue for time-bound things.
+        today && "bg-[#a5c4dc]/[0.07]"
       )}
       style={{ height: totalHeight }}
       data-day={date}
@@ -240,7 +241,7 @@ export function DayColumn({
         <Popover open={pickerOpen} onOpenChange={handlePickerOpenChange}>
           <PopoverAnchor asChild>
             <div
-              className="absolute left-1 right-1 z-20 rounded-lg border-2 border-dashed border-primary/50 bg-primary/10 px-2 py-1 pointer-events-none"
+              className="absolute left-1 right-1 z-20 rounded-lg border-2 border-dashed border-[#e8d19e]/60 bg-[#e8d19e]/10 px-2 py-1 pointer-events-none"
               style={{
                 top: minuteToPixel(draft.startMinute, gridStartMinute, slotHeight),
                 height: ((draft.endMinute - draft.startMinute) / 30) * slotHeight,

@@ -8,6 +8,7 @@
  * changed AND a key + the auto-summarize toggle + the host consent gate allow it.
  */
 import { getStorage } from "../storage";
+import { baseName } from "../env";
 import {
   parseMarkdown,
   filenameToId,
@@ -52,7 +53,7 @@ export async function updateIndexForFile(
 
     const content = await getStorage().readTextFile(filePath);
     const { data: frontmatter } = parseMarkdown<Record<string, unknown>>(content);
-    const filename = filePath.split("/").pop() ?? "";
+    const filename = baseName(filePath);
     const title =
       typeof frontmatter.title === "string" && frontmatter.title
         ? frontmatter.title
