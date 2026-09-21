@@ -1,4 +1,4 @@
-name: Prepare v0.10.0 Security Fix
+name: Release v0.10.0 Windows Preview
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  remediate:
-    runs-on: ubuntu-22.04
+  release-windows:
+    runs-on: windows-2022
 
     steps:
       - uses: actions/checkout@v4
@@ -23,45 +23,57 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Create security branch
-        run: git checkout -b security-v0.10.0
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/app/src-tauri
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Apply safe npm audit fixes
-        run: npm audit fix
-
-      - name: Audit runtime dependencies
-        run: npm audit --omit=dev --audit-level=high
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Type-check
-        run: npm run typecheck
-
-      - name: Unit tests
-        run: npm test
-
-      - name: Storage integration fixture
-        run: npm run verify:storage
-
-      - name: Build desktop webview
-        run: npm run build
-
-      - name: Build hosted web app
-        run: npm run build:hosted -w @desk/app
-
-      - name: Commit dependency remediation
+      - name: Verify v0.10.0 versions
         shell: bash
         run: |
-          if git diff --quiet -- package.json package-lock.json packages/*/package.json; then
-            echo "No dependency files changed."
-            exit 1
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json packages/*/package.json
-          git commit -m "fix: remediate runtime dependency advisories"
-          git push origin security-v0.10.0
+          node - <<'NODE'
+          const fs = require("fs");
+          const files = [
+            "packages/app/src-tauri/tauri.conf.json",
+            "packages/app/package.json",
+            "packages/core/package.json",
+            "packages/server/package.json",
+          ];
+          for (const file of files) {
+            const version = JSON.parse(fs.readFileSync(file, "utf8")).version;
+            if (version !== "0.10.0") {
+              throw new Error(`${file} has version ${version}, expected 0.10.0`);
+            }
+          }
+          NODE
+
+      - name: Disable updater artifacts for local preview
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = "packages/app/src-tauri/tauri.conf.json";
+          const config = JSON.parse(fs.readFileSync(path, "utf8"));
+          config.bundle.createUpdaterArtifacts = false;
+          fs.writeFileSync(path, JSON.stringify(config, null, 2) + "\n");
+          NODE
+
+      - name: Build and publish Windows preview
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: packages/app
+          tagName: v0.10.0
+          releaseName: "Diaspro Viboard v0.10.0 Preview"
+          releaseBody: |
+            Preview Windows installabile di Diaspro Viboard per test locale.
+            Auto-updater disabilitato in questa build di prova.
+          releaseDraft: false
+          prerelease: true
