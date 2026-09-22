@@ -1,0 +1,39 @@
+name: Generate v1 Cargo lock
+
+on:
+  push:
+    branches:
+      - v1-cargo-lock-fast
+    paths:
+      - ".github/workflows/generate-v1-cargo-lock.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v1-cargo-lock-fast
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate lockfile
+        working-directory: packages/app/src-tauri
+        run: cargo generate-lockfile
+
+      - name: Commit lockfile
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/app/src-tauri/Cargo.lock
+          if git diff --cached --quiet; then
+            echo "Cargo.lock already current."
+            exit 0
+          fi
+          git commit -m "release: regenerate Cargo lock for 1.0.0"
+          git push origin HEAD:v1-cargo-lock-fast
