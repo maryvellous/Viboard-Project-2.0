@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 220" width="900" height="220">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1333"/>
+      <stop offset="55%" stop-color="#2b1c47"/>
+      <stop offset="100%" stop-color="#6B5887"/>
+    </linearGradient>
+
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E8D19E"/>
+      <stop offset="50%" stop-color="#9D85C6"/>
+      <stop offset="100%" stop-color="#A5C4DC"/>
+    </linearGradient>
+
+    <clipPath id="clip">
+      <rect width="900" height="220" rx="18"/>
+    </clipPath>
+
+    <filter id="bblur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+
+    <filter id="textglow" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <style>
+      @keyframes lavalamp {
+        0%   { transform: translateY(0px) scale(1); opacity: 0; }
+        8%   { opacity: 1; }
+        30%  { transform: translateY(-58px) scale(1.15); }
+        55%  { transform: translateY(-120px) scale(0.9); }
+        75%  { transform: translateY(-175px) scale(1.2); }
+        88%  { opacity: 0.6; }
+        100% { transform: translateY(-270px) scale(0.8); opacity: 0; }
+      }
+
+      .bubble { animation: lavalamp linear infinite; }
+      .b1 { animation-duration: 12s; animation-delay: 0s; }
+      .b2 { animation-duration: 15s; animation-delay: -3.5s; }
+      .b3 { animation-duration: 18s; animation-delay: -7s; }
+      .b4 { animation-duration: 11s; animation-delay: -1.5s; }
+      .b5 { animation-duration: 14s; animation-delay: -9s; }
+      .b6 { animation-duration: 16s; animation-delay: -5s; }
+      .b7 { animation-duration: 13s; animation-delay: -2s; }
+      .b8 { animation-duration: 17s; animation-delay: -6s; }
+    </style>
+  </defs>
+
+  <rect width="900" height="220" fill="url(#bgGrad)" rx="18"/>
+
+  <g clip-path="url(#clip)" filter="url(#bblur)">
+    <ellipse class="bubble b1" cx="108" cy="268" rx="45" ry="42" fill="rgba(122,63,103,0.55)"/>
+    <ellipse class="bubble b2" cx="495" cy="250" rx="30" ry="27" fill="rgba(157,133,198,0.45)"/>
+    <ellipse class="bubble b3" cx="270" cy="275" rx="55" ry="50" fill="rgba(107,88,135,0.50)"/>
+    <ellipse class="bubble b4" cx="630" cy="245" rx="25" ry="22" fill="rgba(165,196,220,0.35)"/>
+    <ellipse class="bubble b5" cx="405" cy="257" rx="37" ry="34" fill="rgba(152,167,138,0.40)"/>
+    <ellipse class="bubble b6" cx="180" cy="240" rx="22" ry="20" fill="rgba(143,90,90,0.40)"/>
+    <ellipse class="bubble b7" cx="760" cy="262" rx="38" ry="35" fill="rgba(122,63,103,0.38)"/>
+    <ellipse class="bubble b8" cx="845" cy="252" rx="28" ry="26" fill="rgba(157,133,198,0.32)"/>
+  </g>
+
+  <rect x="0" y="0" width="900" height="1" rx="1" fill="rgba(255,255,255,0.12)"/>
+  <rect x="0" y="218" width="900" height="2" rx="1" fill="rgba(157,133,198,0.45)"/>
+
+  <text
+    x="450" y="91"
+    text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-size="56"
+    font-weight="900"
+    letter-spacing="-1.5"
+    fill="url(#textGrad)"
+    filter="url(#textglow)">Diaspro Viboard</text>
+
+  <text
+    x="450" y="124"
+    text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-size="12.5"
+    font-weight="600"
+    letter-spacing="3.4"
+    fill="rgba(232,209,158,0.68)">LOCAL-FIRST DESKTOP WORKSPACE</text>
+
+  <rect x="207" y="149" width="72" height="23" rx="11.5"
+        fill="rgba(232,209,158,0.10)" stroke="rgba(232,209,158,0.38)" stroke-width="1"/>
+  <text x="243" y="164.5" text-anchor="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="10.5" font-weight="700"
+        fill="#E8D19E">Tauri</text>
+
+  <rect x="289" y="149" width="68" height="23" rx="11.5"
+        fill="rgba(97,218,251,0.12)" stroke="rgba(97,218,251,0.38)" stroke-width="1"/>
+  <text x="323" y="164.5" text-anchor="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="10.5" font-weight="700"
+        fill="#7EDCF5">React</text>
+
+  <rect x="367" y="149" width="90" height="23" rx="11.5"
+        fill="rgba(165,196,220,0.12)" stroke="rgba(165,196,220,0.40)" stroke-width="1"/>
+  <text x="412" y="164.5" text-anchor="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="10.5" font-weight="700"
+        fill="#A5C4DC">TypeScript</text>
+
+  <rect x="467" y="149" width="86" height="23" rx="11.5"
+        fill="rgba(152,167,138,0.14)" stroke="rgba(152,167,138,0.42)" stroke-width="1"/>
+  <text x="510" y="164.5" text-anchor="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="10.5" font-weight="700"
+        fill="#B2C2A3">Markdown</text>
+
+  <rect x="563" y="149" width="130" height="23" rx="11.5"
+        fill="rgba(157,133,198,0.14)" stroke="rgba(157,133,198,0.42)" stroke-width="1"/>
+  <text x="628" y="164.5" text-anchor="middle"
+        font-family="system-ui,-apple-system,sans-serif" font-size="10.5" font-weight="700"
+        fill="#B8A4D8">GPL-3.0-or-later</text>
+
+  <text
+    x="450" y="198"
+    text-anchor="middle"
+    font-family="'Courier New',Courier,monospace"
+    font-size="10"
+    font-weight="400"
+    letter-spacing="1.45"
+    fill="rgba(157,133,198,0.52)">WINDOWS · OPEN SOURCE · YOUR FILES STAY LOCAL</text>
+</svg>
