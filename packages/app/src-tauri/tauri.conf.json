@@ -1,7 +1,7 @@
 {
   "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Diaspro Viboard",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "identifier": "it.diaspro.viboard",
   "plugins": {
     "updater": {
@@ -51,8 +51,15 @@
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
+      "icons/icon.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
-  }
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico"
+      }
+    }
+  },
+  "mainBinaryName": "Diaspro Viboard"
 }

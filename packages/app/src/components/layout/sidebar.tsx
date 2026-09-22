@@ -94,8 +94,26 @@ export function Sidebar({ width, isCollapsed, isDragging }: SidebarProps) {
     >
       <div className="diaspro-lava" aria-hidden="true"><span className="diaspro-lava__bubble" /><span className="diaspro-lava__bubble" /><span className="diaspro-lava__bubble" /></div>
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-      {!collapsed && <div className="px-5 pt-5 pb-2 flex items-center gap-3"><DiasproLogo size={34} className="shrink-0" /><div className="min-w-0"><p className="font-[Outfit] text-xl font-black tracking-tight leading-none text-[#e8d19e]">Diaspro <span className="text-white">Viboard</span></p><p className="mt-1 font-mono text-[9px] uppercase tracking-[.2em] text-[#e8d19e]/70">{t("nav.sidebar.brandTagline")}</p></div></div>}
-      {collapsed && <div className="flex justify-center pt-5 pb-2"><DiasproLogo size={30} className="shrink-0" /></div>}
+      {!collapsed && (
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center gap-2.5 rounded-xl px-1 py-1">
+            <DiasproLogo size={36} className="shrink-0" />
+            <div className="min-w-0">
+              <p className="truncate text-[17px] font-semibold tracking-[-0.02em] leading-tight text-sidebar-foreground">
+                Viboard
+              </p>
+              <p className="mt-0.5 text-[11px] font-medium leading-none text-sidebar-foreground/55">
+                by Diaspro
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      {collapsed && (
+        <div className="flex justify-center pt-4 pb-3">
+          <DiasproLogo size={32} className="shrink-0" />
+        </div>
+      )}
       <ScrollArea className="flex-1 min-h-0">
         <nav className="px-2 py-2 space-y-1">
           <SidebarNavRow
