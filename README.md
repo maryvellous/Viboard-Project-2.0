@@ -22,7 +22,7 @@
 
 Progetti, attività e documenti vengono salvati nella cartella che scegli tu, in file locali e leggibili. Non serve un account e non esiste un server Diaspro che conserva i tuoi contenuti.
 
-La versione stabile attuale è **1.0.0**.
+La versione stabile attuale è **1.0.1**.
 
 ## Cosa puoi farci
 

@@ -24,7 +24,7 @@ export function useWindowClose(onCloseRequested?: (dirtyTabs: string[]) => void)
     onCloseRequestedRef.current = onCloseRequested;
   }, [onCloseRequested]);
 
-  // Confirm close - tells Rust to proceed with window close
+  // Confirm close - tells Rust the frontend has resolved unsaved changes
   const confirmClose = useCallback(async () => {
     if (!isTauri()) return;
     try {
@@ -57,7 +57,7 @@ export function useWindowClose(onCloseRequested?: (dirtyTabs: string[]) => void)
         ];
 
         if (dirtyLabels.length === 0) {
-          // No unsaved changes, proceed with close
+          // No unsaved changes, let the native layer hide/close as configured
           try {
             await invoke("confirm_close");
           } catch (error) {
