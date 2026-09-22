@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, FileText, Bug, Github } from "lucide-react";
 import { open as openShell } from "@tauri-apps/plugin-shell";
 import { useTranslation } from "react-i18next";
-import { UpdateSection } from "./update-section";
 import { isTauri } from "@desk/core";
 import { formatLocaleDate } from "@/lib/i18n/format";
 
@@ -80,8 +79,6 @@ export function AboutTab() {
           </SettingsField>
         </SettingsGroup>
       </SettingsSection>
-
-      <UpdateSection />
 
       <SettingsSection
         title={t("settings.about.links.title")}
