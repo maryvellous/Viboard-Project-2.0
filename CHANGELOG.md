@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+- chiudere la finestra mantiene Viboard attivo in background;
+- aggiunta icona nella system tray di Windows con comandi Apri ed Esci completamente;
+- avviare Viboard mentre è già in esecuzione riporta in primo piano l'istanza esistente;
+- riapertura più rapida perché l'app non deve rifare il bootstrap completo.
+
 ## 1.0.0
 
 Prima release stabile di Diaspro Viboard per Windows 10/11 x64.
