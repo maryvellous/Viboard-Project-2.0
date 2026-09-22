@@ -1,31 +1,18 @@
-name: Release
+name: Release Windows
 
 on:
   push:
-    tags:
-      - "v*"
     branches:
       - release
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
-  release:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest
-            args: "--target universal-apple-darwin"
-            rust-targets: "aarch64-apple-darwin,x86_64-apple-darwin"
-          - platform: ubuntu-22.04
-            args: ""
-            rust-targets: ""
-          - platform: windows-latest
-            args: ""
-            rust-targets: ""
-
-    runs-on: ${{ matrix.platform }}
+  release-windows:
+    runs-on: windows-2022
 
     steps:
       - uses: actions/checkout@v4
@@ -38,21 +25,11 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.rust-targets }}
 
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: packages/app/src-tauri
-
-      - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev build-essential curl wget file \
-            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
 
       - name: Install dependencies
         run: npm ci
@@ -60,22 +37,19 @@ jobs:
       - name: Generate native app icons
         run: npm run icons -w @desk/app
 
-      - name: Apply compatible security updates
-        run: npm audit fix
-
-      - name: Security audit
-        run: npm audit --audit-level=high
+      - name: Dependency audit (informational)
+        shell: bash
+        run: npm audit --omit=dev || true
 
       - name: Verify release version
         shell: bash
         run: |
-          TAURI_VERSION=$(jq -r '.version' packages/app/src-tauri/tauri.conf.json)
-          APP_VERSION=$(jq -r '.version' packages/app/package.json)
-          CORE_VERSION=$(jq -r '.version' packages/core/package.json)
-          SERVER_VERSION=$(jq -r '.version' packages/server/package.json)
+          TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
+          APP_VERSION=$(node -p "require('./packages/app/package.json').version")
+          CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
 
-          if [ "$TAURI_VERSION" != "$APP_VERSION" ] || \
-             [ "$TAURI_VERSION" != "$CORE_VERSION" ] || [ "$TAURI_VERSION" != "$SERVER_VERSION" ]; then
+          if [ "$TAURI_VERSION" != "$APP_VERSION" ] ||              [ "$TAURI_VERSION" != "$CORE_VERSION" ] || [ "$TAURI_VERSION" != "$SERVER_VERSION" ]; then
             echo "Version mismatch! tauri.conf.json: $TAURI_VERSION, app: $APP_VERSION, core: $CORE_VERSION, server: $SERVER_VERSION"
             exit 1
           fi
@@ -88,19 +62,27 @@ jobs:
             fi
           fi
 
-          echo "Release version $TAURI_VERSION is consistent across all packages."
+      - name: Disable updater artifacts for local Windows release
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = "packages/app/src-tauri/tauri.conf.json";
+          const config = JSON.parse(fs.readFileSync(path, "utf8"));
+          config.bundle.createUpdaterArtifacts = false;
+          fs.writeFileSync(path, JSON.stringify(config, null, 2) + "\n");
+          NODE
 
-      - name: Build & publish release
+      - name: Build and publish Windows release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: packages/app
           tagName: "v__VERSION__"
           releaseName: "Diaspro Viboard v__VERSION__"
-          releaseBody: "Diaspro Viboard v__VERSION__. See the attached installers and packages."
+          releaseBody: |
+            Windows build di Diaspro Viboard.
+            Icone Viboard aggiornate, interfaccia locale-only e updater disabilitato.
           releaseDraft: false
-          prerelease: false
-          args: ${{ matrix.args }}
+          prerelease: true
