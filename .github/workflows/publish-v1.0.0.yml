@@ -1,0 +1,82 @@
+name: Publish Diaspro Viboard 1.0.0
+
+on:
+  push:
+    branches:
+      - publish-v1.0.0
+    paths:
+      - ".github/workflows/publish-v1.0.0.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-windows:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: publish-v1.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/app/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native app icons
+        run: npm run icons -w @desk/app
+
+      - name: Verify 1.0.0 version sources
+        shell: bash
+        run: |
+          EXPECTED=1.0.0
+          ROOT_VERSION=$(node -p "require('./package.json').version")
+          TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
+          APP_VERSION=$(node -p "require('./packages/app/package.json').version")
+          CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
+          CARGO_VERSION=$(node -e "const fs=require('fs'); const m=fs.readFileSync('packages/app/src-tauri/Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(2); process.stdout.write(m[1]);")
+
+          for VERSION in "$ROOT_VERSION" "$TAURI_VERSION" "$APP_VERSION" "$CORE_VERSION" "$SERVER_VERSION" "$CARGO_VERSION"; do
+            if [ "$VERSION" != "$EXPECTED" ]; then
+              echo "Expected 1.0.0 but found $VERSION"
+              exit 1
+            fi
+          done
+
+      - name: Build and publish stable Windows release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: packages/app
+          tagName: "v__VERSION__"
+          releaseName: "Diaspro Viboard v__VERSION__"
+          releaseBody: |
+            Prima release stabile di Diaspro Viboard per Windows 10/11 x64.
+
+            Funzioni principali:
+            - progetti, attività, pianificazione e documenti Markdown locali
+            - interfaccia Diaspro / Viboard
+            - supporto opzionale Anthropic, OpenAI e DeepSeek
+            - nessun server Diaspro richiesto
+            - dati salvati nella cartella scelta dall'utente
+
+            Linux resta sperimentale e non è incluso in questa release.
+
+            Nota: la build Windows può non essere firmata digitalmente e SmartScreen può mostrare un avviso.
+          releaseDraft: false
+          prerelease: false
