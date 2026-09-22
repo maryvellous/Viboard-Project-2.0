@@ -2,8 +2,6 @@ name: Release Windows
 
 on:
   push:
-    branches:
-      - release
     tags:
       - "v*"
 
@@ -37,41 +35,24 @@ jobs:
       - name: Generate native app icons
         run: npm run icons -w @desk/app
 
-      - name: Dependency audit (informational)
+      - name: Dependency audit
         shell: bash
         run: npm audit --omit=dev || true
 
-      - name: Verify release version
+      - name: Verify release version matches tag
         shell: bash
         run: |
+          TAG=${GITHUB_REF#refs/tags/v}
           TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
           APP_VERSION=$(node -p "require('./packages/app/package.json').version")
           CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
           SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
 
-          if [ "$TAURI_VERSION" != "$APP_VERSION" ] ||              [ "$TAURI_VERSION" != "$CORE_VERSION" ] || [ "$TAURI_VERSION" != "$SERVER_VERSION" ]; then
-            echo "Version mismatch! tauri.conf.json: $TAURI_VERSION, app: $APP_VERSION, core: $CORE_VERSION, server: $SERVER_VERSION"
+          if [ "$TAG" != "$TAURI_VERSION" ] || [ "$TAG" != "$APP_VERSION" ] || \
+             [ "$TAG" != "$CORE_VERSION" ] || [ "$TAG" != "$SERVER_VERSION" ]; then
+            echo "Version mismatch! tag=$TAG tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION"
             exit 1
           fi
-
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            TAG=${GITHUB_REF#refs/tags/v}
-            if [ "$TAG" != "$TAURI_VERSION" ]; then
-              echo "Tag v$TAG does not match app version $TAURI_VERSION"
-              exit 1
-            fi
-          fi
-
-      - name: Disable updater artifacts for local Windows release
-        shell: bash
-        run: |
-          node - <<'NODE'
-          const fs = require("fs");
-          const path = "packages/app/src-tauri/tauri.conf.json";
-          const config = JSON.parse(fs.readFileSync(path, "utf8"));
-          config.bundle.createUpdaterArtifacts = false;
-          fs.writeFileSync(path, JSON.stringify(config, null, 2) + "\n");
-          NODE
 
       - name: Build and publish Windows release
         uses: tauri-apps/tauri-action@v0
@@ -79,10 +60,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: packages/app
-          tagName: "v__VERSION__"
-          releaseName: "Diaspro Viboard v__VERSION__"
+          tagName: ${{ github.ref_name }}
+          releaseName: "Diaspro Viboard ${{ github.ref_name }}"
           releaseBody: |
-            Windows build di Diaspro Viboard.
-            Icone Viboard aggiornate, interfaccia locale-only e updater disabilitato.
+            Diaspro Viboard for Windows x64.
+
+            See README.md and RELEASE_CHECKLIST.md for supported platforms and release notes.
           releaseDraft: false
-          prerelease: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
