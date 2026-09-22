@@ -1,6 +1,6 @@
 {
   "name": "@desk/app",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "icons": "tauri icon src/assets/brand/viboard-logo.svg",
+    "icons": "tauri icon public/favicon.svg",
     "pretauri:dev": "npm run icons",
     "pretauri:build": "npm run icons"
   },
