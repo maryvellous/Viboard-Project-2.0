@@ -1,18 +1,22 @@
 ---
 name: Feature request
-about: Suggest an idea for Desk
+about: Proponi un miglioramento per Diaspro Viboard
 title: ""
 labels: enhancement
 ---
 
-**What problem does this solve?**
-A clear description of the problem or limitation you're running into.
+## Problema o esigenza
 
-**Describe the solution you'd like**
-What you'd like to happen.
+Che cosa vorresti poter fare meglio o più velocemente?
 
-**Alternatives considered**
-Any alternative solutions or workarounds you've thought about.
+## Proposta
 
-**Additional context**
-Anything else, e.g. mockups or examples from other apps.
+Descrivi il comportamento o la funzione che vorresti aggiungere.
+
+## Alternative considerate
+
+Hai già provato altri flussi o workaround?
+
+## Contesto
+
+Se utile, aggiungi screenshot, mockup o esempi.
