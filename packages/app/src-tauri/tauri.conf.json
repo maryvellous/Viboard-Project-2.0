@@ -1,7 +1,7 @@
 {
   "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Diaspro Viboard",
-  "version": "0.10.2",
+  "version": "1.0.0",
   "identifier": "it.diaspro.viboard",
   "plugins": {},
   "build": {

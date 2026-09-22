@@ -61,7 +61,7 @@ describe("MCP v2 contract", () => {
     const { client, server } = await connect();
     try {
       expect(client.getInstructions()).toContain("incomplete or out of date");
-      expect(client.getServerVersion()?.version).toMatch(/^0\.\d+\.\d+$/);
+      expect(client.getServerVersion()?.version).toMatch(/^\d+\.\d+\.\d+$/);
       const tools = await client.listTools();
       expect(tools.tools.map((tool) => tool.name)).toEqual([
         "desk_context",

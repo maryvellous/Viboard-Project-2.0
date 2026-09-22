@@ -6,7 +6,7 @@ Diaspro Viboard è un'app desktop local-first per organizzare progetti, attivit�
 
 ## Stato
 
-Diaspro Viboard è attualmente in fase preview.
+Diaspro Viboard è disponibile in versione stabile per Windows.
 
 ### Supporto ufficiale
 
@@ -42,7 +42,7 @@ Le funzioni AI sono opzionali. Quando vengono usate, Diaspro Viboard invia al pr
 
 Scarica l'ultima build dalla pagina **Releases** del repository e avvia l'installer x64.
 
-Le build preview possono non essere firmate digitalmente; Windows SmartScreen può quindi mostrare un avviso.
+Le build possono non essere firmate digitalmente; Windows SmartScreen può quindi mostrare un avviso.
 
 ## Sviluppo
 
