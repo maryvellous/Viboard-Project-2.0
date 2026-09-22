@@ -43,14 +43,17 @@ jobs:
         shell: bash
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
+          ROOT_VERSION=$(node -p "require('./package.json').version")
           TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
           APP_VERSION=$(node -p "require('./packages/app/package.json').version")
           CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
           SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
+          CARGO_VERSION=$(node -e "const fs=require('fs'); const m=fs.readFileSync('packages/app/src-tauri/Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(2); process.stdout.write(m[1]);")
 
-          if [ "$TAG" != "$TAURI_VERSION" ] || [ "$TAG" != "$APP_VERSION" ] || \
-             [ "$TAG" != "$CORE_VERSION" ] || [ "$TAG" != "$SERVER_VERSION" ]; then
-            echo "Version mismatch! tag=$TAG tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION"
+          if [ "$TAG" != "$ROOT_VERSION" ] || [ "$TAG" != "$TAURI_VERSION" ] || \
+             [ "$TAG" != "$APP_VERSION" ] || [ "$TAG" != "$CORE_VERSION" ] || \
+             [ "$TAG" != "$SERVER_VERSION" ] || [ "$TAG" != "$CARGO_VERSION" ]; then
+            echo "Version mismatch! tag=$TAG root=$ROOT_VERSION tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION cargo=$CARGO_VERSION"
             exit 1
           fi
 
