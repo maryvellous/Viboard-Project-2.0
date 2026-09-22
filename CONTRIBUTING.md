@@ -1,84 +1,70 @@
-# Contributing to Desk
+# Contributing to Diaspro Viboard
 
-Thanks for your interest in contributing to Desk — a local-first work
-management app where everything is stored as plain Markdown files you own.
+Grazie per l'interesse nel progetto.
 
-## Ways to contribute
+Diaspro Viboard è un'app local-first basata su file Markdown e sviluppata principalmente per Windows.
 
-- **Report bugs** — open an [issue](../../issues/new/choose) with steps to reproduce.
-- **Suggest features** — open an issue describing the problem you want solved.
-- **Submit code** — fix a bug or build a feature via a pull request.
-- **Improve docs** — corrections and clarifications are always welcome.
+## Come contribuire
 
-## Development setup
+Puoi:
 
-### Prerequisites
+- segnalare bug;
+- proporre miglioramenti;
+- inviare pull request;
+- migliorare documentazione e traduzioni.
 
-- **Node.js 22 LTS.** Newer versions (24+) currently break Rollup's optional
-  native dependency — please use Node 22.
-- **Rust** (stable) and the [Tauri prerequisites](https://tauri.app/start/prerequisites/)
-  for your OS — only needed to run/build the desktop app.
+## Ambiente di sviluppo
 
-### Getting started
+### Requisiti
+
+- Node.js 22
+- Rust stable
+- prerequisiti Tauri per il tuo sistema operativo
+
+### Setup
 
 ```bash
-npm install
-
-npm run dev          # Browser with fixture data (port 3001) — fastest loop, no Rust needed
-npm run tauri:dev    # Desktop app with real file system access
+npm ci
+npm run dev
 ```
 
-Browser mode (`npm run dev`) runs against deterministic fixture data and is enough for most
-UI work. Use `npm run tauri:dev` when you need real file system behavior.
-
-## Before opening a pull request
-
-Run these checks and make sure they pass:
+Per usare filesystem e shell reali:
 
 ```bash
-npm run typecheck    # core, app, server, tests, and scripts
-npm run lint         # ESLint
-npm test             # unit and regression tests
+npm run tauri:dev
+```
+
+## Prima di aprire una pull request
+
+Esegui:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
 npm run verify:storage
-npm run build        # desktop webview production build
-npm run build:hosted -w @desk/app
+npm run build
 ```
 
-CI runs all five checks and both production builds on every pull request. Rust
-CI also runs on macOS, Linux, and Windows when Tauri source changes.
+Le pull request eseguono automaticamente i controlli frontend. Le modifiche Tauri/Rust vengono controllate anche tramite GitHub Actions.
 
-If your change affects the UI shown in the README, regenerate its screenshots:
+## Piattaforme
 
-```bash
-npm run screenshots  # rebuilds the banner + screenshots in assets/
-```
+Windows 10/11 x64 è la piattaforma ufficialmente supportata.
 
-This runs the app in browser fixture mode and captures each page in light and dark
-(needs the Playwright browser once: `npx playwright install chromium`).
+Le modifiche Linux sono benvenute, ma Linux è ancora considerato sperimentale finché non viene introdotto un processo di release e test manuale dedicato.
 
-## Pull request guidelines
+## Convenzioni
 
-- Branch off `main` and open your PR against `main`.
-- Keep PRs focused — one logical change per PR is much easier to review.
-- Use [Conventional Commits](https://www.conventionalcommits.org/) for commit
-  messages, matching the existing history, e.g.:
-  - `feat(meetings): add recurring meeting support`
-  - `fix(watcher): normalize paths on Windows`
-  - `refactor(storage): simplify path classification`
-  - `chore(deps): bump tauri to 2.10`
-- Update documentation when you change behavior.
+- crea un branch da `main`;
+- mantieni ogni PR focalizzata su un cambiamento coerente;
+- aggiorna documentazione e test quando cambi il comportamento;
+- evita di rinominare in massa i namespace `@desk/*` senza una migrazione dedicata.
 
-## Project layout
+## Upstream
 
-[CLAUDE.md](CLAUDE.md) contains a detailed overview of the project structure,
-conventions, and key directories.
+Diaspro Viboard deriva da [desk.md](https://github.com/v1lling/desk.md). Le modifiche di questo fork restano distribuite secondo la stessa licenza GPL.
 
-## Code of Conduct
+## Licenza
 
-This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By
-participating, you agree to uphold it.
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the
-same license as this project (see [LICENSE](LICENSE)).
+Contribuendo accetti che il tuo contributo venga distribuito sotto **GPL-3.0-or-later**.
