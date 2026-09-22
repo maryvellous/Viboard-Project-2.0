@@ -1,10 +1,14 @@
 use fs2::FileExt;
 use std::process::Command;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::{fs, io::Write, path::Path};
 #[cfg(target_os = "macos")]
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
+#[cfg(target_os = "windows")]
+use tauri::{
+    menu::{MenuBuilder, MenuItemBuilder},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+};
 use tauri::{Emitter, Manager, WindowEvent};
 use tauri_plugin_fs::FsExt;
 
@@ -14,15 +18,20 @@ pub mod data_root;
 mod drop_view;
 mod secrets;
 
-// Flag to track if close has been confirmed by frontend
-static CLOSE_CONFIRMED: AtomicBool = AtomicBool::new(false);
+fn show_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
 
-/// Confirm that the window can be closed (called by frontend after save/discard)
+/// Confirm the close request after the frontend has flushed/discarded changes.
+/// On desktop we keep Viboard alive and hide the window so reopening is instant.
 #[tauri::command]
 fn confirm_close(window: tauri::Window) {
-    CLOSE_CONFIRMED.store(true, Ordering::SeqCst);
-    window.close().unwrap_or_else(|e| {
-        log::error!("Failed to close window: {}", e);
+    window.hide().unwrap_or_else(|e| {
+        log::error!("Failed to hide window: {}", e);
     });
 }
 
@@ -439,6 +448,9 @@ fn sync_parent_directory(parent: &Path) {
 pub fn run() {
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_main_window(app);
+        }))
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
@@ -474,6 +486,42 @@ pub fn run() {
                         .level(log::LevelFilter::Info)
                         .build(),
                 )?;
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                let show_item = MenuItemBuilder::with_id("tray-show", "Apri Viboard").build(app)?;
+                let quit_item =
+                    MenuItemBuilder::with_id("tray-quit", "Esci completamente").build(app)?;
+                let tray_menu = MenuBuilder::new(app)
+                    .items(&[&show_item, &quit_item])
+                    .build()?;
+
+                TrayIconBuilder::new()
+                    .icon(
+                        app.default_window_icon()
+                            .expect("Diaspro Viboard must have a default app icon")
+                            .clone(),
+                    )
+                    .tooltip("Diaspro Viboard")
+                    .menu(&tray_menu)
+                    .show_menu_on_left_click(false)
+                    .on_menu_event(|app, event| match event.id().as_ref() {
+                        "tray-show" => show_main_window(app),
+                        "tray-quit" => app.exit(0),
+                        _ => {}
+                    })
+                    .on_tray_icon_event(|tray, event| {
+                        if let TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        } = event
+                        {
+                            show_main_window(tray.app_handle());
+                        }
+                    })
+                    .build(app)?;
             }
 
             #[cfg(target_os = "macos")]
@@ -562,16 +610,11 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
-                // If close was confirmed by frontend, allow it
-                if CLOSE_CONFIRMED.load(Ordering::SeqCst) {
-                    CLOSE_CONFIRMED.store(false, Ordering::SeqCst);
-                    return;
-                }
-
-                // Prevent default close behavior
+                // Keep the process warm in the background. The frontend first
+                // flushes editors / resolves unsaved changes, then confirm_close
+                // hides this window instead of terminating the process.
                 api.prevent_close();
 
-                // Emit event to frontend to check for unsaved changes
                 window
                     .emit("window-close-requested", ())
                     .unwrap_or_else(|e| {
