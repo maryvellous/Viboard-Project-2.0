@@ -103,7 +103,7 @@ export function AboutTab() {
           <LinkRow
             icon={<Bug className="h-3.5 w-3.5" />}
             label={t("settings.about.links.reportIssue")}
-            href={`${REPO_URL}/issues/new`}
+            href={`${REPO_URL}/issues/new/choose`}
           />
         </SettingsGroup>
       </SettingsSection>
