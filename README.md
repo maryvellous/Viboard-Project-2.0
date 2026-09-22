@@ -1,82 +1,76 @@
 # Diaspro Viboard
 
-Seconda generazione di Viboard basata sul progetto open source **desk.md**, adattata all'identità e al flusso di lavoro Diaspro.
+Diaspro Viboard è un'app desktop local-first per organizzare progetti, attività e documenti in semplici file Markdown.
 
-La base resta local-first: spazi di lavoro, progetti, attività, documenti e riunioni sono salvati come normali file Markdown. Il progetto supporta sia l'app desktop locale sia la modalità self-hosted.
+È un fork evoluto di [desk.md](https://github.com/v1lling/desk.md), adattato al flusso di lavoro e all'identità visiva Diaspro.
 
-## Stato del progetto
+## Stato
 
-Il fork è in fase di trasformazione attiva da Desk a Diaspro Viboard.
+Diaspro Viboard è attualmente in fase preview.
 
-Sono già integrati nell'app:
+### Supporto ufficiale
 
-- identità visiva Diaspro, palette, tipografia, logo e navigazione;
-- dashboard con calendario, focus, raccolta rapida e quick-add;
-- viste progetti con card Diaspro e task in formato post-it;
-- planner settimanale;
-- attività, documenti e riunioni;
-- localizzazione italiana completa e risorse i18n;
-- shell desktop e metadati applicativi con branding Diaspro Viboard.
+- **Windows 10/11 x64** — supportato e distribuito tramite installer `.exe`.
+- **Linux** — il codice resta compatibile e viene controllato in CI, ma al momento non viene distribuito come build ufficiale.
+- **macOS** — non è un target di release ufficiale.
 
-La cartella `diaspro-ui/` resta il kit di riferimento per i pattern visivi e contiene card, lava, post-it, calendar strip e guida visuale.
+Le release disponibili sono pubblicate nella sezione **Releases** di GitHub.
 
-### Naming interno
+## Funzioni principali
 
-Per ridurre il rischio durante la migrazione, i namespace tecnici ereditati restano temporaneamente invariati:
+- spazi di lavoro locali;
+- progetti;
+- attività e pianificazione settimanale;
+- documenti Markdown;
+- dashboard e raccolta rapida;
+- ricerca e command palette;
+- modelli per attività e documenti;
+- supporto AI opzionale tramite API proprie di Anthropic, OpenAI e DeepSeek;
+- dati salvati nella cartella scelta dall'utente, senza server Diaspro.
 
-- `@desk/core`
-- `@desk/app`
-- `@desk/server`
-- `DeskService` e la cartella dominio `src/desk/`
+Diaspro Viboard non richiede un account e non usa un server remoto per conservare i tuoi progetti.
 
-Questi identificatori sono dettagli interni e non rappresentano il nome del prodotto. Il loro eventuale rename verrà affrontato come refactor separato dopo un checkpoint CI pulito.
+## Dati e privacy
 
-## Stack
+I dati principali restano sul computer dell'utente in file locali.
 
-- React 19
-- TypeScript
-- Vite
-- Tauri 2
-- Rust
-- Zustand
-- TanStack Query
-- Tiptap
-- Tailwind CSS
-- Vitest
-- Node 22
-- Hono per il server self-hosted
+Le funzioni AI sono opzionali. Quando vengono usate, Diaspro Viboard invia al provider selezionato soltanto i contenuti necessari alla funzione richiesta. Le chiavi API vengono salvate nel credential store del sistema operativo.
 
-## Struttura
+## Installazione
 
-```text
-Viboard-Project-2.0/
-├── packages/
-│   ├── core/            # Dominio condiviso
-│   ├── app/             # Applicazione React + Tauri
-│   └── server/          # Backend self-hosted e MCP
-├── diaspro-ui/          # Kit e riferimenti visuali Diaspro
-├── deploy/              # Configurazione self-hosting
-├── docs/
-├── tests/
-└── package.json
-```
+### Windows
 
-## Sviluppo locale
+Scarica l'ultima build dalla pagina **Releases** del repository e avvia l'installer x64.
 
-Richiede Node 22.
+Le build preview possono non essere firmate digitalmente; Windows SmartScreen può quindi mostrare un avviso.
+
+## Sviluppo
+
+### Requisiti
+
+- Node.js 22
+- Rust stable
+- prerequisiti Tauri per il sistema operativo
+
+Installa le dipendenze:
 
 ```bash
-npm install
+npm ci
+```
+
+Avvia il frontend in modalità sviluppo:
+
+```bash
 npm run dev
 ```
 
-Per eseguire l'app desktop con filesystem reale:
+Avvia l'app desktop:
 
 ```bash
 npm run tauri:dev
 ```
 
-Checkpoint completo:
+Controlli principali:
 
 ```bash
 npm run lint
@@ -84,21 +78,34 @@ npm run typecheck
 npm test
 npm run verify:storage
 npm run build
-npm run build:hosted -w @desk/app
 ```
 
-Le pull request eseguono questi controlli tramite GitHub Actions. Le modifiche a `packages/app/src-tauri/` attivano anche `cargo check` su macOS, Linux e Windows.
+## Struttura del repository
 
-## Release e aggiornamenti
+```text
+Viboard-Project-2.0/
+├── packages/
+│   ├── app/        # React + Tauri
+│   ├── core/       # dominio condiviso
+│   └── server/     # codice ereditato/compatibilità, non usato dall'app desktop locale
+├── diaspro-ui/     # riferimenti visuali Diaspro
+├── docs/
+├── tests/
+└── .github/
+```
 
-L'app desktop usa il repository `maryvellous/Viboard-Project-2.0` come sorgente per release e aggiornamenti. Prima della prima release pubblica va configurata la chiave di firma Tauri del progetto e verificata la relativa chiave pubblica in `tauri.conf.json`.
+Alcuni namespace tecnici ereditati da desk.md (`@desk/*`, `DeskService`, ecc.) sono ancora presenti internamente. Non fanno parte del branding pubblico.
 
-## Upstream
+## Contribuire
 
-Progetto originale: `v1lling/desk.md`.
+Bug report e pull request sono benvenuti. Vedi [CONTRIBUTING.md](CONTRIBUTING.md).
 
-La struttura tecnica di base, parte della cronologia e gli avvisi di licenza derivano dal progetto upstream.
+## Sicurezza
 
-## Licenza
+Per vulnerabilità di sicurezza, vedi [SECURITY.md](SECURITY.md). Non pubblicare vulnerabilità sensibili come issue pubbliche.
 
-GPL-3.0-or-later. Vedi `LICENSE`.
+## Upstream e licenza
+
+Progetto originale: [v1lling/desk.md](https://github.com/v1lling/desk.md).
+
+Diaspro Viboard mantiene la licenza **GPL-3.0-or-later** del progetto upstream. Vedi [LICENSE](LICENSE).
