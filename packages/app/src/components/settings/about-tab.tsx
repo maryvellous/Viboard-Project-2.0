@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, FileText, Bug, Github } from "lucide-react";
 import { open as openShell } from "@tauri-apps/plugin-shell";
 import { useTranslation } from "react-i18next";
-import { UpdateSection } from "./update-section";
 import { isTauri } from "@desk/core";
 import { formatLocaleDate } from "@/lib/i18n/format";
 
@@ -81,8 +80,6 @@ export function AboutTab() {
         </SettingsGroup>
       </SettingsSection>
 
-      <UpdateSection />
-
       <SettingsSection
         title={t("settings.about.links.title")}
         description={t("settings.about.links.description")}
@@ -106,7 +103,7 @@ export function AboutTab() {
           <LinkRow
             icon={<Bug className="h-3.5 w-3.5" />}
             label={t("settings.about.links.reportIssue")}
-            href={`${REPO_URL}/issues/new`}
+            href={`${REPO_URL}/issues/new/choose`}
           />
         </SettingsGroup>
       </SettingsSection>

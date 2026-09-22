@@ -1,48 +1,33 @@
 # Security Policy
 
-## Supported versions
+## Versioni supportate
 
-Desk is actively developed and only the **latest release** receives security
-fixes. Please make sure you are on the most recent version before reporting.
+Solo l'ultima release di Diaspro Viboard riceve correzioni di sicurezza.
 
-## Reporting a vulnerability
+## Segnalare una vulnerabilità
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+Non pubblicare vulnerabilità di sicurezza come issue pubbliche.
 
-Instead, report them privately one of these ways:
+Preferisci **GitHub Security Advisories → Report a vulnerability** nel repository, se disponibile. Se la segnalazione privata di GitHub non è disponibile, contatta privatamente il maintainer tramite il profilo GitHub del repository.
 
-- Use GitHub's [**Report a vulnerability**](../../security/advisories/new)
-  button (Security → Advisories), or
-- Email **sascha@svilling.de** with the details.
+Includi, se possibile:
 
-Please include:
+- descrizione del problema e impatto;
+- passaggi per riprodurlo;
+- versione di Diaspro Viboard;
+- versione di Windows;
+- eventuale proof of concept.
 
-- A description of the issue and its potential impact
-- Steps to reproduce, or a proof of concept
-- The version of Desk and your operating system
+## Ambito
 
-You can expect an initial acknowledgement within a few days. Once the issue is
-confirmed and fixed, a new release will be published and the advisory disclosed.
+Diaspro Viboard è local-first: progetti, attività e documenti vengono salvati nella cartella dati scelta dall'utente.
 
-## Scope notes
+Le funzioni AI sono opzionali e possono inviare contenuti ai provider configurati dall'utente (Anthropic, OpenAI o DeepSeek) tramite le rispettive API. Le chiavi API dell'app desktop vengono conservate nel credential store del sistema operativo.
 
-Desk stores work content as plain Markdown. In local mode those files stay in
-the data folder you choose; in self-hosted mode they live on the server you
-operate. The hosted authentication database contains accounts and sessions, not
-your workspace content.
+Sono considerate in ambito, tra le altre:
 
-External access is opt-in:
-
-- **Smart Index:** when enabled, Desk sends file previews to the Anthropic or
-  OpenAI provider you select so it can generate summaries. Local API keys are
-  stored in the operating system's secure credential store. In hosted mode, the
-  server operator supplies the provider key through an environment variable.
-- **MCP:** a self-hosted server can grant an external AI client read-only access
-  after an OAuth sign-in and consent flow. Per-workspace `.aiignore` rules are
-  enforced by the read layer for tree, read, search, and catalog operations.
-
-Desk does not include an in-app chatbot, and MCP clients cannot write workspace
-content today.
-
-If you find a way for data to leave your machine unexpectedly, that is in
-scope — please report it.
+- lettura o modifica non autorizzata dei file locali;
+- esfiltrazione inattesa di contenuti;
+- esposizione delle chiavi API;
+- esecuzione di codice non autorizzata;
+- bypass delle restrizioni del filesystem o della shell Tauri.

@@ -3,14 +3,7 @@
   "productName": "Diaspro Viboard",
   "version": "0.10.2",
   "identifier": "it.diaspro.viboard",
-  "plugins": {
-    "updater": {
-      "endpoints": [
-        "https://github.com/maryvellous/Viboard-Project-2.0/releases/latest/download/latest.json"
-      ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJGMjBCNzgyN0Q1ODRGQTEKUldTaFQxaDlncmNnTDNDMHc1SWFrLzFqQlFaL2x0UGJyY29IcktYZFZWd1dYTURUUUhua2R0NW8K"
-    }
-  },
+  "plugins": {},
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3001",
@@ -39,14 +32,9 @@
   "bundle": {
     "active": true,
     "targets": [
-      "dmg",
-      "app",
-      "nsis",
-      "deb",
-      "rpm",
-      "appimage"
+      "nsis"
     ],
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

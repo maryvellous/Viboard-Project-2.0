@@ -4,7 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect, useCallback } from "react";
 import { queryClient } from "@/lib/query-client";
 import { useTranslation } from "react-i18next";
-import { usePreferencesStore } from "@/stores/preferences";
 import {
   expandHostFsScope,
   initializeHostDeskDirectory,
@@ -13,7 +12,6 @@ import { isLocalDisk } from "@/lib/connection";
 import { useQueryInvalidator } from "@/hooks/use-query-invalidator";
 import { useSearchIndex } from "@/hooks/use-search-index";
 import { useWindowClose } from "@/hooks/use-window-close";
-import { useUpdateChecker } from "@/hooks/use-update-checker";
 import { useSuppressContextMenu } from "@/hooks/use-suppress-context-menu";
 import { SaveChangesDialog } from "@/components/ui/save-changes-dialog";
 import { Button } from "@/components/ui/button";
@@ -70,16 +68,14 @@ function TauriInitializer({ children }: { children: React.ReactNode }) {
   const runInit = useCallback(async () => {
     setInitError(null);
     setInitialized(false);
-    // Local-disk setup (Tauri FS scope + creating ~/DeskMD) only applies when the domain
-    // runs on THIS machine. In native-remote mode `isTauri()` is still true but storage is
-    // the GuardStorageProvider, so initDeskDirectory() would throw — the data folder lives
-    // on the server. Gate on isLocalDisk(), never bare isTauri() (the rule in CLAUDE.md).
+    // Local desktop setup: expand the Tauri filesystem scope and initialize
+    // the configured Viboard data folder before rendering the app.
     if (isLocalDisk()) {
       try {
         await expandHostFsScope();
         await initializeHostDeskDirectory();
       } catch (error) {
-        console.error("[Desk] Failed to initialize:", error);
+        console.error("[Viboard] Failed to initialize:", error);
         setInitError(error instanceof Error ? error.message : String(error));
         return;
       }
@@ -111,36 +107,6 @@ function QueryInvalidatorProvider({ children }: { children: React.ReactNode }) {
 // Initialize search index
 function SearchIndexProvider({ children }: { children: React.ReactNode }) {
   useSearchIndex();
-  return <>{children}</>;
-}
-
-// Check for updates on launch and show toast if available
-function UpdateProvider({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation();
-  const { status, updateInfo, downloadAndInstall, dismiss } = useUpdateChecker();
-  const dismissedUpdateVersion = usePreferencesStore((s) => s.dismissedUpdateVersion);
-
-  useEffect(() => {
-    if (
-      status === "available" &&
-      updateInfo &&
-      updateInfo.version !== dismissedUpdateVersion
-    ) {
-      toast(t("updates.available", { version: updateInfo.version }), {
-        description: t("updates.description"),
-        action: {
-          label: t("updates.updateAndRestart"),
-          onClick: () => downloadAndInstall(),
-        },
-        cancel: {
-          label: t("updates.skip"),
-          onClick: () => dismiss(),
-        },
-        duration: 15000,
-      });
-    }
-  }, [status, updateInfo, downloadAndInstall, dismiss, dismissedUpdateVersion, t]);
-
   return <>{children}</>;
 }
 
@@ -271,22 +237,20 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <TauriInitializer>
-        <UpdateProvider>
-          <QueryInvalidatorProvider>
-            <SearchIndexProvider>
-              <WindowCloseProvider>
-                <EditorFlushProvider>
-                  <ThemeProvider>
-                    <ContextMenuSuppressionProvider>
-                      {children}
-                      <EmailDropOverlay />
-                    </ContextMenuSuppressionProvider>
-                  </ThemeProvider>
-                </EditorFlushProvider>
-              </WindowCloseProvider>
-            </SearchIndexProvider>
-          </QueryInvalidatorProvider>
-        </UpdateProvider>
+        <QueryInvalidatorProvider>
+          <SearchIndexProvider>
+            <WindowCloseProvider>
+              <EditorFlushProvider>
+                <ThemeProvider>
+                  <ContextMenuSuppressionProvider>
+                    {children}
+                    <EmailDropOverlay />
+                  </ContextMenuSuppressionProvider>
+                </ThemeProvider>
+              </EditorFlushProvider>
+            </WindowCloseProvider>
+          </SearchIndexProvider>
+        </QueryInvalidatorProvider>
       </TauriInitializer>
     </QueryClientProvider>
   );

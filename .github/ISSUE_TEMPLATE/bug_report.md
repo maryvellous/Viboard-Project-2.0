@@ -1,28 +1,35 @@
 ---
 name: Bug report
-about: Report something that isn't working
+about: Segnala qualcosa che non funziona
 title: ""
 labels: bug
 ---
 
-**Describe the bug**
-A clear and concise description of what went wrong.
+## Problema
 
-**To reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '...'
-3. See error
+Descrivi cosa è successo.
 
-**Expected behavior**
-What you expected to happen instead.
+## Come riprodurlo
 
-**Screenshots**
-If applicable, add screenshots to help explain the problem.
+1.
+2.
+3.
 
-**Environment**
-- OS: [e.g. macOS 14.5, Windows 11, Ubuntu 24.04]
-- Desk version: [e.g. 0.7.1]
+## Comportamento atteso
 
-**Additional context**
-Anything else that might be relevant.
+Cosa ti aspettavi che succedesse?
+
+## Screenshot
+
+Se utile, aggiungi screenshot.
+
+## Ambiente
+
+- Diaspro Viboard: [es. 0.10.2]
+- Sistema operativo: [es. Windows 11 24H2]
+- Installazione nuova o aggiornamento:
+- Cartella dati locale / percorso particolare:
+
+## Altri dettagli
+
+Aggiungi qui qualsiasi informazione utile.

@@ -2,7 +2,7 @@
   "ai": {
     "consent": {
       "title": "Prima di usare le funzioni AI",
-      "description": "Le funzioni AI di Diaspro Viboard inviano contenuti al provider che hai scelto (Anthropic o OpenAI) tramite la sua API. Diaspro Viboard non gestisce alcun server AI proprio.",
+      "description": "Le funzioni AI di Diaspro Viboard inviano contenuti al provider che hai scelto (Anthropic, OpenAI o DeepSeek) tramite la sua API. Diaspro Viboard non gestisce alcun server AI proprio.",
       "whatHeading": "Cosa viene inviato",
       "whatItems": {
         "previews": "Brevi anteprime e riassunti dei tuoi file, usati per costruire il catalogo dell'Indice intelligente."
