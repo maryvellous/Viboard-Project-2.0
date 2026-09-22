@@ -43,4 +43,4 @@ jobs:
 
       - name: Cargo check
         working-directory: packages/app/src-tauri
-        run: cargo check
+        run: cargo check --locked
