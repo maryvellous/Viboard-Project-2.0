@@ -1,48 +1,69 @@
-# Diaspro Viboard
+<p align="center">
+  <img src="docs/banner.svg" alt="Diaspro Viboard" width="900">
+</p>
 
-Diaspro Viboard è un'app desktop local-first per organizzare progetti, attività e documenti in semplici file Markdown.
+<p align="center">
+  <strong>Progetti, attività, pianificazione e documenti Markdown in un'app desktop local-first.</strong>
+</p>
 
-È un fork evoluto di [desk.md](https://github.com/v1lling/desk.md), adattato al flusso di lavoro e all'identità visiva Diaspro.
+<p align="center">
+  <a href="https://github.com/maryvellous/Viboard-Project-2.0/releases/latest"><strong>Scarica per Windows</strong></a>
+  ·
+  <a href="CHANGELOG.md">Changelog</a>
+  ·
+  <a href="CONTRIBUTING.md">Contribuire</a>
+</p>
 
-## Stato
+---
 
-Diaspro Viboard è disponibile in versione stabile per Windows.
+## Cos'è Viboard
 
-### Supporto ufficiale
+**Diaspro Viboard** è un'app desktop per organizzare il lavoro senza affidare i tuoi dati a un servizio remoto.
 
-- **Windows 10/11 x64** — supportato e distribuito tramite installer `.exe`.
-- **Linux** — il codice resta compatibile e viene controllato in CI, ma al momento non viene distribuito come build ufficiale.
-- **macOS** — non è un target di release ufficiale.
+Progetti, attività e documenti vengono salvati nella cartella che scegli tu, in file locali e leggibili. Non serve un account e non esiste un server Diaspro che conserva i tuoi contenuti.
 
-Le release disponibili sono pubblicate nella sezione **Releases** di GitHub.
+La versione stabile attuale è **1.0.0**.
 
-## Funzioni principali
+## Cosa puoi farci
 
-- spazi di lavoro locali;
-- progetti;
-- attività e pianificazione settimanale;
-- documenti Markdown;
-- dashboard e raccolta rapida;
-- ricerca e command palette;
-- modelli per attività e documenti;
-- supporto AI opzionale tramite API proprie di Anthropic, OpenAI e DeepSeek;
-- dati salvati nella cartella scelta dall'utente, senza server Diaspro.
-
-Diaspro Viboard non richiede un account e non usa un server remoto per conservare i tuoi progetti.
-
-## Dati e privacy
-
-I dati principali restano sul computer dell'utente in file locali.
-
-Le funzioni AI sono opzionali. Quando vengono usate, Diaspro Viboard invia al provider selezionato soltanto i contenuti necessari alla funzione richiesta. Le chiavi API vengono salvate nel credential store del sistema operativo.
+- organizzare più spazi di lavoro e progetti;
+- creare, ordinare e pianificare attività;
+- usare il planner settimanale e la dashboard;
+- scrivere documenti in Markdown;
+- raccogliere velocemente idee e cose da fare;
+- cercare contenuti e usare la command palette;
+- creare modelli per attività e documenti;
+- usare funzioni AI opzionali tramite le tue API di **Anthropic, OpenAI o DeepSeek**.
 
 ## Installazione
 
 ### Windows
 
-Scarica l'ultima build dalla pagina **Releases** del repository e avvia l'installer x64.
+**Windows 10/11 x64** è la piattaforma ufficialmente supportata.
 
-Le build possono non essere firmate digitalmente; Windows SmartScreen può quindi mostrare un avviso.
+Scarica l'ultima versione dalla pagina [Releases](https://github.com/maryvellous/Viboard-Project-2.0/releases/latest) e avvia l'installer `.exe`.
+
+Le build possono non essere firmate digitalmente, quindi Windows SmartScreen può mostrare un avviso durante l'installazione.
+
+### Linux
+
+Il codice continua a essere verificato in CI anche su Linux, ma non distribuisco ancora una build Linux ufficiale. Per ora Linux va considerato **sperimentale**.
+
+## Local-first, davvero
+
+I dati principali restano nella cartella locale scelta dall'utente.
+
+Le funzioni AI sono facoltative. Quando le usi, Viboard invia al provider selezionato soltanto i contenuti necessari alla funzione richiesta. Le chiavi API dell'app desktop vengono conservate nel credential store del sistema operativo.
+
+L'auto-updater non è incluso nella 1.0.0: le nuove versioni vengono pubblicate nella sezione Releases.
+
+## Stack
+
+- **Tauri 2** + Rust per l'app desktop;
+- **React 19** + TypeScript;
+- **Vite**;
+- **Tailwind CSS**;
+- file Markdown come base del modello local-first.
 
 ## Sviluppo
 
@@ -58,7 +79,7 @@ Installa le dipendenze:
 npm ci
 ```
 
-Avvia il frontend in modalità sviluppo:
+Avvia il frontend:
 
 ```bash
 npm run dev
@@ -87,25 +108,29 @@ Viboard-Project-2.0/
 ├── packages/
 │   ├── app/        # React + Tauri
 │   ├── core/       # dominio condiviso
-│   └── server/     # codice ereditato/compatibilità, non usato dall'app desktop locale
+│   └── server/     # codice ereditato/compatibilità
 ├── diaspro-ui/     # riferimenti visuali Diaspro
 ├── docs/
 ├── tests/
 └── .github/
 ```
 
-Alcuni namespace tecnici ereditati da desk.md (`@desk/*`, `DeskService`, ecc.) sono ancora presenti internamente. Non fanno parte del branding pubblico.
+Alcuni namespace tecnici ereditati da desk.md, come `@desk/*` e `DeskService`, sono ancora presenti internamente ma non fanno parte del branding pubblico.
 
-## Contribuire
+## Origine del progetto
 
-Bug report e pull request sono benvenuti. Vedi [CONTRIBUTING.md](CONTRIBUTING.md).
+Diaspro Viboard nasce come fork di [desk.md](https://github.com/v1lling/desk.md) di Sascha Villing e si è poi evoluto in una versione focalizzata sull'uso desktop locale e sull'identità Diaspro.
+
+Le modifiche principali includono il nuovo sistema visuale, il flusso desktop local-only, la localizzazione italiana, il supporto DeepSeek e la rimozione delle superfici Riunioni/server dall'esperienza utente.
+
+Per l'attribuzione completa vedi [NOTICE.md](NOTICE.md).
+
+## Licenza
+
+Diaspro Viboard mantiene la licenza **GPL-3.0-or-later** del progetto upstream.
+
+Vedi [LICENSE](LICENSE).
 
 ## Sicurezza
 
-Per vulnerabilità di sicurezza, vedi [SECURITY.md](SECURITY.md). Non pubblicare vulnerabilità sensibili come issue pubbliche.
-
-## Upstream e licenza
-
-Progetto originale: [v1lling/desk.md](https://github.com/v1lling/desk.md).
-
-Diaspro Viboard mantiene la licenza **GPL-3.0-or-later** del progetto upstream. Vedi [LICENSE](LICENSE).
+Per segnalazioni di sicurezza consulta [SECURITY.md](SECURITY.md). Non pubblicare vulnerabilità sensibili come issue pubbliche.
