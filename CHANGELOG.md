@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+- tipografia dell'interfaccia riallineata all'identità Diaspro: Inter per testo e UI, Outfit per titoli, JetBrains Mono per microcopy tecnico;
+- le card dei progetti usano ora i sei colori accent Diaspro in modo stabile per progetto;
+- corretta una collisione CSS che forzava visivamente le card progetto sul viola predefinito.
+
 ## 1.0.2
 
 - `Esci completamente` dalla system tray passa ora dal controllo dei documenti non salvati;
