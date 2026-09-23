@@ -1,5 +1,6 @@
 use fs2::FileExt;
 use std::process::Command;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::{fs, io::Write, path::Path};
 #[cfg(target_os = "macos")]
@@ -18,6 +19,8 @@ pub mod data_root;
 mod drop_view;
 mod secrets;
 
+static FULL_EXIT_REQUESTED: AtomicBool = AtomicBool::new(false);
+
 fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
@@ -27,12 +30,40 @@ fn show_main_window(app: &tauri::AppHandle) {
 }
 
 /// Confirm the close request after the frontend has flushed/discarded changes.
-/// On desktop we keep Viboard alive and hide the window so reopening is instant.
+/// Normal window closes keep Viboard warm in the background; an explicit tray
+/// quit terminates the process after the same unsaved-changes flow completes.
 #[tauri::command]
 fn confirm_close(window: tauri::Window) {
+    if FULL_EXIT_REQUESTED.swap(false, Ordering::SeqCst) {
+        window.app_handle().exit(0);
+        return;
+    }
+
     window.hide().unwrap_or_else(|e| {
         log::error!("Failed to hide window: {}", e);
     });
+}
+
+#[tauri::command]
+fn cancel_close() {
+    FULL_EXIT_REQUESTED.store(false, Ordering::SeqCst);
+}
+
+#[cfg(target_os = "windows")]
+fn request_full_exit(app: &tauri::AppHandle) {
+    FULL_EXIT_REQUESTED.store(true, Ordering::SeqCst);
+    show_main_window(app);
+
+    if let Some(window) = app.get_webview_window("main") {
+        window
+            .emit("window-close-requested", ())
+            .unwrap_or_else(|e| {
+                FULL_EXIT_REQUESTED.store(false, Ordering::SeqCst);
+                log::error!("Failed to request full Viboard exit: {}", e);
+            });
+    } else {
+        FULL_EXIT_REQUESTED.store(false, Ordering::SeqCst);
+    }
 }
 
 /// Read a user-dropped file as text. The path comes from a Tauri drag-drop
@@ -457,6 +488,7 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![
             confirm_close,
+            cancel_close,
             expand_fs_scope,
             release_data_root_ownership,
             allow_data_path,
@@ -508,7 +540,7 @@ pub fn run() {
                     .show_menu_on_left_click(false)
                     .on_menu_event(|app, event| match event.id().as_ref() {
                         "tray-show" => show_main_window(app),
-                        "tray-quit" => app.exit(0),
+                        "tray-quit" => request_full_exit(app),
                         _ => {}
                     })
                     .on_tray_icon_event(|tray, event| {
@@ -610,6 +642,9 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
+                // A normal X/close request means "send to background", not quit.
+                FULL_EXIT_REQUESTED.store(false, Ordering::SeqCst);
+
                 // Keep the process warm in the background. The frontend first
                 // flushes editors / resolves unsaved changes, then confirm_close
                 // hides this window instead of terminating the process.

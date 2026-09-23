@@ -34,9 +34,13 @@ export function useWindowClose(onCloseRequested?: (dirtyTabs: string[]) => void)
     }
   }, []);
 
-  // Cancel close - just reset pending state
+  // Cancel close and clear any pending native full-exit request.
   const cancelClose = useCallback(() => {
     setPendingClose(false);
+    if (!isTauri()) return;
+    void invoke("cancel_close").catch((error) => {
+      console.error("[use-window-close] Failed to cancel close:", error);
+    });
   }, []);
 
   useEffect(() => {

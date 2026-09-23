@@ -55,7 +55,7 @@ I dati principali restano nella cartella locale scelta dall'utente.
 
 Le funzioni AI sono facoltative. Quando le usi, Viboard invia al provider selezionato soltanto i contenuti necessari alla funzione richiesta. Le chiavi API dell'app desktop vengono conservate nel credential store del sistema operativo.
 
-L'auto-updater non è incluso nella 1.0.0: le nuove versioni vengono pubblicate nella sezione Releases.
+L'auto-updater non è incluso: le nuove versioni vengono pubblicate nella sezione Releases.
 
 ## Stack
 
