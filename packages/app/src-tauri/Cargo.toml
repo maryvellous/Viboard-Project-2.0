@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "1.0.2"
+version = "1.0.3"
 description = "Diaspro Viboard - local-first work management"
 authors = ["Sascha Villing (upstream)", "maryvellous / Diaspro Viboard"]
 license = "GPL-3.0-or-later"
