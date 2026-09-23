@@ -9,8 +9,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-diaspro-body);
+  --font-mono: var(--font-diaspro-mono);
+  --font-display: var(--font-diaspro-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -52,8 +53,9 @@
 }
 
 :root {
-  --font-geist-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-geist-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --font-diaspro-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-diaspro-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-diaspro-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius: 0.5rem;
 
   /* Refined light theme - warm neutral with subtle depth */
@@ -164,8 +166,6 @@
 
 /* Diaspro keeps a coherent night canvas in either system preference. */
 :root, .dark {
-  --font-geist-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-geist-mono: "JetBrains Mono", ui-monospace, monospace;
   --background: #1e1333;
   --foreground: #f8f4ed;
   --card: #2b1c47;
@@ -197,8 +197,9 @@
 }
 
 @layer base {
-  body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; }
-  h1, h2, h3, h4, h5, h6 { font-family: "Outfit", ui-sans-serif, system-ui, sans-serif; }
+  body { font-family: var(--font-diaspro-body); }
+  button, input, textarea, select { font: inherit; }
+  h1, h2, h3, h4, h5, h6 { font-family: var(--font-diaspro-heading); }
 }
 
 /* ============================================================================
@@ -268,8 +269,7 @@
 .diaspro-project-card {
   display:flex; flex-direction:column; gap:2px;
   margin:0; padding:18px 20px 16px; min-height:132px;
-  border:1px solid rgba(255,255,255,.12); border-radius:24px;
-  background:#2b1c47; color:#ffffff;
+  border:1px solid color-mix(in srgb, currentColor 14%, transparent); border-radius:24px;
   box-shadow:0 14px 28px rgba(10,5,22,.24);
   transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
 }
