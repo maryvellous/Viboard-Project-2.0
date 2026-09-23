@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ProjectSummary } from "@desk/core";
-import { filterAndSortProjects } from "../../packages/app/src/lib/project-browse";
+import {
+  filterAndSortProjects,
+  PROJECT_CARD_VARIANTS,
+  projectCardVariant,
+} from "../../packages/app/src/lib/project-browse";
 
 function project(overrides: Partial<ProjectSummary> & Pick<ProjectSummary, "id" | "name">): ProjectSummary {
   return {
@@ -28,6 +32,16 @@ describe("project browse", () => {
       "alpha",
       "gamma",
     ]);
+  });
+
+  it("assigns every project a stable Diaspro accent-card color", () => {
+    const ids = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta"];
+    const firstPass = ids.map(projectCardVariant);
+    const secondPass = ids.map(projectCardVariant);
+
+    expect(secondPass).toEqual(firstPass);
+    expect(firstPass).not.toContain("default");
+    firstPass.forEach((variant) => expect(PROJECT_CARD_VARIANTS).toContain(variant));
   });
 
   it("supports alphabetical sorting and combined search/status filtering", () => {
