@@ -2,8 +2,8 @@ name: Release Windows
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "release-trigger/v1.0.3"
 
 permissions:
   contents: write
@@ -39,10 +39,10 @@ jobs:
         shell: bash
         run: npm audit --omit=dev || true
 
-      - name: Verify release version matches tag
+      - name: Verify release version
         shell: bash
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
+          EXPECTED_VERSION="1.0.3"
           ROOT_VERSION=$(node -p "require('./package.json').version")
           TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
           APP_VERSION=$(node -p "require('./packages/app/package.json').version")
@@ -50,10 +50,10 @@ jobs:
           SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
           CARGO_VERSION=$(node -e "const fs=require('fs'); const m=fs.readFileSync('packages/app/src-tauri/Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(2); process.stdout.write(m[1]);")
 
-          if [ "$TAG" != "$ROOT_VERSION" ] || [ "$TAG" != "$TAURI_VERSION" ] || \
-             [ "$TAG" != "$APP_VERSION" ] || [ "$TAG" != "$CORE_VERSION" ] || \
-             [ "$TAG" != "$SERVER_VERSION" ] || [ "$TAG" != "$CARGO_VERSION" ]; then
-            echo "Version mismatch! tag=$TAG root=$ROOT_VERSION tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION cargo=$CARGO_VERSION"
+          if [ "$EXPECTED_VERSION" != "$ROOT_VERSION" ] || [ "$EXPECTED_VERSION" != "$TAURI_VERSION" ] || \
+             [ "$EXPECTED_VERSION" != "$APP_VERSION" ] || [ "$EXPECTED_VERSION" != "$CORE_VERSION" ] || \
+             [ "$EXPECTED_VERSION" != "$SERVER_VERSION" ] || [ "$EXPECTED_VERSION" != "$CARGO_VERSION" ]; then
+            echo "Version mismatch! expected=$EXPECTED_VERSION root=$ROOT_VERSION tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION cargo=$CARGO_VERSION"
             exit 1
           fi
 
@@ -63,11 +63,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: packages/app
-          tagName: ${{ github.ref_name }}
-          releaseName: "Diaspro Viboard ${{ github.ref_name }}"
+          tagName: "v1.0.3"
+          releaseName: "Diaspro Viboard v1.0.3"
+          releaseCommitish: "1afa8a449c2cbc2026f99935add3eee962cfe068"
           releaseBody: |
-            Diaspro Viboard for Windows x64.
+            Diaspro Viboard 1.0.3 for Windows x64.
 
-            See README.md and RELEASE_CHECKLIST.md for supported platforms and release notes.
+            - Tipografia dell'interfaccia riallineata all'identità Diaspro: Inter per testo e UI, Outfit per titoli, JetBrains Mono per microcopy tecnico.
+            - Le card dei progetti usano ora i sei colori accent Diaspro in modo stabile per progetto.
+            - Corretta una collisione CSS che forzava visivamente le card progetto sul viola predefinito.
+
+            I dati restano local-first. Windows 10/11 x64 è la piattaforma ufficialmente supportata.
           releaseDraft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: false
