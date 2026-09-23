@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- `Esci completamente` dalla system tray passa ora dal controllo dei documenti non salvati;
+- annullare il dialog di chiusura annulla correttamente anche la richiesta di uscita completa;
+- mantenuto il comportamento standby introdotto nella 1.0.1.
+
 ## 1.0.1
 
 - chiudere la finestra mantiene Viboard attivo in background;
