@@ -1,0 +1,78 @@
+name: Publish Diaspro Viboard 1.0.2
+
+on:
+  push:
+    branches:
+      - publish-v1.0.2
+    paths:
+      - ".github/workflows/publish-v1.0.2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-windows:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/app/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native app icons
+        run: npm run icons -w @desk/app
+
+      - name: Verify 1.0.2 version sources
+        shell: bash
+        run: |
+          TAG="1.0.2"
+          ROOT_VERSION=$(node -p "require('./package.json').version")
+          TAURI_VERSION=$(node -p "require('./packages/app/src-tauri/tauri.conf.json').version")
+          APP_VERSION=$(node -p "require('./packages/app/package.json').version")
+          CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          SERVER_VERSION=$(node -p "require('./packages/server/package.json').version")
+          CARGO_VERSION=$(node -e "const fs=require('fs'); const m=fs.readFileSync('packages/app/src-tauri/Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(2); process.stdout.write(m[1]);")
+
+          if [ "$TAG" != "$ROOT_VERSION" ] || [ "$TAG" != "$TAURI_VERSION" ] || \
+             [ "$TAG" != "$APP_VERSION" ] || [ "$TAG" != "$CORE_VERSION" ] || \
+             [ "$TAG" != "$SERVER_VERSION" ] || [ "$TAG" != "$CARGO_VERSION" ]; then
+            echo "Version mismatch! expected=$TAG root=$ROOT_VERSION tauri=$TAURI_VERSION app=$APP_VERSION core=$CORE_VERSION server=$SERVER_VERSION cargo=$CARGO_VERSION"
+            exit 1
+          fi
+
+      - name: Build and publish stable Windows release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: packages/app
+          tagName: v1.0.2
+          releaseName: "Diaspro Viboard v1.0.2"
+          releaseBody: |
+            Diaspro Viboard 1.0.2 for Windows x64.
+
+            Novità:
+            - Viboard resta attivo in background quando chiudi la finestra;
+            - system tray con Apri Viboard ed Esci completamente;
+            - riaprire Viboard richiama l'istanza già attiva;
+            - Esci completamente rispetta il controllo dei documenti non salvati;
+            - riapertura più rapida perché l'app resta già inizializzata.
+
+            L'auto-updater non è incluso.
+          releaseDraft: false
+          prerelease: false
