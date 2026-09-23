@@ -11,13 +11,12 @@ export type ProjectSortOrder = "recent" | "name";
  * filters, sorting and reloads (and never changes on hover).
  */
 export const PROJECT_CARD_VARIANTS = [
-  "default",
-  "sand",
   "blue",
   "sage",
+  "sand",
+  "terracotta",
   "lavender",
   "plum",
-  "terracotta",
 ] as const;
 
 export type ProjectCardVariant = (typeof PROJECT_CARD_VARIANTS)[number];
