@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4
+
+- avvio desktop più rapido: il filesystem locale viene inizializzato una sola volta invece di ripetere il bootstrap dopo il mount React;
+- manutenzione AI caricata dopo il primo render, fuori dal percorso critico di avvio;
+- costruzione dell'indice di ricerca posticipata di un breve intervallo per lasciare priorità al primo frame interattivo;
+- `tauri:dev` non rigenera più tutte le icone native a ogni avvio; la generazione resta nel flusso di build/release.
+
 ## 1.0.3
 
 - tipografia dell'interfaccia riallineata all'identità Diaspro: Inter per testo e UI, Outfit per titoli, JetBrains Mono per microcopy tecnico;
