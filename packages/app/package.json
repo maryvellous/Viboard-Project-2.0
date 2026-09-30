@@ -13,7 +13,6 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "icons": "tauri icon public/favicon.svg",
-    "pretauri:dev": "npm run icons",
     "pretauri:build": "npm run icons"
   },
   "dependencies": {
