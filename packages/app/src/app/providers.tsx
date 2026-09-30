@@ -4,20 +4,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect, useCallback } from "react";
 import { queryClient } from "@/lib/query-client";
 import { useTranslation } from "react-i18next";
-import {
-  expandHostFsScope,
-  initializeHostDeskDirectory,
-} from "@/lib/host-files";
-import { isLocalDisk } from "@/lib/connection";
 import { useQueryInvalidator } from "@/hooks/use-query-invalidator";
 import { useSearchIndex } from "@/hooks/use-search-index";
 import { useWindowClose } from "@/hooks/use-window-close";
 import { useSuppressContextMenu } from "@/hooks/use-suppress-context-menu";
 import { SaveChangesDialog } from "@/components/ui/save-changes-dialog";
-import { Button } from "@/components/ui/button";
 import { EmailDropOverlay } from "@/components/email/email-drop-overlay";
 import { toast } from "sonner";
-import { AppBootScreen } from "./boot-screen";
 import { applyThemePreference } from "@/lib/theme";
 import {
   flushAllEditorSessions,
@@ -27,75 +20,6 @@ import {
 
 interface ProvidersProps {
   children: React.ReactNode;
-}
-
-// Blocking error screen shown when startup initialization fails. Rendering the
-// app anyway would only produce a confusing, broken state (no data folder).
-function StartupError({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex h-screen w-screen items-center justify-center bg-background p-6">
-      <div className="w-full max-w-md space-y-4 rounded-lg border border-destructive/30 bg-card p-6 text-center">
-        <h1 className="text-lg font-semibold text-foreground">
-          {t("errors.startup.title")}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t("errors.startup.description")}
-        </p>
-        <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded bg-muted p-3 text-left text-xs text-muted-foreground">
-          {message}
-        </pre>
-        <p className="text-sm text-muted-foreground">
-          {t("errors.startup.hint")}
-        </p>
-        <Button onClick={onRetry}>{t("common.buttons.retry")}</Button>
-      </div>
-    </div>
-  );
-}
-
-// Initialize Tauri file system on startup
-function TauriInitializer({ children }: { children: React.ReactNode }) {
-  const [initialized, setInitialized] = useState(false);
-  const [initError, setInitError] = useState<string | null>(null);
-
-  const runInit = useCallback(async () => {
-    setInitError(null);
-    setInitialized(false);
-    // Local desktop setup: expand the Tauri filesystem scope and initialize
-    // the configured Viboard data folder before rendering the app.
-    if (isLocalDisk()) {
-      try {
-        await expandHostFsScope();
-        await initializeHostDeskDirectory();
-      } catch (error) {
-        console.error("[Viboard] Failed to initialize:", error);
-        setInitError(error instanceof Error ? error.message : String(error));
-        return;
-      }
-    }
-    setInitialized(true);
-  }, []);
-
-  useEffect(() => {
-    void runInit();
-  }, [runInit]);
-
-  if (initError) {
-    return <StartupError message={initError} onRetry={() => void runInit()} />;
-  }
-
-  if (!initialized) {
-    return <AppBootScreen />;
-  }
-
-  return <>{children}</>;
 }
 
 // Initialize query invalidator for live updates
@@ -236,22 +160,20 @@ function EditorFlushProvider({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <TauriInitializer>
-        <QueryInvalidatorProvider>
-          <SearchIndexProvider>
-            <WindowCloseProvider>
-              <EditorFlushProvider>
-                <ThemeProvider>
-                  <ContextMenuSuppressionProvider>
-                    {children}
-                    <EmailDropOverlay />
-                  </ContextMenuSuppressionProvider>
-                </ThemeProvider>
-              </EditorFlushProvider>
-            </WindowCloseProvider>
-          </SearchIndexProvider>
-        </QueryInvalidatorProvider>
-      </TauriInitializer>
+      <QueryInvalidatorProvider>
+        <SearchIndexProvider>
+          <WindowCloseProvider>
+            <EditorFlushProvider>
+              <ThemeProvider>
+                <ContextMenuSuppressionProvider>
+                  {children}
+                  <EmailDropOverlay />
+                </ContextMenuSuppressionProvider>
+              </ThemeProvider>
+            </EditorFlushProvider>
+          </WindowCloseProvider>
+        </SearchIndexProvider>
+      </QueryInvalidatorProvider>
     </QueryClientProvider>
   );
 }
