@@ -16,14 +16,23 @@ export function useSearchIndex() {
   const state = useSearchIndexState();
 
   useEffect(() => {
-    void searchIndexController.refresh();
-    if (!isTauri()) return;
+    // Let the first interactive frame land before scanning workspace content.
+    const startupTimer = window.setTimeout(() => {
+      void searchIndexController.refresh();
+    }, 200);
 
-    return onFileChange((event) => {
-      if (event.paths.some((path) => Boolean(getWorkspaceIdFromPath(path)))) {
-        void searchIndexController.refresh();
-      }
-    });
+    const stopWatchingChanges = isTauri()
+      ? onFileChange((event) => {
+          if (event.paths.some((path) => Boolean(getWorkspaceIdFromPath(path)))) {
+            void searchIndexController.refresh();
+          }
+        })
+      : undefined;
+
+    return () => {
+      window.clearTimeout(startupTimer);
+      stopWatchingChanges?.();
+    };
   }, []);
 
   return { ...state, rebuildIndex: searchIndexController.refresh };

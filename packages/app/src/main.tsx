@@ -39,18 +39,17 @@ async function bootstrap() {
   setDataRootResolver(async () => useBootStore.getState().dataPath || "~/Viboard");
   const { isTauri } = await import("@desk/core");
 
-  // Set the Tauri FS scope BEFORE any store module is evaluated. File-backed
-  // zustand stores (createRemoteSettingStorage & co.) read the filesystem during
-  // hydration at module-eval time — that must happen after the scope is set,
-  // otherwise the narrowed capability denies the read and the store hydrates
-  // empty. expandFsScope() is a no-op in browser mode (isTauri() guard inside).
+  // Set up the local data root exactly once, before file-backed stores are
+  // evaluated. The old provider-level initializer repeated this work after
+  // React mounted, keeping the app behind a second boot gate.
   if (isTauri()) {
-    const { expandFsScope } = await import("@desk/core/host/files");
+    const { expandFsScope, initDeskDirectory } = await import("@desk/core/host/files");
     try {
       await expandFsScope(); // claims ownership before any local read or write
+      await initDeskDirectory();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error("[Desk] data-root ownership failed at bootstrap:", error);
+      console.error("[Desk] local bootstrap failed:", error);
       stopInitialThemeSync();
       root.render(<AppBootError message={message} />);
       return;
@@ -99,11 +98,6 @@ async function bootstrap() {
     setDeskService(createRemoteDeskService(window.location.origin));
   }
 
-  // AI maintenance runs where the data lives: start the engine only when this app owns the
-  // data (local disk). Hosted builds run maintenance on the server.
-  const { startAppMaintenanceEngine } = await import("./lib/maintenance");
-  await startAppMaintenanceEngine();
-
   // Dynamic import: the App module graph (and every store with persist) is
   // only evaluated now, after the FS scope is in place.
   const { App } = await import("./app");
@@ -114,6 +108,14 @@ async function bootstrap() {
       <App />
     </StrictMode>
   );
+
+  // Maintenance is not required for first paint. Load it after the app is
+  // visible so its module graph and store hydration cannot delay startup.
+  void import("./lib/maintenance")
+    .then(({ startAppMaintenanceEngine }) => startAppMaintenanceEngine())
+    .catch((error) => {
+      console.warn("[maintenance] Failed to start after bootstrap:", error);
+    });
 }
 
 bootstrap();
