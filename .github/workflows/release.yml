@@ -16,12 +16,6 @@ jobs:
       - name: Checkout Viboard
         uses: actions/checkout@v4
 
-      - name: Checkout Diaspro Installer
-        uses: actions/checkout@v4
-        with:
-          repository: maryvellous/diaspro-installer
-          path: .diaspro-installer
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
