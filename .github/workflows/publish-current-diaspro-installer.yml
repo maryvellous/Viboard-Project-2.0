@@ -1,0 +1,25 @@
+name: Publish current Diaspro installer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-current-diaspro-installer.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace current release installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p current-installer
+          gh run download 36940501424 --repo maryvellous/Viboard-Project-2.0 --name diaspro-viboard-windows --dir current-installer
+          gh release delete-asset v1.0.4 "Diaspro.Viboard_1.0.4_x64-setup.exe" --repo maryvellous/Viboard-Project-2.0 -y || true
+          gh release upload v1.0.4 "current-installer/Diaspro-Viboard-1.0.4-Setup.exe" --repo maryvellous/Viboard-Project-2.0 --clobber
+          gh release view v1.0.4 --repo maryvellous/Viboard-Project-2.0 --json assets
