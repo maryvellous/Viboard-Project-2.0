@@ -1,0 +1,107 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "packages/app/**"
+      - "packages/core/**"
+      - "package.json"
+      - "package-lock.json"
+      - "diaspro-installer.json"
+      - ".github/workflows/build-windows.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/app/**"
+      - "packages/core/**"
+      - "package.json"
+      - "package-lock.json"
+      - "diaspro-installer.json"
+      - ".github/workflows/build-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Viboard
+        uses: actions/checkout@v4
+
+      - name: Checkout Diaspro Installer
+        uses: actions/checkout@v4
+        with:
+          repository: maryvellous/diaspro-installer
+          path: .diaspro-installer
+
+      - name: Read version
+        id: meta
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/app/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native app icons
+        run: npm run icons -w @desk/app
+
+      - name: Build raw Windows executable
+        working-directory: packages/app
+        run: npx tauri build --no-bundle
+
+      - name: Prepare Diaspro Installer payload
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force ".release-payload" | Out-Null
+          $exe = Get-ChildItem "packages\app\src-tauri\target\release" -Filter "*.exe" -File | Sort-Object Length -Descending | Select-Object -First 1
+          if (-not $exe) { throw "Eseguibile Viboard raw non trovato." }
+          Copy-Item $exe.FullName ".release-payload\Diaspro Viboard.exe"
+          Get-Item ".release-payload\Diaspro Viboard.exe" | Format-List Name,Length,FullName
+
+      - name: Install Inno Setup 7
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP "innosetup-7.1.0-x64.exe"
+          Invoke-WebRequest "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe" -OutFile $installer
+          $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash.ToLowerInvariant()
+          $expectedHash = "0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f"
+          if ($actualHash -ne $expectedHash) { throw "Inno Setup SHA256 mismatch: $actualHash" }
+          $process = Start-Process -FilePath $installer -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Inno Setup installer exited with code $($process.ExitCode)" }
+
+      - name: Build Diaspro installer
+        shell: pwsh
+        run: .\.diaspro-installer\build.ps1 -ConfigPath ".\diaspro-installer.json" -Version "${{ steps.meta.outputs.version }}"
+
+      - name: Verify generated installer
+        shell: pwsh
+        run: |
+          $setup = Get-Item ".\dist-installer\Diaspro-Viboard-${{ steps.meta.outputs.version }}-Setup.exe"
+          if ($setup.Length -lt 100000) { throw "Installer troppo piccolo: $($setup.Length) byte" }
+          Write-Host "Diaspro Viboard installer: $($setup.FullName) - $($setup.Length) byte"
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: diaspro-viboard-windows
+          path: dist-installer/Diaspro-Viboard-${{ steps.meta.outputs.version }}-Setup.exe
+          if-no-files-found: error
