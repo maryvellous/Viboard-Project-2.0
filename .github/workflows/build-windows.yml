@@ -10,6 +10,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - "diaspro-installer.json"
+      - ".diaspro-installer/**"
       - ".github/workflows/build-windows.yml"
   pull_request:
     branches: [main]
