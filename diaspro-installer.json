@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "Diaspro Viboard",
+    "version": "1.0.4",
+    "publisher": "Diaspro",
+    "publisherUrl": "https://studiodiaspro.com",
+    "appId": "it.diaspro.viboard",
+    "description": "Campaign manager desktop local-first",
+    "sourceDir": ".release-payload",
+    "executable": "Diaspro Viboard.exe",
+    "icon": "packages/app/src-tauri/icons/icon.ico"
+  },
+  "installer": {
+    "architecture": "x64",
+    "installScope": "currentUser",
+    "allowScopeChoice": false,
+    "desktopShortcut": true,
+    "startMenuShortcut": true,
+    "launchAfterInstall": true,
+    "outputDir": "dist-installer",
+    "outputName": "Diaspro-Viboard-{version}-Setup"
+  }
+}
