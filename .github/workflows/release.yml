@@ -13,7 +13,14 @@ jobs:
     runs-on: windows-2022
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Viboard
+        uses: actions/checkout@v4
+
+      - name: Checkout Diaspro Installer
+        uses: actions/checkout@v4
+        with:
+          repository: maryvellous/diaspro-installer
+          path: .diaspro-installer
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,6 +47,7 @@ jobs:
         run: npm audit --omit=dev || true
 
       - name: Verify release version matches tag
+        id: meta
         shell: bash
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
@@ -57,17 +65,48 @@ jobs:
             exit 1
           fi
 
-      - name: Build and publish Windows release
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: packages/app
-          tagName: ${{ github.ref_name }}
-          releaseName: "Diaspro Viboard ${{ github.ref_name }}"
-          releaseBody: |
-            Diaspro Viboard for Windows x64.
+          echo "version=$TAG" >> "$GITHUB_OUTPUT"
 
-            See README.md and RELEASE_CHECKLIST.md for supported platforms and release notes.
-          releaseDraft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+      - name: Build raw Windows executable
+        working-directory: packages/app
+        run: npx tauri build --no-bundle
+
+      - name: Prepare Diaspro Installer payload
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force ".release-payload" | Out-Null
+          $exe = Get-ChildItem "packages\app\src-tauri\target\release" -Filter "*.exe" -File | Sort-Object Length -Descending | Select-Object -First 1
+          if (-not $exe) { throw "Eseguibile Viboard raw non trovato." }
+          Copy-Item $exe.FullName ".release-payload\Diaspro Viboard.exe"
+
+      - name: Install Inno Setup 7
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP "innosetup-7.1.0-x64.exe"
+          Invoke-WebRequest "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe" -OutFile $installer
+          $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash.ToLowerInvariant()
+          $expectedHash = "0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f"
+          if ($actualHash -ne $expectedHash) { throw "Inno Setup SHA256 mismatch: $actualHash" }
+          $process = Start-Process -FilePath $installer -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Inno Setup installer exited with code $($process.ExitCode)" }
+
+      - name: Build Diaspro installer
+        shell: pwsh
+        run: .\.diaspro-installer\build.ps1 -ConfigPath ".\diaspro-installer.json" -Version "${{ steps.meta.outputs.version }}"
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ steps.meta.outputs.version }}"
+          $tag = "${{ github.ref_name }}"
+          $asset = Get-Item ".\dist-installer\Diaspro-Viboard-$version-Setup.exe"
+          $notes = "Diaspro Viboard for Windows x64.`n`nInstaller generato con Diaspro Installer."
+
+          $null = gh release view $tag 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $asset.FullName --clobber
+          } else {
+            gh release create $tag $asset.FullName --title "Diaspro Viboard $tag" --notes $notes
+          }
