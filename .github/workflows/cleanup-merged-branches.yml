@@ -48,6 +48,28 @@ jobs:
                 throw e;
               }
             }
+            const tagged = [
+              {branch:'publish-v1.0.0',tag:'v1.0.0'},
+              {branch:'publish-v1.0.1',tag:'v1.0.1'},
+              {branch:'publish-v1.0.2',tag:'v1.0.2'}
+            ];
+            for (const {branch,tag} of tagged) {
+              try {
+                const b=(await github.rest.repos.getBranch({owner,repo,branch})).data;
+                if (b.protected) { skipped.push(branch+': protected'); continue; }
+                const tagRef=(await github.rest.git.getRef({owner,repo,ref:'tags/'+tag})).data;
+                if (tagRef.object.type!=='commit' || tagRef.object.sha!==b.commit.sha) {
+                  skipped.push(branch+': tip not identical to release tag'); continue;
+                }
+                const open=await github.rest.pulls.list({owner,repo,state:'open',head:owner+':'+branch});
+                if (open.data.length) { skipped.push(branch+': open PR'); continue; }
+                await github.rest.git.deleteRef({owner,repo,ref:'heads/'+branch});
+                deleted.push(branch+' (tag '+tag+' preserved)');
+              } catch (e) {
+                if (e.status===404) { skipped.push(branch+': branch or tag missing'); continue; }
+                throw e;
+              }
+            }
             await core.summary.addHeading('Merged-PR branch cleanup')
               .addRaw('Deleted: ' + (deleted.join(', ') || 'none') + '\n\n')
               .addRaw('Skipped: ' + (skipped.join(', ') || 'none') + '\n')
