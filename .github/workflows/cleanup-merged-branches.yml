@@ -1,4 +1,4 @@
-name: Cleanup merged branches
+name: Cleanup already-merged PR branches
 
 on:
   workflow_dispatch:
@@ -14,39 +14,42 @@ permissions:
 jobs:
   prune:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Delete only verified merged branches
+      - name: Prune only merged PR branches with unchanged original heads
         uses: actions/github-script@v7
         with:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const candidates = ["Diaspro-Viboard","background-standby","diaspro-rebrand-checkpoint","public-release-readiness","readme-banner-refresh","release","release-audit-fix","release-security-refresh","release-v1.0.0","release-v1.0.2","sidebar-brand-icon-fix","viboard-brand-icons","windows-release-0.10.1","windows-ux-cleanup"];
+            const candidates = [{"branch":"fix/startup-performance-1.0.4","pr":16},{"branch":"release-v1.0.3","pr":15},{"branch":"ui/diaspro-fonts-project-cards","pr":14}];
             const deleted = [];
             const skipped = [];
-            const meta = (await github.rest.repos.get({owner,repo})).data;
-            if (meta.default_branch !== 'main' || meta.archived) {
-              core.setFailed('Unexpected default branch or archived repository');
+            const metadata = (await github.rest.repos.get({owner,repo})).data;
+            if (metadata.default_branch !== 'main' || metadata.archived) {
+              core.setFailed('Wrong default branch or archived repository');
               return;
             }
-            for (const branch of candidates) {
+            for (const {branch,pr} of candidates) {
               try {
                 const b = (await github.rest.repos.getBranch({owner,repo,branch})).data;
                 if (b.protected) { skipped.push(branch + ': protected'); continue; }
-                const comparison = (await github.rest.repos.compareCommits({owner,repo,base:'main',head:branch})).data;
-                if (comparison.ahead_by !== 0) { skipped.push(branch + ': ' + comparison.ahead_by + ' unmerged commits'); continue; }
-                const pr = await github.rest.pulls.list({owner,repo,state:'open',head:owner + ':' + branch,per_page:100});
-                if (pr.data.length) { skipped.push(branch + ': open PR'); continue; }
+                const p = (await github.rest.pulls.get({owner,repo,pull_number:pr})).data;
+                if (!p.merged_at || p.base.ref !== 'main' || p.head.ref !== branch || p.head.sha !== b.commit.sha) {
+                  skipped.push(branch + ': PR not merged to main or branch changed since merge');
+                  continue;
+                }
+                const open = await github.rest.pulls.list({owner,repo,state:'open',head:owner + ':' + branch});
+                if (open.data.length) { skipped.push(branch + ': has open PR'); continue; }
                 await github.rest.git.deleteRef({owner,repo,ref:'heads/' + branch});
                 deleted.push(branch);
-              } catch (error) {
-                if (error.status === 404) { skipped.push(branch + ': not found'); continue; }
-                throw error;
+              } catch (e) {
+                if (e.status === 404) { skipped.push(branch + ': not found'); continue; }
+                throw e;
               }
             }
-            await core.summary.addHeading('Conservative branch cleanup')
-              .addRaw('Deleted fully merged branches: ' + (deleted.join(', ') || 'none') + '\n\n')
+            await core.summary.addHeading('Merged-PR branch cleanup')
+              .addRaw('Deleted: ' + (deleted.join(', ') || 'none') + '\n\n')
               .addRaw('Skipped: ' + (skipped.join(', ') || 'none') + '\n')
               .write();
             core.info(JSON.stringify({deleted,skipped}));
