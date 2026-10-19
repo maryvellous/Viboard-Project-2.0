@@ -1,0 +1,52 @@
+name: Cleanup merged branches
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cleanup-merged-branches.yml
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Delete only verified merged branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const candidates = ["Diaspro-Viboard","background-standby","diaspro-rebrand-checkpoint","public-release-readiness","readme-banner-refresh","release","release-audit-fix","release-security-refresh","release-v1.0.0","release-v1.0.2","sidebar-brand-icon-fix","viboard-brand-icons","windows-release-0.10.1","windows-ux-cleanup"];
+            const deleted = [];
+            const skipped = [];
+            const meta = (await github.rest.repos.get({owner,repo})).data;
+            if (meta.default_branch !== 'main' || meta.archived) {
+              core.setFailed('Unexpected default branch or archived repository');
+              return;
+            }
+            for (const branch of candidates) {
+              try {
+                const b = (await github.rest.repos.getBranch({owner,repo,branch})).data;
+                if (b.protected) { skipped.push(branch + ': protected'); continue; }
+                const comparison = (await github.rest.repos.compareCommits({owner,repo,base:'main',head:branch})).data;
+                if (comparison.ahead_by !== 0) { skipped.push(branch + ': ' + comparison.ahead_by + ' unmerged commits'); continue; }
+                const pr = await github.rest.pulls.list({owner,repo,state:'open',head:owner + ':' + branch,per_page:100});
+                if (pr.data.length) { skipped.push(branch + ': open PR'); continue; }
+                await github.rest.git.deleteRef({owner,repo,ref:'heads/' + branch});
+                deleted.push(branch);
+              } catch (error) {
+                if (error.status === 404) { skipped.push(branch + ': not found'); continue; }
+                throw error;
+              }
+            }
+            await core.summary.addHeading('Conservative branch cleanup')
+              .addRaw('Deleted fully merged branches: ' + (deleted.join(', ') || 'none') + '\n\n')
+              .addRaw('Skipped: ' + (skipped.join(', ') || 'none') + '\n')
+              .write();
+            core.info(JSON.stringify({deleted,skipped}));
